@@ -429,12 +429,12 @@ public class ModLoaderModContainer implements ModContainer
 
             if ("required-before".equals(depparts[0]) || "before".equals(depparts[0]))
             {
-                preDependencies.add(depparts[1]);
+            	postDependencies.add(depparts[1]);
             }
 
             if ("required-after".equals(depparts[0]) || "after".equals(depparts[0]))
             {
-                postDependencies.add(depparts[1]);
+                preDependencies.add(depparts[1]);
             }
         }
     }
@@ -458,7 +458,7 @@ public class ModLoaderModContainer implements ModContainer
             computeDependencies();
         }
 
-        return preDependencies;
+        return postDependencies;
     }
 
     @Override
@@ -469,7 +469,7 @@ public class ModLoaderModContainer implements ModContainer
             computeDependencies();
         }
 
-        return postDependencies;
+        return preDependencies;
     }
 
     public String toString()
