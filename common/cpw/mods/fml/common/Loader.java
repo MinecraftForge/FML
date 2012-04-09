@@ -58,7 +58,7 @@ import cpw.mods.fml.common.toposort.TopologicalSort;
  */
 public class Loader
 {
-    private static Pattern zipJar = Pattern.compile(".+.(zip|jar)$");
+    private static Pattern zipJar = Pattern.compile("(.+).(zip|jar)$");
     private static Pattern modClass = Pattern.compile("(.+/|)(mod\\_[^\\s$]+).class$");
 
     /**
