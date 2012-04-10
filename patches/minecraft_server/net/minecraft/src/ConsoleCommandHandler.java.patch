@@ -9,14 +9,16 @@
  import net.minecraft.server.MinecraftServer;
  
  public class ConsoleCommandHandler
-@@ -397,6 +399,10 @@
-                                 var6.func_2_b("Ban list:" + this.func_40648_a(this.field_22116_b.func_40025_r(), ", "));
-                             }
-                         }
-+                        else if (FMLServerHandler.instance().handleServerCommand(var2, var6.func_1_c(), var6))
-+                        {
-+                            
-+                        }
-                         else
-                         {
-                             field_22117_a.info("Unknown console command. Type \"help\" for help.");
+@@ -41,7 +43,11 @@
+                 int var9;
+                 WorldServer var10;
+ 
+-                if (var4.equalsIgnoreCase("save-all"))
++                if (FMLServerHandler.instance().handleServerCommand(var2, var6.getUsername(), var6))
++                {
++                    //We handled it
++                }
++                else if (var4.equalsIgnoreCase("save-all"))
+                 {
+                     this.func_22115_a(var7, "Forcing save..");
+ 
