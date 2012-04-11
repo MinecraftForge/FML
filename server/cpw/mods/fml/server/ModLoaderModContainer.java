@@ -474,7 +474,7 @@ public class ModLoaderModContainer implements ModContainer
 
     public String toString()
     {
-        return modSource;
+       	return getName();
     }
 
     @Override
