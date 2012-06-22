@@ -488,23 +488,28 @@ public class ModLoaderModContainer implements ModContainer
             {
                 parseFailure=true;
             }
-            else if ("required-before".equals(depparts[0]) || "required-after".equals(depparts[0]))
-            {
-                if (!depparts[1].trim().equals("*")) {
-                    dependencies.add(depparts[1]);
+            else
+            { //Don't merge this, I did it with the github edit
+                if ("required-before".equals(depparts[0]) || "required-after".equals(depparts[0]))
+                {
+                    if (!depparts[1].trim().equals("*")) {
+                        dependencies.add(depparts[1]);
+                    } else {
+                        parseFailure=true;
+                    }
+                }
+                
+                if ("required-before".equals(depparts[0]) || "before".equals(depparts[0]))
+                {
+                    postDependencies.add(depparts[1]);
+                } else if ("required-after".equals(depparts[0]) || "after".equals(depparts[0]))
+                {
+                    preDependencies.add(depparts[1]);
                 } else {
                     parseFailure=true;
-                }
+                }  
             }
-            else if ("required-before".equals(depparts[0]) || "before".equals(depparts[0]))
-            {
-            	postDependencies.add(depparts[1]);
-            } else if ("required-after".equals(depparts[0]) || "after".equals(depparts[0]))
-            {
-                preDependencies.add(depparts[1]);
-            } else {
-                parseFailure=true;
-            }
+           
         }
         
         if (parseFailure) {
