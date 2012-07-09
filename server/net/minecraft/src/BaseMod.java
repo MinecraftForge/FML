@@ -297,7 +297,7 @@ public abstract class BaseMod implements cpw.mods.fml.common.modloader.BaseMod
 
     }
 
-    public boolean renderWorldBlock(Object renderer, IBlockAccess world, int x, int y, int z, Block block, int modelID)
+    public boolean renderWorldBlock(RenderBlocks renderer, IBlockAccess world, int x, int y, int z, Block block, int modelID)
     {
         return false;
 
