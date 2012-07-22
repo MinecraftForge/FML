@@ -59,7 +59,7 @@ public class FMLCommonHandler
      * The singleton
      */
     private static final FMLCommonHandler INSTANCE = new FMLCommonHandler();
-    private static final Pattern metadataFile = Pattern.compile("$/modinfo.json$");;
+    private static final Pattern metadataFile = Pattern.compile("$/modinfo.json$");
     /**
      * A map of mods to their network channels
      */
