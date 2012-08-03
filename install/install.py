@@ -9,7 +9,7 @@ def main():
     print '================ Forge ModLoader Setup Start ==================='
     setup_mcp(fml_dir, mcp_dir)
     setup_fml(fml_dir, mcp_dir)
-    apply_fml_patches(fml_dir, mcp_sir, os.path.join(mcp_dir, 'src'))
+    apply_fml_patches(fml_dir, mcp_dir, os.path.join(mcp_dir, 'src'))
     finish_setup_fml(fml_dir, mcp_dir)
     print '================  Forge ModLoader Setup End  ==================='
     
