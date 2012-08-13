@@ -135,11 +135,11 @@ public class NetworkRegistry
 
     void playerLoggedIn(EntityPlayerMP player, NetServerHandler netHandler, NetworkManager manager)
     {
+        generateChannelRegistration(player, netHandler, manager);
         for (IConnectionHandler handler : connectionHandlers)
         {
             handler.playerLoggedIn((Player)player, netHandler, manager);
         }
-        generateChannelRegistration(player, netHandler, manager);
     }
 
     String connectionReceived(NetLoginHandler netHandler, NetworkManager manager)
