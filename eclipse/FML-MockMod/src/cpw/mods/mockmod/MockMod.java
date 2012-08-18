@@ -29,12 +29,13 @@ public class MockMod
         {
         }
     }
-    public class TestItem extends ItemBlock
+    public static class TestItem extends ItemBlock
     {
 
         public TestItem(int id)
         {
             super(id);
+            System.out.printf("Mockmod testitem is id %d\n", id);
         }
 
     }
