@@ -23,7 +23,7 @@ public class MetadataCollection
         {
             return new MetadataCollection();
         }
-        
+
         InputStreamReader reader = new InputStreamReader(inputStream);
         try
         {

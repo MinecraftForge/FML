@@ -50,14 +50,14 @@ public class FMLSanityChecker implements IFMLCallHook
         if (!mlTester.foundMarker)
         {
             JOptionPane.showMessageDialog(null, "<html>CRITICAL ERROR<br/>" +
-            		"ModLoader was detected in this environment<br/>" +
-                        "ForgeModLoader cannot be installed alongside ModLoader<br/>" +
-                        "All mods should work without ModLoader being installed<br/>" +
-                        "Because ForgeModLoader is 100% compatible with ModLoader<br/>" +
-                        "Re-install Minecraft Forge or Forge ModLoader into a clean<br/>" +
-                        "jar and try again.",
-                        "ForgeModLoader critical error",
-                        JOptionPane.ERROR_MESSAGE);
+                                          "ModLoader was detected in this environment<br/>" +
+                                          "ForgeModLoader cannot be installed alongside ModLoader<br/>" +
+                                          "All mods should work without ModLoader being installed<br/>" +
+                                          "Because ForgeModLoader is 100% compatible with ModLoader<br/>" +
+                                          "Re-install Minecraft Forge or Forge ModLoader into a clean<br/>" +
+                                          "jar and try again.",
+                                          "ForgeModLoader critical error",
+                                          JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException("Invalid ModLoader class detected");
         }
         return null;

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import cpw.mods.fml.common.Side;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
+@Target( {ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
 public @interface SideOnly
 {
     public Side value();

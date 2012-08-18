@@ -14,7 +14,8 @@
 
 package cpw.mods.fml.common;
 
-public enum Side {
+public enum Side
+{
     CLIENT, SERVER, BUKKIT;
 
     /**

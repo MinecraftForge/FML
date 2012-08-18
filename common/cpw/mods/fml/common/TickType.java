@@ -16,7 +16,8 @@ package cpw.mods.fml.common;
 
 import java.util.EnumSet;
 
-public enum TickType {
+public enum TickType
+{
     /**
      * Fired during the world evaluation loop
      * server and client side

@@ -314,53 +314,54 @@ public class ModLoader
      */
     public static void genericContainerRemoval(World world, int x, int y, int z)
     {
-/*        TileEntity te = world.func_603_b(x, y, z);
+        /*        TileEntity te = world.func_603_b(x, y, z);
 
-        if (!(te instanceof IInventory))
-        {
-            return;
-        }
-
-        IInventory inv = (IInventory)te;
-
-        for (int l = 0; l < inv.func_469_c(); l++)
-        {
-            ItemStack itemstack = inv.func_468_c(l);
-
-            if (itemstack == null)
-            {
-                continue;
-            }
-
-            float f = world.field_1037_n.nextFloat() * 0.8F + 0.1F;
-            float f1 = world.field_1037_n.nextFloat() * 0.8F + 0.1F;
-            float f2 = world.field_1037_n.nextFloat() * 0.8F + 0.1F;
-
-            while (itemstack.field_1615_a > 0)
-            {
-                int i1 = world.field_1037_n.nextInt(21) + 10;
-
-                if (i1 > itemstack.field_1615_a)
+                if (!(te instanceof IInventory))
                 {
-                    i1 = itemstack.field_1615_a;
+                    return;
                 }
 
-                itemstack.field_1615_a -= i1;
-                EntityItem entityitem = new EntityItem(world, (float)te.field_823_f + f, (float)te.field_822_g + f1, (float)te.field_821_h + f2, new ItemStack(itemstack.field_1617_c, i1, itemstack.func_21181_i()));
-                float f3 = 0.05F;
-                entityitem.field_608_an = (float) world.field_1037_n.nextGaussian() * f3;
-                entityitem.field_607_ao = (float) world.field_1037_n.nextGaussian() * f3 + 0.2F;
-                entityitem.field_606_ap = (float) world.field_1037_n.nextGaussian() * f3;
+                IInventory inv = (IInventory)te;
 
-                if (itemstack.func_40710_n())
+                for (int l = 0; l < inv.func_469_c(); l++)
                 {
-                    entityitem.field_801_a.func_40706_d((NBTTagCompound) itemstack.func_40709_o().func_40195_b());
-                }
+                    ItemStack itemstack = inv.func_468_c(l);
 
-                world.func_674_a(entityitem);
-            }
-        }
-*/    }
+                    if (itemstack == null)
+                    {
+                        continue;
+                    }
+
+                    float f = world.field_1037_n.nextFloat() * 0.8F + 0.1F;
+                    float f1 = world.field_1037_n.nextFloat() * 0.8F + 0.1F;
+                    float f2 = world.field_1037_n.nextFloat() * 0.8F + 0.1F;
+
+                    while (itemstack.field_1615_a > 0)
+                    {
+                        int i1 = world.field_1037_n.nextInt(21) + 10;
+
+                        if (i1 > itemstack.field_1615_a)
+                        {
+                            i1 = itemstack.field_1615_a;
+                        }
+
+                        itemstack.field_1615_a -= i1;
+                        EntityItem entityitem = new EntityItem(world, (float)te.field_823_f + f, (float)te.field_822_g + f1, (float)te.field_821_h + f2, new ItemStack(itemstack.field_1617_c, i1, itemstack.func_21181_i()));
+                        float f3 = 0.05F;
+                        entityitem.field_608_an = (float) world.field_1037_n.nextGaussian() * f3;
+                        entityitem.field_607_ao = (float) world.field_1037_n.nextGaussian() * f3 + 0.2F;
+                        entityitem.field_606_ap = (float) world.field_1037_n.nextGaussian() * f3;
+
+                        if (itemstack.func_40710_n())
+                        {
+                            entityitem.field_801_a.func_40706_d((NBTTagCompound) itemstack.func_40709_o().func_40195_b());
+                        }
+
+                        world.func_674_a(entityitem);
+                    }
+                }
+        */
+    }
 
     /**
      * Get a list of all BaseMod loaded into the system
@@ -725,7 +726,8 @@ public class ModLoader
      *
      * @param packet
      */
-    public static void sendPacket(Packet packet) {
+    public static void sendPacket(Packet packet)
+    {
         PacketDispatcher.sendPacketToServer(packet);
     }
     /**

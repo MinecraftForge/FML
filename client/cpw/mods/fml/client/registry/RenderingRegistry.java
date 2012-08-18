@@ -153,7 +153,10 @@ public class RenderingRegistry
      */
     public boolean renderWorldBlock(RenderBlocks renderer, IBlockAccess world, int x, int y, int z, Block block, int modelId)
     {
-        if (!blockRenderers.containsKey(modelId)) { return false; }
+        if (!blockRenderers.containsKey(modelId))
+        {
+            return false;
+        }
         ISimpleBlockRenderingHandler bri = blockRenderers.get(modelId);
         return bri.renderWorldBlock(world, x, y, z, block, modelId, renderer);
     }
@@ -166,7 +169,10 @@ public class RenderingRegistry
      */
     public void renderInventoryBlock(RenderBlocks renderer, Block block, int metadata, int modelID)
     {
-        if (!blockRenderers.containsKey(modelID)) { return; }
+        if (!blockRenderers.containsKey(modelID))
+        {
+            return;
+        }
         ISimpleBlockRenderingHandler bri = blockRenderers.get(modelID);
         bri.renderInventoryBlock(block, metadata, modelID, renderer);
     }

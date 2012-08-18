@@ -93,7 +93,8 @@ public class ModLoaderModContainer implements ModContainer
      * We only instantiate this for "not mod mods"
      * @param instance
      */
-    ModLoaderModContainer(BaseModProxy instance) {
+    ModLoaderModContainer(BaseModProxy instance)
+    {
         this.mod=instance;
         this.gameTickHandler = new BaseModTicker(instance, false);
         this.guiTickHandler = new BaseModTicker(instance, true);

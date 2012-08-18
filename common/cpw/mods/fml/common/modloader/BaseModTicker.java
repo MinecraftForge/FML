@@ -103,7 +103,8 @@ public class BaseModTicker implements ITickHandler
             {
                 keepTicking = mod.doTickInGame(type, end, tickData);
             }
-            if (!keepTicking) {
+            if (!keepTicking)
+            {
                 ticks.remove(type);
                 ticks.removeAll(type.partnerTicks());
             }

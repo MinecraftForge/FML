@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 
 /**
  * @author cpw
- * 
+ *
  */
 @Retention(value = RUNTIME)
 @Target(value = FIELD)
@@ -29,21 +29,21 @@ public @interface MLProp
     /**
      * Adds additional help to top of configuration file.
      */
-    String info() default "";
+String info() default "";
 
     /**
      * Maximum value allowed if field is a number.
      */
-    double max() default Double.MAX_VALUE;
+double max() default Double.MAX_VALUE;
 
     /**
      * Minimum value allowed if field is a number.
      */
-    double min() default Double.MIN_VALUE;
+double min() default Double.MIN_VALUE;
 
     /**
      * Overrides the field name for property key.
      */
-    String name() default "";
+String name() default "";
 
 }

@@ -58,7 +58,7 @@ public class SideTransformer implements IClassTransformer
         classNode.accept(writer);
         return writer.toByteArray();
     }
-    
+
     private boolean remove(List<AnnotationNode> anns, String side)
     {
         if (anns == null)

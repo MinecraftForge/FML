@@ -39,23 +39,23 @@ public @interface Mod
      * A user friendly name for the mod
      * @return
      */
-    String name() default "";
+String name() default "";
     /**
      * A version string for this mod
      * @return
      */
-    String version() default "";
+String version() default "";
     /**
      * A simple dependency string for this mod (see modloader's "priorities" string specification)
      * @return
      */
-    String dependencies() default "";
+String dependencies() default "";
     /**
      * Whether to use the mcmod.info metadata by default for this mod.
      * If true, settings in the mcmod.info file will override settings in these annotations.
      * @return
      */
-    boolean useMetadata() default false;
+boolean useMetadata() default false;
 
     /**
      * Mark the designated method as being called at the "pre-initialization" phase
@@ -112,12 +112,13 @@ public @interface Mod
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public @interface Instance {
+    public @interface Instance
+    {
         /**
          * The mod object to inject into this field
          * @return
          */
-        String value() default "";
+    String value() default "";
     }
     /**
      * Populate the annotated field with the mod's metadata.
@@ -126,12 +127,13 @@ public @interface Mod
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public @interface Metadata {
+    public @interface Metadata
+    {
         /**
          * The mod id specifying the metadata to load here
          * @return
          */
-        String value() default "";
+    String value() default "";
     }
     /**
      * Populate the annotated field with an instance of the Block as specified
@@ -140,7 +142,8 @@ public @interface Mod
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public @interface Block {
+    public @interface Block
+    {
         /**
          * The block's name
          * @return
@@ -150,7 +153,7 @@ public @interface Mod
          * The associated ItemBlock subtype for the item (can be null for an ItemBlock)
          * @return
          */
-        Class<?> itemTypeClass() default ItemBlock.class;
+    Class<?> itemTypeClass() default ItemBlock.class;
     }
     /**
      * Populate the annotated field with an Item
@@ -159,7 +162,8 @@ public @interface Mod
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public @interface Item {
+    public @interface Item
+    {
         /**
          * The name of the item
          * @return

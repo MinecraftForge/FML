@@ -14,7 +14,8 @@ public class ModContainerFactory
 {
     private static Pattern modClass = Pattern.compile(".*(\\.|)(mod\\_[^\\s$]+)$");
     private static ModContainerFactory INSTANCE = new ModContainerFactory();
-    public static ModContainerFactory instance() {
+    public static ModContainerFactory instance()
+    {
         return INSTANCE;
     }
     public ModContainer build(ASMModParser modParser, File modSource, ModCandidate container)
@@ -30,8 +31,8 @@ public class ModContainerFactory
         if (className.startsWith("net.minecraft.src.") && container.isClasspath())
         {
             FMLLog.severe("FML has detected a mod that is using a package name based on 'net.minecraft.src' : %s. This is generally a severe programming error. "
-                    + " There should be no mod code in the minecraft namespace. MOVE YOUR MOD! If you're in eclipse, select your source code and 'refactor' it into "
-                    + "a new package. Go on. DO IT NOW!",className);
+                          + " There should be no mod code in the minecraft namespace. MOVE YOUR MOD! If you're in eclipse, select your source code and 'refactor' it into "
+                          + "a new package. Go on. DO IT NOW!",className);
         }
 
         for (ModAnnotation ann : modParser.getAnnotations())

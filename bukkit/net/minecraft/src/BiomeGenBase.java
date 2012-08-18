@@ -1,5 +1,6 @@
 package net.minecraft.src;
 
-public interface BiomeGenBase {
+public interface BiomeGenBase
+{
 
 }

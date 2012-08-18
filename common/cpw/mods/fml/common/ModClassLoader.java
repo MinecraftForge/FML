@@ -37,14 +37,15 @@ public class ModClassLoader extends URLClassLoader
     private static final List<String> STANDARD_LIBRARIES = ImmutableList.of("jinput.jar", "lwjgl.jar", "lwjgl_util.jar");
     private RelaunchClassLoader mainClassLoader;
 
-    public ModClassLoader(ClassLoader parent) {
+    public ModClassLoader(ClassLoader parent)
+    {
         super(new URL[0], null);
         this.mainClassLoader = (RelaunchClassLoader)parent;
     }
 
     public void addFile(File modFile) throws MalformedURLException
     {
-            URL url = modFile.toURI().toURL();
+        URL url = modFile.toURI().toURL();
         mainClassLoader.addURL(url);
     }
 
@@ -54,7 +55,8 @@ public class ModClassLoader extends URLClassLoader
         return mainClassLoader.loadClass(name);
     }
 
-    public File[] getParentSources() {
+    public File[] getParentSources()
+    {
         List<URL> urls=mainClassLoader.getSources();
         File[] sources=new File[urls.size()];
         try

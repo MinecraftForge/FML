@@ -9,7 +9,7 @@ public class FMLLoadCompleteEvent extends FMLStateEvent
     {
         super(data);
     }
-    
+
     @Override
     public ModState getModState()
     {

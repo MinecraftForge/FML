@@ -24,7 +24,7 @@ public class BukkitRegistry implements IMinecraftRegistry
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void addRecipe(net.minecraft.src.IRecipe recipe)
     {
         CraftingManager.getInstance().getRecipies().add(recipe);
@@ -59,21 +59,21 @@ public class BukkitRegistry implements IMinecraftRegistry
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void registerEntityID(Class <? extends net.minecraft.src.Entity > entityClass, String entityName, int id)
     {
         EntityTypes.addNewEntityListMapping((Class<? extends Entity>) entityClass, entityName, id);
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void registerEntityID(Class <? extends net.minecraft.src.Entity > entityClass, String entityName, int id, int backgroundEggColour, int foregroundEggColour)
     {
         EntityTypes.addNewEntityListMapping((Class<? extends Entity>) entityClass, entityName, id, backgroundEggColour, foregroundEggColour);
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void registerTileEntity(Class <? extends net.minecraft.src.TileEntity > tileEntityClass, String id)
     {
         TileEntity.addNewTileEntityMapping((Class<? extends TileEntity>) tileEntityClass, id);
@@ -82,13 +82,13 @@ public class BukkitRegistry implements IMinecraftRegistry
     @Override
     public void addBiome(BiomeGenBase biome)
     {
-    	FMLBukkitHandler.instance().addBiomeToDefaultWorldGenerator((BiomeBase) biome);
+        FMLBukkitHandler.instance().addBiomeToDefaultWorldGenerator((BiomeBase) biome);
     }
 
     @Override
     public void addSpawn(Class <? extends net.minecraft.src.EntityLiving > entityClass, int weightedProb, int min, int max, net.minecraft.src.EnumCreatureType typeOfCreature, BiomeGenBase... biomes)
     {
-    	BiomeBase[] realBiomes=(BiomeBase[]) biomes;
+        BiomeBase[] realBiomes=(BiomeBase[]) biomes;
         for (BiomeBase biome : realBiomes)
         {
             @SuppressWarnings("unchecked")
@@ -125,13 +125,13 @@ public class BukkitRegistry implements IMinecraftRegistry
     @Override
     public void removeBiome(BiomeGenBase biome)
     {
-    	FMLBukkitHandler.instance().removeBiomeFromDefaultWorldGenerator((BiomeBase)biome);
+        FMLBukkitHandler.instance().removeBiomeFromDefaultWorldGenerator((BiomeBase)biome);
     }
 
     @Override
     public void removeSpawn(Class <? extends net.minecraft.src.EntityLiving > entityClass, net.minecraft.src.EnumCreatureType typeOfCreature, BiomeGenBase... biomesO)
     {
-    	BiomeBase[] biomes=(BiomeBase[]) biomesO;
+        BiomeBase[] biomes=(BiomeBase[]) biomesO;
         for (BiomeBase biome : biomes)
         {
             @SuppressWarnings("unchecked")
@@ -140,7 +140,7 @@ public class BukkitRegistry implements IMinecraftRegistry
             Iterator<BiomeMeta> entries = spawns.iterator();
             while (entries.hasNext())
             {
-            	BiomeMeta entry = entries.next();
+                BiomeMeta entry = entries.next();
                 if (entry.a == entityClass)
                 {
                     entries.remove();

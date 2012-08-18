@@ -14,24 +14,24 @@ public @interface NetworkMod
      *
      * @return
      */
-    boolean clientSideRequired() default false;
+boolean clientSideRequired() default false;
     /**
      * Does this mod require the server side to be present when installed on a client?
      * @return
      */
-    boolean serverSideRequired() default false;
+boolean serverSideRequired() default false;
     /**
      * A list of Packet250 network channels to register for this mod - these channels
      * will be universal and will require a universal packethandler to handle them
      *
      * @return
      */
-    String[] channels() default {};
+String[] channels() default {};
     /**
      * An optional range check for client to server communication version compatibility
      * @return
      */
-    String versionBounds() default "";
+String versionBounds() default "";
 
     /**
      * A packet handler implementation for channels registered through this annotation
@@ -40,26 +40,26 @@ public @interface NetworkMod
      *
      * @return
      */
-    Class<? extends IPacketHandler> packetHandler() default NULL.class;
+Class<? extends IPacketHandler> packetHandler() default NULL.class;
 
     /**
      * A connection handler implementation for this network mod
      *
      * @return
      */
-    Class<? extends IConnectionHandler> connectionHandler() default NULL.class;
+Class<? extends IConnectionHandler> connectionHandler() default NULL.class;
     /**
      * A packet handler and channels to register for the client side
      *
      * @return
      */
-    SidedPacketHandler clientPacketHandlerSpec() default @SidedPacketHandler(channels = {}, packetHandler = NULL.class );
+SidedPacketHandler clientPacketHandlerSpec() default @SidedPacketHandler(channels = {}, packetHandler = NULL.class );
 
     /**
      * A packet handler and channels to register for the server side
      * @return
      */
-    SidedPacketHandler serverPacketHandlerSpec() default @SidedPacketHandler(channels = {}, packetHandler = NULL.class );
+SidedPacketHandler serverPacketHandlerSpec() default @SidedPacketHandler(channels = {}, packetHandler = NULL.class );
 
     /**
      * Special dummy class for handling stupid annotation default values
@@ -85,7 +85,8 @@ public @interface NetworkMod
      * @author cpw
      *
      */
-    public @interface SidedPacketHandler {
+    public @interface SidedPacketHandler
+    {
         String[] channels();
         Class<? extends IPacketHandler> packetHandler();
     }

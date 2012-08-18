@@ -222,7 +222,8 @@ public class TextureFXManager
         info.index=anim.field_76850_b;
         info.imageIndex=anim.field_76847_f;
         info.textureFX=anim;
-        if (animationSet.contains(info)) {
+        if (animationSet.contains(info))
+        {
             animationSet.remove(info);
         }
         animationSet.add(info);
@@ -238,15 +239,19 @@ public class TextureFXManager
     }
 
 
-    public void registerTextureOverrides(RenderEngine renderer) {
-        for (OverrideInfo animationOverride : animationSet) {
+    public void registerTextureOverrides(RenderEngine renderer)
+    {
+        for (OverrideInfo animationOverride : animationSet)
+        {
             renderer.func_78355_a(animationOverride.textureFX);
             addedTextureFX.add(animationOverride.textureFX);
             FMLCommonHandler.instance().getFMLLogger().finer(String.format("Registered texture override %d (%d) on %s (%d)", animationOverride.index, animationOverride.textureFX.field_76850_b, animationOverride.textureFX.getClass().getSimpleName(), animationOverride.textureFX.field_76847_f));
         }
 
-        for (String fileToOverride : overrideInfo.keySet()) {
-            for (OverrideInfo override : overrideInfo.get(fileToOverride)) {
+        for (String fileToOverride : overrideInfo.keySet())
+        {
+            for (OverrideInfo override : overrideInfo.get(fileToOverride))
+            {
                 try
                 {
                     BufferedImage image=loadImageFromTexturePack(renderer, override.override);
@@ -275,10 +280,13 @@ public class TextureFXManager
      */
     public void onEarlyTexturePackLoad(TexturePackBase fallback)
     {
-        if (client==null) {
+        if (client==null)
+        {
             // We're far too early- let's wait
             this.earlyTexturePack = fallback;
-        } else {
+        }
+        else
+        {
             loadTextures(fallback);
         }
     }
@@ -304,7 +312,8 @@ public class TextureFXManager
             }
         }
     }
-    public void addNewTextureOverride(String textureToOverride, String overridingTexturePath, int location) {
+    public void addNewTextureOverride(String textureToOverride, String overridingTexturePath, int location)
+    {
         OverrideInfo info = new OverrideInfo();
         info.index = location;
         info.override = overridingTexturePath;
@@ -321,7 +330,8 @@ public class TextureFXManager
     public BufferedImage loadImageFromTexturePack(RenderEngine renderEngine, String path) throws IOException
     {
         InputStream image=client.field_71418_C.func_77292_e().func_77532_a(path);
-        if (image==null) {
+        if (image==null)
+        {
             throw new RuntimeException(String.format("The requested image path %s is not found",path));
         }
         BufferedImage result=ImageIO.read(image);

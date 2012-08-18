@@ -65,13 +65,13 @@ public class FMLModContainer implements ModContainer
     private boolean isNetworkMod;
 
     private static final BiMap<Class<? extends FMLStateEvent>, Class<? extends Annotation>> modAnnotationTypes = ImmutableBiMap.<Class<? extends FMLStateEvent>, Class<? extends Annotation>>builder()
-        .put(FMLPreInitializationEvent.class, Mod.PreInit.class)
-        .put(FMLInitializationEvent.class, Mod.Init.class)
-        .put(FMLPostInitializationEvent.class, Mod.PostInit.class)
-        .put(FMLServerStartingEvent.class, Mod.ServerStarting.class)
-        .put(FMLServerStartedEvent.class, Mod.ServerStarted.class)
-        .put(FMLServerStoppingEvent.class, Mod.ServerStopping.class)
-        .build();
+            .put(FMLPreInitializationEvent.class, Mod.PreInit.class)
+            .put(FMLInitializationEvent.class, Mod.Init.class)
+            .put(FMLPostInitializationEvent.class, Mod.PostInit.class)
+            .put(FMLServerStartingEvent.class, Mod.ServerStarting.class)
+            .put(FMLServerStartedEvent.class, Mod.ServerStarted.class)
+            .put(FMLServerStoppingEvent.class, Mod.ServerStopping.class)
+            .build();
     private static final BiMap<Class<? extends Annotation>, Class<? extends FMLStateEvent>> modTypeAnnotations = modAnnotationTypes.inverse();
     private String annotationDependencies;
 

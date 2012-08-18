@@ -145,7 +145,10 @@ public class AccessTransformer implements IClassTransformer
     @Override
     public byte[] transform(String name, byte[] bytes)
     {
-        if (!modifiers.containsKey(name)) { return bytes; }
+        if (!modifiers.containsKey(name))
+        {
+            return bytes;
+        }
 
         ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(bytes);

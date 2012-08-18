@@ -37,8 +37,14 @@ public class FMLTextureFX extends TextureFX implements ITextureFX
         super(icon);
     }
 
-    @Override public void setErrored(boolean err){ errored = err; }
-    @Override public boolean getErrored(){ return errored; }
+    @Override public void setErrored(boolean err)
+    {
+        errored = err;
+    }
+    @Override public boolean getErrored()
+    {
+        return errored;
+    }
     @Override
     public void onTexturePackChanged(RenderEngine engine, TexturePackBase texturepack, Dimension dimensions)
     {

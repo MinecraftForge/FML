@@ -179,9 +179,12 @@ public class FMLCommonHandler
     {
         if (forge==null && !noForge)
         {
-            try {
+            try
+            {
                 forge = Class.forName("net.minecraftforge.common.MinecraftForge");
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 noForge = true;
             }
         }
@@ -219,11 +222,14 @@ public class FMLCommonHandler
                 brd.add(forgeBranding);
             }
             brd.addAll(sidedDelegate.getAdditionalBrandingInformation());
-            try {
+            try
+            {
                 Properties props=new Properties();
                 props.load(getClass().getClassLoader().getResourceAsStream("fmlbranding.properties"));
                 brd.add(props.getProperty("fmlbranding"));
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 // Ignore - no branding file found
             }
             int tModCount = Loader.instance().getModList().size();
