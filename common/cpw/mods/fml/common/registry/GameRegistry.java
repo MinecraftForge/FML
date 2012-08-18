@@ -1,5 +1,7 @@
 package cpw.mods.fml.common.registry;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -18,9 +20,8 @@ import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldType;
 
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import cpw.mods.fml.common.FMLLog;
@@ -34,10 +35,25 @@ import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.Mod.Block;
 import cpw.mods.fml.common.ModContainer;
 
+@SuppressWarnings("serial")
+class InvalidBlockAnnotation extends RuntimeException
+{
+    InvalidBlockAnnotation(String modId, String typeName, Throwable e)
+    {
+        super("The mod " + modId + " has an invalid block annotation or uses an invalid block type (" + typeName + ").",
+            e);
+    }
+
+    public InvalidBlockAnnotation(String modId, String reason)
+    {
+        super("The mod " + modId + " has an invalid block annotation: " + reason);
+    }
+}
+
 public class GameRegistry
 {
-    private static Multimap<ModContainer, BlockProxy> blockRegistry = ArrayListMultimap.create();
-    private static Multimap<ModContainer, ItemProxy> itemRegistry = ArrayListMultimap.create();
+    // private static Multimap<ModContainer, BlockProxy> blockRegistry = ArrayListMultimap.create();
+    // private static Multimap<ModContainer, ItemProxy> itemRegistry = ArrayListMultimap.create();
     private static Set<IWorldGenerator> worldGenerators = Sets.newHashSet();
     private static List<IFuelHandler> fuelHandlers = Lists.newArrayList();
     private static List<ICraftingHandler> craftingHandlers = Lists.newArrayList();
@@ -113,18 +129,63 @@ public class GameRegistry
         }
         return -1;
     }
+
     /**
      * Internal method for creating an @Block instance
+     * 
      * @param container
      * @param type
      * @param annotation
      * @return
-     * @throws Exception
+     * @throws InvalidBlockAnnotation
      */
-    public static Object buildBlock(ModContainer container, Class<?> type, Block annotation) throws Exception
+    public static net.minecraft.src.Block buildBlock(ModContainer container, Class<?> type, Block annotation)
+            throws InvalidBlockAnnotation
     {
-        Object o = type.getConstructor(int.class).newInstance(findSpareBlockId());
-        registerBlock((net.minecraft.src.Block) o);
+        Class<? extends net.minecraft.src.Block> typeCast;
+        try
+        {
+            typeCast = type.asSubclass(net.minecraft.src.Block.class);
+        }
+        catch (ClassCastException e)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+
+        Class<? extends ItemBlock> itemTypeClass = annotation.itemTypeClass();
+        if (itemTypeClass == null)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), "The itemTypeClass parameter is null.");
+        }
+
+        net.minecraft.src.Block o;
+        try
+        {
+            o = typeCast.getConstructor(int.class).newInstance(findSpareBlockId());
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+        catch (InstantiationException e)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+        catch (InvocationTargetException e)
+        {
+            Throwables.propagateIfPossible(e.getTargetException());
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        registerBlock(o, itemTypeClass);
         return o;
     }
 
@@ -157,21 +218,36 @@ public class GameRegistry
     {
         if (Loader.instance().isInState(LoaderState.CONSTRUCTING))
         {
-            FMLLog.warning("The mod %s is attempting to register a block whilst it it being constructed. This is bad modding practice - please use a proper mod lifecycle event.", Loader.instance().activeModContainer());
+            FMLLog.warning(
+                    "The mod %s is attempting to register a block while it is being constructed. This is bad practice -- please use a proper lifecycle event.",
+                    Loader.instance().activeModContainer());
         }
         try
         {
             assert block != null : "registerBlock: block cannot be null";
             assert itemclass != null : "registerBlock: itemclass cannot be null";
             int blockItemId = block.field_71990_ca - 256;
-            itemclass.getConstructor(int.class).newInstance(blockItemId);
+            try
+            {
+                itemclass.getConstructor(int.class, block.getClass()).newInstance(blockItemId, block);
+            }
+            catch (NoSuchMethodException e)
+            {
+                itemclass.getConstructor(int.class).newInstance(blockItemId);
+            }
+        }
+        catch (InvocationTargetException e)
+        {
+            Throwables.propagateIfPossible(e);
+            throw new RuntimeException(e);
         }
         catch (Exception e)
         {
-            FMLLog.log(Level.SEVERE, e, "Caught an exception during block registration");
             throw new LoaderException(e);
         }
-        blockRegistry.put(Loader.instance().activeModContainer(), (BlockProxy) block);
+        // TODO
+        // blockRegistry.put(Loader.instance().activeModContainer(),
+        // (BlockProxy) block);
     }
 
     public static void addRecipe(ItemStack output, Object... params)

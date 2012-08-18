@@ -11,39 +11,42 @@ class BlockTracker
 
     private BlockTracker()
     {
-        allocatedBlocks = new BitSet(4096);
-        allocatedBlocks.set(0, 4096);
-        for (int i = 0; i < Block.field_71973_m.length; i++)
+        if (allocatedBlocks != null)
         {
-            if (Block.field_71973_m[i]!=null)
+            return;
+        }
+        
+        allocatedBlocks = new BitSet(4096);
+        allocatedBlocks.set(0);  // Never use ID 0.
+        Block[] blockList = Block.field_71973_m;
+        for (int i = 0; i < blockList.length; i++)
+        {
+            if (blockList[i] != null)
             {
-                allocatedBlocks.clear(i);
+                allocatedBlocks.set(i);
             }
         }
-    }
+    }    
+    
     public static int nextBlockId()
     {
-        return instance().getNextBlockId();
+        return INSTANCE.getNextBlockId();
     }
 
     private int getNextBlockId()
     {
-        int idx = allocatedBlocks.nextSetBit(0);
-        allocatedBlocks.clear(idx);
+        int idx = allocatedBlocks.nextClearBit(0);
+        allocatedBlocks.set(idx);
         return idx;
     }
-    private static BlockTracker instance()
-    {
-        return INSTANCE;
-    }
+
     public static void reserveBlockId(int id)
     {
-        instance().doReserveId(id);
+        INSTANCE.doReserveId(id);
     }
+
     private void doReserveId(int id)
     {
-        allocatedBlocks.clear(id);
+        allocatedBlocks.set(id);
     }
-
-
 }

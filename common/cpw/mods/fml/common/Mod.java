@@ -150,7 +150,7 @@ public @interface Mod
          * The associated ItemBlock subtype for the item (can be null for an ItemBlock)
          * @return
          */
-        Class<?> itemTypeClass() default ItemBlock.class;
+        Class<? extends ItemBlock> itemTypeClass() default ItemBlock.class;
     }
     /**
      * Populate the annotated field with an Item
