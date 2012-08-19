@@ -27,7 +27,8 @@ public class LanguageRegistry
     public void addStringLocalization(String key, String lang, String value)
     {
         Properties langPack=modLanguageData.get(lang);
-        if (langPack==null) {
+        if (langPack==null)
+        {
             langPack=new Properties();
             modLanguageData.put(lang, langPack);
         }
@@ -46,19 +47,26 @@ public class LanguageRegistry
     public void addNameForObject(Object objectToName, String lang, String name)
     {
         String objectName;
-        if (objectToName instanceof Item) {
+        if (objectToName instanceof Item)
+        {
             objectName=((Item)objectToName).func_77658_a();
-        } else if (objectToName instanceof Block) {
+        }
+        else if (objectToName instanceof Block)
+        {
             objectName=((Block)objectToName).func_71917_a();
-        } else if (objectToName instanceof ItemStack) {
+        }
+        else if (objectToName instanceof ItemStack)
+        {
             objectName=((ItemStack)objectToName).func_77973_b().func_77667_c((ItemStack)objectToName);
-        } else {
+        }
+        else
+        {
             throw new IllegalArgumentException(String.format("Illegal object for naming %s",objectToName));
         }
         objectName+=".name";
         addStringLocalization(objectName, lang, name);
     }
-    
+
     public static void addName(Object objectToName, String name)
     {
         instance().addNameForObject(objectToName, "en_US", name);
@@ -67,11 +75,13 @@ public class LanguageRegistry
     public void loadLanguageTable(Properties languagePack, String lang)
     {
         Properties usPack=modLanguageData.get("en_US");
-        if (usPack!=null) {
+        if (usPack!=null)
+        {
             languagePack.putAll(usPack);
         }
         Properties langPack=modLanguageData.get(lang);
-        if (langPack==null) {
+        if (langPack==null)
+        {
             return;
         }
         languagePack.putAll(langPack);

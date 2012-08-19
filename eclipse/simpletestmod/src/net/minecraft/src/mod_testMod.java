@@ -17,8 +17,9 @@ import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.common.registry.TickRegistry;
 import net.minecraft.client.Minecraft;
 
-@NetworkMod(channels={"mod_TestMod"},clientSideRequired=true,packetHandler=mod_testMod.PacketHandler.class)
-public class mod_testMod extends BaseMod {
+@NetworkMod(channels= {"mod_TestMod"},clientSideRequired=true,packetHandler=mod_testMod.PacketHandler.class)
+public class mod_testMod extends BaseMod
+{
     public static class PacketHandler implements IPacketHandler
     {
         @Override
@@ -29,12 +30,14 @@ public class mod_testMod extends BaseMod {
 
     private long ts;
     @Override
-    public String getVersion() {
+    public String getVersion()
+    {
         return "test";
     }
 
     @Override
-    public void load() {
+    public void load()
+    {
 //        if (1==1) throw new RuntimeException();
 //        ModLoader.setInGameHook(this, true, false);
 //        ModLoader.setInGUIHook(this, true, false);

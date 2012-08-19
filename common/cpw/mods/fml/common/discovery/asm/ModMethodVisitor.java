@@ -27,7 +27,7 @@ public class ModMethodVisitor extends MethodVisitor
     {
         labels.clear();
     }
-    
+
     @Override
     public void visitLdcInsn(Object cst)
     {
@@ -49,7 +49,7 @@ public class ModMethodVisitor extends MethodVisitor
     {
         labels.push(label);
     }
-    
+
     @Override
     public void visitEnd()
     {

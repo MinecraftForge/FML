@@ -14,7 +14,8 @@ import java.util.logging.Level;
 
 public class RelaunchClassLoader extends URLClassLoader
 {
-    private static String[] excludedPackages = {
+    private static String[] excludedPackages =
+    {
         "java.", "sun.", "javax.",
         "cpw.mods.fml.relauncher.", "net.minecraftforge.classloading."
     };

@@ -32,7 +32,8 @@ public abstract class BaseMod implements cpw.mods.fml.common.modloader.BaseModPr
         Minecraft mc = FMLClientHandler.instance().getClient();
         boolean hasWorld = mc.field_71441_e != null;
         // World and render ticks
-        if (tickEnd && ( tick==TickType.RENDER || tick==TickType.CLIENT ) && hasWorld) {
+        if (tickEnd && ( tick==TickType.RENDER || tick==TickType.CLIENT ) && hasWorld)
+        {
             return onTickInGame((Float) data[0], mc);
         }
         return true;
@@ -44,7 +45,8 @@ public abstract class BaseMod implements cpw.mods.fml.common.modloader.BaseModPr
 
         boolean hasWorld = mc.field_71441_e != null;
 
-        if (tickEnd && ( tick==TickType.RENDER || ( tick==TickType.CLIENT && hasWorld))) {
+        if (tickEnd && ( tick==TickType.RENDER || ( tick==TickType.CLIENT && hasWorld)))
+        {
             return onTickInGUI((Float) data[0], mc, mc.field_71462_r);
         }
         return true;
@@ -55,114 +57,114 @@ public abstract class BaseMod implements cpw.mods.fml.common.modloader.BaseModPr
      * @return
      *//*
 
-    *//**
-     * @param renderers
-     *//*
-    public final void onRenderHarvest(Map renderers)
+*//**
+ * @param renderers
+ *//*
+public final void onRenderHarvest(Map renderers)
+{
+    addRenderer((Map<Class<? extends Entity>,Render>)renderers);
+
+}
+
+*//**
+ *
+ *//*
+public final void onRegisterAnimations()
+{
+    registerAnimation(FMLClientHandler.instance().getClient());
+}
+
+@Override
+public final void onCrafting(Object... craftingParameters)
+{
+    takenFromCrafting((EntityPlayer)craftingParameters[0], (ItemStack)craftingParameters[1], (IInventory)craftingParameters[2]);
+}
+
+@Override
+public final void onSmelting(Object... smeltingParameters)
+{
+    takenFromFurnace((EntityPlayer)smeltingParameters[0], (ItemStack)smeltingParameters[1]);
+}
+
+@Override
+public final boolean dispense(double x, double y, double z, int xVelocity, int zVelocity, Object... data)
+{
+    return dispenseEntity((World)data[0], x, y, z, xVelocity, zVelocity, (ItemStack)data[1]);
+}
+
+@Override
+public final boolean onChat(Object... data)
+{
+    receiveChatPacket(((Packet3Chat)data[0]).field_73476_b);
+    return true;
+}
+
+
+@Override
+public final void onServerLogin(Object handler) {
+    serverConnect((NetClientHandler) handler);
+}
+
+public final void onServerLogout() {
+    serverDisconnect();
+}
+
+@Override
+public final void onPlayerLogin(Object player)
+{
+    onClientLogin((EntityPlayer) player);
+}
+
+@Override
+public final void onPlayerLogout(Object player)
+{
+    onClientLogout((EntityPlayer)player);
+}
+
+@Override
+public final void onPlayerChangedDimension(Object player)
+{
+    onClientDimensionChanged((EntityPlayer)player);
+}
+
+@Override
+public final void onPacket250Packet(Object... data)
+{
+    receiveCustomPacket((Packet250CustomPayload)data[0]);
+}
+
+@Override
+public final void notifyPickup(Object... pickupData)
+{
+    EntityItem item = (EntityItem) pickupData[0];
+    EntityPlayer player = (EntityPlayer) pickupData[1];
+    onItemPickup(player, item.field_70294_a);
+}
+
+@Override
+public final void generate(Random random, int chunkX, int chunkZ, Object... additionalData)
+{
+    World w = (World) additionalData[0];
+    IChunkProvider cp = (IChunkProvider) additionalData[1];
+
+    if (cp instanceof ChunkProviderGenerate)
     {
-        addRenderer((Map<Class<? extends Entity>,Render>)renderers);
-
+        generateSurface(w, random, chunkX << 4, chunkZ << 4);
     }
-
-    *//**
-     *
-     *//*
-    public final void onRegisterAnimations()
+    else if (cp instanceof ChunkProviderHell)
     {
-        registerAnimation(FMLClientHandler.instance().getClient());
+        generateNether(w, random, chunkX << 4, chunkZ << 4);
     }
+}
 
-    @Override
-    public final void onCrafting(Object... craftingParameters)
-    {
-        takenFromCrafting((EntityPlayer)craftingParameters[0], (ItemStack)craftingParameters[1], (IInventory)craftingParameters[2]);
-    }
-
-    @Override
-    public final void onSmelting(Object... smeltingParameters)
-    {
-        takenFromFurnace((EntityPlayer)smeltingParameters[0], (ItemStack)smeltingParameters[1]);
-    }
-
-    @Override
-    public final boolean dispense(double x, double y, double z, int xVelocity, int zVelocity, Object... data)
-    {
-        return dispenseEntity((World)data[0], x, y, z, xVelocity, zVelocity, (ItemStack)data[1]);
-    }
-
-    @Override
-    public final boolean onChat(Object... data)
-    {
-        receiveChatPacket(((Packet3Chat)data[0]).field_73476_b);
-        return true;
-    }
-
-
-    @Override
-    public final void onServerLogin(Object handler) {
-        serverConnect((NetClientHandler) handler);
-    }
-
-    public final void onServerLogout() {
-        serverDisconnect();
-    }
-
-    @Override
-    public final void onPlayerLogin(Object player)
-    {
-        onClientLogin((EntityPlayer) player);
-    }
-
-    @Override
-    public final void onPlayerLogout(Object player)
-    {
-        onClientLogout((EntityPlayer)player);
-    }
-
-    @Override
-    public final void onPlayerChangedDimension(Object player)
-    {
-        onClientDimensionChanged((EntityPlayer)player);
-    }
-
-    @Override
-    public final void onPacket250Packet(Object... data)
-    {
-        receiveCustomPacket((Packet250CustomPayload)data[0]);
-    }
-
-    @Override
-    public final void notifyPickup(Object... pickupData)
-    {
-        EntityItem item = (EntityItem) pickupData[0];
-        EntityPlayer player = (EntityPlayer) pickupData[1];
-        onItemPickup(player, item.field_70294_a);
-    }
-
-    @Override
-    public final void generate(Random random, int chunkX, int chunkZ, Object... additionalData)
-    {
-        World w = (World) additionalData[0];
-        IChunkProvider cp = (IChunkProvider) additionalData[1];
-
-        if (cp instanceof ChunkProviderGenerate)
-        {
-            generateSurface(w, random, chunkX << 4, chunkZ << 4);
-        }
-        else if (cp instanceof ChunkProviderHell)
-        {
-            generateNether(w, random, chunkX << 4, chunkZ << 4);
-        }
-    }
-
-    *//**
-     * NO-OP on client side
-     *//*
-    @Override
-    public final boolean handleCommand(String command, Object... data)
-    {
-        return false;
-    }
+*//**
+ * NO-OP on client side
+ *//*
+@Override
+public final boolean handleCommand(String command, Object... data)
+{
+    return false;
+}
 
 */    // BASEMOD API
     /**
@@ -347,12 +349,14 @@ public abstract class BaseMod implements cpw.mods.fml.common.modloader.BaseModPr
     }
 
     @Override
-    public void serverConnect(NetHandler handler) {
+    public void serverConnect(NetHandler handler)
+    {
 
     }
 
     @Override
-    public void serverDisconnect() {
+    public void serverDisconnect()
+    {
 
     }
     /**

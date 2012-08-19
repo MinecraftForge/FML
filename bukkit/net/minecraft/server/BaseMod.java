@@ -30,9 +30,12 @@ public abstract class BaseMod implements cpw.mods.fml.common.modloader.BaseMod
      */
     public final boolean doTickInGame(TickType tick, boolean tickEnd, Object minecraftInstance, Object... data)
     {
-        if (tick==TickType.GAME && tickEnd) {
+        if (tick==TickType.GAME && tickEnd)
+        {
             return onTickInGame((MinecraftServer)minecraftInstance);
-        } else {
+        }
+        else
+        {
             return true;
         }
     }
@@ -62,11 +65,13 @@ public abstract class BaseMod implements cpw.mods.fml.common.modloader.BaseMod
     }
 
     @Override
-    public final void onServerLogin(Object handler) {
+    public final void onServerLogin(Object handler)
+    {
         // NOOP
     }
 
-    public final void onServerLogout() {
+    public final void onServerLogout()
+    {
         // NOOP
     }
     @Override
@@ -126,13 +131,15 @@ public abstract class BaseMod implements cpw.mods.fml.common.modloader.BaseMod
         return onServerCommand(command, (String)data[0], (ICommandListener)data[1]);
     }
     @Override
-    public void onRegisterAnimations() {
-    	// NOOP on servers
+    public void onRegisterAnimations()
+    {
+        // NOOP on servers
     }
 
     @Override
-    public void onRenderHarvest(@SuppressWarnings("rawtypes") Map renderers) {
-    	// NOOP on servers
+    public void onRenderHarvest(@SuppressWarnings("rawtypes") Map renderers)
+    {
+        // NOOP on servers
     }
 
     // BASEMOD API
@@ -403,7 +410,8 @@ public abstract class BaseMod implements cpw.mods.fml.common.modloader.BaseMod
     // void keyboardEvent(KeyBinding event);
 
     @Override
-    public void keyBindingEvent(Object keybinding) {
-    	// NOOP on server
+    public void keyBindingEvent(Object keybinding)
+    {
+        // NOOP on server
     }
 }

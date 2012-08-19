@@ -161,7 +161,8 @@ public class NetworkModHandler
      */
     private Object getConnectionHandlerDefaultValue()
     {
-        try {
+        try
+        {
             if (connectionHandlerDefaultValue == null)
             {
                 connectionHandlerDefaultValue = NetworkMod.class.getMethod("connectionHandler").getDefaultValue();
@@ -179,7 +180,8 @@ public class NetworkModHandler
      */
     private Object getPacketHandlerDefaultValue()
     {
-        try {
+        try
+        {
             if (packetHandlerDefaultValue == null)
             {
                 packetHandlerDefaultValue = NetworkMod.class.getMethod("packetHandler").getDefaultValue();
@@ -197,7 +199,8 @@ public class NetworkModHandler
      */
     private Object getClientHandlerSpecDefaultValue()
     {
-        try {
+        try
+        {
             if (clientHandlerDefaultValue == null)
             {
                 clientHandlerDefaultValue = NetworkMod.class.getMethod("clientPacketHandlerSpec").getDefaultValue();
@@ -214,7 +217,8 @@ public class NetworkModHandler
      */
     private Object getServerHandlerSpecDefaultValue()
     {
-        try {
+        try
+        {
             if (serverHandlerDefaultValue == null)
             {
                 serverHandlerDefaultValue = NetworkMod.class.getMethod("serverPacketHandlerSpec").getDefaultValue();

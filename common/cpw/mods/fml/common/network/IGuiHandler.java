@@ -7,7 +7,7 @@ public interface IGuiHandler
 {
     /**
      * Returns a Server side Container to be displayed to the user.
-     * 
+     *
      * @param ID
      *            The Gui ID Number
      * @param player
@@ -27,7 +27,7 @@ public interface IGuiHandler
      * Returns a Container to be displayed to the user. On the client side, this
      * needs to return a instance of GuiScreen On the server side, this needs to
      * return a instance of Container
-     * 
+     *
      * @param ID
      *            The Gui ID Number
      * @param player

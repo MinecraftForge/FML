@@ -205,7 +205,8 @@ public class FMLClientHandler implements IFMLSidedHandler
      */
     public void displayGuiScreen(EntityPlayer player, GuiScreen gui)
     {
-        if (client.field_71439_g==player && gui != null) {
+        if (client.field_71439_g==player && gui != null)
+        {
             client.func_71373_a(gui);
         }
     }
@@ -215,7 +216,8 @@ public class FMLClientHandler implements IFMLSidedHandler
      */
     public void addSpecialModEntries(ArrayList<ModContainer> mods)
     {
-        if (optifineContainer!=null) {
+        if (optifineContainer!=null)
+        {
             mods.add(optifineContainer);
         }
     }
@@ -226,7 +228,9 @@ public class FMLClientHandler implements IFMLSidedHandler
         if (optifineContainer!=null)
         {
             return Arrays.asList(String.format("Optifine %s",optifineContainer.getVersion()));
-        } else {
+        }
+        else
+        {
             return Collections.emptyList();
         }
     }

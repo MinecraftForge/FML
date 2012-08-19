@@ -15,7 +15,7 @@ public class ModAnnotationVisitor extends AnnotationVisitor
         super(Opcodes.ASM4);
         this.discoverer = discoverer;
     }
-    
+
     public ModAnnotationVisitor(ASMModParser discoverer, String name)
     {
         this(discoverer);
@@ -35,13 +35,13 @@ public class ModAnnotationVisitor extends AnnotationVisitor
     {
         discoverer.addAnnotationProperty(key, value);
     }
-    
+
     @Override
     public void visitEnum(String name, String desc, String value)
     {
         discoverer.addAnnotationEnumProperty(name, desc, value);
     }
-    
+
     @Override
     public AnnotationVisitor visitArray(String name)
     {
@@ -60,7 +60,7 @@ public class ModAnnotationVisitor extends AnnotationVisitor
         {
             discoverer.endArray();
         }
-        
+
         if (isSubAnnotation)
         {
             discoverer.endSubAnnotation();

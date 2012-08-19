@@ -24,8 +24,8 @@ public interface ITextureFX
     public void onTexturePackChanged(RenderEngine engine, TexturePackBase texturepack, Dimension dimensions);
 
     public void onTextureDimensionsUpdate(int width, int height);
-    
+
     public void setErrored(boolean errored);
-    
+
     public boolean getErrored();
 }

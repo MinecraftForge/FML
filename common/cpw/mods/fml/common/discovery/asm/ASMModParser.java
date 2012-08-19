@@ -63,13 +63,13 @@ public class ASMModParser
     public String toString()
     {
         return Objects.toStringHelper("ASMAnnotationDiscoverer")
-                .add("className", asmType.getClassName())
-                .add("classVersion", classVersion)
-                .add("superName", asmSuperType.getClassName())
-                .add("annotations", annotations)
-                .add("isBaseMod", isBaseMod())
-                .add("baseModProperties", baseModProperties)
-                .toString();
+               .add("className", asmType.getClassName())
+               .add("classVersion", classVersion)
+               .add("superName", asmSuperType.getClassName())
+               .add("annotations", annotations)
+               .add("isBaseMod", isBaseMod())
+               .add("baseModProperties", baseModProperties)
+               .toString();
     }
 
     public Type getASMType()
@@ -132,13 +132,13 @@ public class ASMModParser
     public void addAnnotationEnumProperty(String name, String desc, String value)
     {
         annotations.getFirst().addEnumProperty(name, desc, value);
-        
+
     }
 
     public void endArray()
     {
         annotations.getFirst().endArray();
-        
+
     }
 
     public void addSubAnnotation(String name, String desc)

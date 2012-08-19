@@ -176,7 +176,7 @@ public class FMLNetworkHandler
         else
         {
             FMLLog.fine("Received invalid FML login packet %d, %d from %s", login.field_73561_a, login.field_73558_e,
-                    handler.field_72538_b.func_74430_c());
+                        handler.field_72538_b.func_74430_c());
         }
     }
 

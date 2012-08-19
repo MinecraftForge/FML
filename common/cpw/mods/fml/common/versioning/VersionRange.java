@@ -92,7 +92,7 @@ public class VersionRange
      *
      */
     public static VersionRange createFromVersionSpec( String spec )
-        throws InvalidVersionSpecificationException
+    throws InvalidVersionSpecificationException
     {
         if ( spec == null )
         {
@@ -165,7 +165,7 @@ public class VersionRange
     }
 
     private static Restriction parseRestriction( String spec )
-        throws InvalidVersionSpecificationException
+    throws InvalidVersionSpecificationException
     {
         boolean lowerBoundInclusive = spec.startsWith( "[" );
         boolean upperBoundInclusive = spec.endsWith( "]" );
@@ -283,7 +283,7 @@ public class VersionRange
                     break;
                 }
                 else if ( version == null && restriction.getRecommendedVersion() != null
-                    && r.containsVersion( restriction.getRecommendedVersion() ) )
+                          && r.containsVersion( restriction.getRecommendedVersion() ) )
                 {
                     // use this if we can, but prefer the original if possible
                     version = restriction.getRecommendedVersion();
@@ -302,12 +302,12 @@ public class VersionRange
             // original recommended version
             version = restriction.recommendedVersion;
         }
-/* TODO: should throw this immediately, but need artifact
-        else
-        {
-            throw new OverConstrainedVersionException( "Restricting incompatible version ranges" );
-        }
-*/
+        /* TODO: should throw this immediately, but need artifact
+                else
+                {
+                    throw new OverConstrainedVersionException( "Restricting incompatible version ranges" );
+                }
+        */
 
         return new VersionRange( version, restrictions );
     }
@@ -324,10 +324,10 @@ public class VersionRange
         while ( !done )
         {
             if ( res1.getLowerBound() == null || res2.getUpperBound() == null
-                || res1.getLowerBound().compareTo( res2.getUpperBound() ) <= 0 )
+                    || res1.getLowerBound().compareTo( res2.getUpperBound() ) <= 0 )
             {
                 if ( res1.getUpperBound() == null || res2.getLowerBound() == null
-                    || res1.getUpperBound().compareTo( res2.getLowerBound() ) >= 0 )
+                        || res1.getUpperBound().compareTo( res2.getLowerBound() ) >= 0 )
                 {
                     ArtifactVersion lower;
                     ArtifactVersion upper;
@@ -523,10 +523,10 @@ public class VersionRange
 
         boolean equals =
             recommendedVersion == other.recommendedVersion
-                || ( ( recommendedVersion != null ) && recommendedVersion.equals( other.recommendedVersion ) );
+            || ( ( recommendedVersion != null ) && recommendedVersion.equals( other.recommendedVersion ) );
         equals &=
             restrictions == other.restrictions
-                || ( ( restrictions != null ) && restrictions.equals( other.restrictions ) );
+            || ( ( restrictions != null ) && restrictions.equals( other.restrictions ) );
         return equals;
     }
 

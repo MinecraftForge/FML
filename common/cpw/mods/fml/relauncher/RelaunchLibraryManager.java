@@ -159,9 +159,9 @@ public class RelaunchLibraryManager
             if (!caughtErrors.isEmpty())
             {
                 FMLRelaunchLog.severe("There were errors during initial FML setup. " +
-                		"Some files failed to download or were otherwise corrupted. " +
-                		"You will need to manually obtain the following files from " +
-                		"these download links and ensure your lib directory is clean. ");
+                                      "Some files failed to download or were otherwise corrupted. " +
+                                      "You will need to manually obtain the following files from " +
+                                      "these download links and ensure your lib directory is clean. ");
                 for (ILibrarySet set : libraries)
                 {
                     for (String file : set.getLibraries())
@@ -171,7 +171,7 @@ public class RelaunchLibraryManager
                 }
                 FMLRelaunchLog.severe("<===========>");
                 FMLRelaunchLog.severe("The following is the errors that caused the setup to fail. " +
-                		"They may help you diagnose and resolve the issue");
+                                      "They may help you diagnose and resolve the issue");
                 for (Throwable t : caughtErrors)
                 {
                     if (t.getMessage()!=null)
@@ -429,8 +429,8 @@ public class RelaunchLibraryManager
             }
             if (e instanceof RuntimeException) throw (RuntimeException)e;
             FMLRelaunchLog.severe("There was a problem downloading the file %s automatically. Perhaps you " +
-            		"have an environment without internet access. You will need to download " +
-            		"the file manually or restart and let it try again\n", libFile.getName());
+                                  "have an environment without internet access. You will need to download " +
+                                  "the file manually or restart and let it try again\n", libFile.getName());
             libFile.delete();
             throw new RuntimeException("A download error occured", e);
         }
@@ -460,7 +460,8 @@ public class RelaunchLibraryManager
         {
             downloadMonitor.pokeThread = Thread.currentThread();
             byte[] smallBuffer = new byte[1024];
-            while ((bytesRead = is.read(smallBuffer)) >= 0) {
+            while ((bytesRead = is.read(smallBuffer)) >= 0)
+            {
                 downloadBuffer.put(smallBuffer, 0, bytesRead);
                 fullLength += bytesRead;
                 if (downloadMonitor.stopIt)
@@ -519,9 +520,10 @@ public class RelaunchLibraryManager
             digest.update(buffer);
             byte[] chksum = digest.digest();
             final StringBuilder hex = new StringBuilder( 2 * chksum.length );
-            for ( final byte b : chksum ) {
-              hex.append(HEXES.charAt((b & 0xF0) >> 4))
-                 .append(HEXES.charAt((b & 0x0F)));
+            for ( final byte b : chksum )
+            {
+                hex.append(HEXES.charAt((b & 0xF0) >> 4))
+                .append(HEXES.charAt((b & 0x0F)));
             }
             return hex.toString();
         }

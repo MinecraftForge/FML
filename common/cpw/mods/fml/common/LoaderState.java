@@ -59,7 +59,7 @@ public enum LoaderState
     {
         return eventClass != null;
     }
-    
+
     public FMLStateEvent getEvent(Object... eventData)
     {
         try
@@ -87,7 +87,7 @@ public enum LoaderState
         AVAILABLE("Available"),
         DISABLED("Disabled"),
         ERRORED("Errored");
-        
+
         private String label;
 
         private ModState(String label)

@@ -44,7 +44,7 @@ public abstract class FMLPacket
          * Fixes entity location data after spawning
          */
         ENTITYSPAWNADJUSTMENT(EntitySpawnAdjustmentPacket.class);
-        
+
 
         private Class<? extends FMLPacket> packetType;
 

@@ -44,16 +44,22 @@ public class ModLoaderHelper
         BaseModTicker ticker = mlmc.getGameTickHandler();
         EnumSet<TickType> ticks = ticker.ticks();
         // If we're enabled we get render ticks
-        if (enable && !useClock) {
+        if (enable && !useClock)
+        {
             ticks.add(TickType.RENDER);
-        } else {
+        }
+        else
+        {
             ticks.remove(TickType.RENDER);
         }
         // If we're enabled but we want clock ticks, or we're server side we get game ticks
-        if (enable && (useClock || FMLCommonHandler.instance().getSide().isServer())) {
+        if (enable && (useClock || FMLCommonHandler.instance().getSide().isServer()))
+        {
             ticks.add(TickType.CLIENT);
             ticks.add(TickType.WORLDLOAD);
-        } else {
+        }
+        else
+        {
             ticks.remove(TickType.CLIENT);
             ticks.remove(TickType.WORLDLOAD);
         }
@@ -64,16 +70,22 @@ public class ModLoaderHelper
         ModLoaderModContainer mlmc = findOrBuildModContainer(mod);
         EnumSet<TickType> ticks = mlmc.getGUITickHandler().ticks();
         // If we're enabled and we don't want clock ticks we get render ticks
-        if (enable && !useClock) {
+        if (enable && !useClock)
+        {
             ticks.add(TickType.RENDER);
-        } else {
+        }
+        else
+        {
             ticks.remove(TickType.RENDER);
         }
         // If we're enabled but we want clock ticks, or we're server side we get world ticks
-        if (enable && useClock) {
+        if (enable && useClock)
+        {
             ticks.add(TickType.CLIENT);
             ticks.add(TickType.WORLDLOAD);
-        } else {
+        }
+        else
+        {
             ticks.remove(TickType.CLIENT);
             ticks.remove(TickType.WORLDLOAD);
         }
@@ -86,9 +98,11 @@ public class ModLoaderHelper
     private static ModLoaderModContainer findOrBuildModContainer(BaseMod mod)
     {
         ModLoaderModContainer mlmc=(ModLoaderModContainer) FMLCommonHandler.instance().findContainerFor(mod);
-        if (mlmc==null) {
+        if (mlmc==null)
+        {
             mlmc=notModCallbacks.get(mod);
-            if (mlmc==null) {
+            if (mlmc==null)
+            {
                 mlmc=new ModLoaderModContainer(mod);
                 notModCallbacks.put(mod, mlmc);
             }

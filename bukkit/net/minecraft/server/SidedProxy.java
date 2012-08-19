@@ -31,16 +31,16 @@ public @interface SidedProxy
      * The name of the client side class to load and populate
      * @return
      */
-    String clientSide() default "";
-    
+String clientSide() default "";
+
     /**
      * The name of the server side class to load and populate
      * @return
      */
-    String serverSide() default "";
-    
+String serverSide() default "";
+
     /**
      * The name of the a special bukkit plugin class to load and populate
      */
-    String bukkitSide() default "";
+String bukkitSide() default "";
 }

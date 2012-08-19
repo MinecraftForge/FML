@@ -86,7 +86,7 @@ public class ComparableVersion
     private static class IntegerItem
         implements Item
     {
-    	private static final BigInteger BigInteger_ZERO = new BigInteger( "0" );
+        private static final BigInteger BigInteger_ZERO = new BigInteger( "0" );
 
         private final BigInteger value;
 
@@ -121,17 +121,17 @@ public class ComparableVersion
 
             switch ( item.getType() )
             {
-                case INTEGER_ITEM:
-                    return value.compareTo( ( (IntegerItem) item ).value );
+            case INTEGER_ITEM:
+                return value.compareTo( ( (IntegerItem) item ).value );
 
-                case STRING_ITEM:
-                    return 1; // 1.1 > 1-sp
+            case STRING_ITEM:
+                return 1; // 1.1 > 1-sp
 
-                case LIST_ITEM:
-                    return 1; // 1.1 > 1-1
+            case LIST_ITEM:
+                return 1; // 1.1 > 1-1
 
-                default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+            default:
+                throw new RuntimeException( "invalid item: " + item.getClass() );
             }
         }
 
@@ -174,15 +174,15 @@ public class ComparableVersion
                 // a1 = alpha-1, b1 = beta-1, m1 = milestone-1
                 switch ( value.charAt( 0 ) )
                 {
-                    case 'a':
-                        value = "alpha";
-                        break;
-                    case 'b':
-                        value = "beta";
-                        break;
-                    case 'm':
-                        value = "milestone";
-                        break;
+                case 'a':
+                    value = "alpha";
+                    break;
+                case 'b':
+                    value = "beta";
+                    break;
+                case 'm':
+                    value = "milestone";
+                    break;
                 }
             }
             this.value = ALIASES.getProperty( value , value );
@@ -226,17 +226,17 @@ public class ComparableVersion
             }
             switch ( item.getType() )
             {
-                case INTEGER_ITEM:
-                    return -1; // 1.any < 1.1 ?
+            case INTEGER_ITEM:
+                return -1; // 1.any < 1.1 ?
 
-                case STRING_ITEM:
-                    return comparableQualifier( value ).compareTo( comparableQualifier( ( (StringItem) item ).value ) );
+            case STRING_ITEM:
+                return comparableQualifier( value ).compareTo( comparableQualifier( ( (StringItem) item ).value ) );
 
-                case LIST_ITEM:
-                    return -1; // 1.any < 1-1
+            case LIST_ITEM:
+                return -1; // 1.any < 1-1
 
-                default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+            default:
+                throw new RuntimeException( "invalid item: " + item.getClass() );
             }
         }
 
@@ -293,34 +293,34 @@ public class ComparableVersion
             }
             switch ( item.getType() )
             {
-                case INTEGER_ITEM:
-                    return -1; // 1-1 < 1.0.x
+            case INTEGER_ITEM:
+                return -1; // 1-1 < 1.0.x
 
-                case STRING_ITEM:
-                    return 1; // 1-1 > 1-sp
+            case STRING_ITEM:
+                return 1; // 1-1 > 1-sp
 
-                case LIST_ITEM:
-                    Iterator<Item> left = iterator();
-                    Iterator<Item> right = ( (ListItem) item ).iterator();
+            case LIST_ITEM:
+                Iterator<Item> left = iterator();
+                Iterator<Item> right = ( (ListItem) item ).iterator();
 
-                    while ( left.hasNext() || right.hasNext() )
+                while ( left.hasNext() || right.hasNext() )
+                {
+                    Item l = left.hasNext() ? left.next() : null;
+                    Item r = right.hasNext() ? right.next() : null;
+
+                    // if this is shorter, then invert the compare and mul with -1
+                    int result = l == null ? -1 * r.compareTo( l ) : l.compareTo( r );
+
+                    if ( result != 0 )
                     {
-                        Item l = left.hasNext() ? left.next() : null;
-                        Item r = right.hasNext() ? right.next() : null;
-
-                        // if this is shorter, then invert the compare and mul with -1
-                        int result = l == null ? -1 * r.compareTo( l ) : l.compareTo( r );
-
-                        if ( result != 0 )
-                        {
-                            return result;
-                        }
+                        return result;
                     }
+                }
 
-                    return 0;
+                return 0;
 
-                default:
-                    throw new RuntimeException( "invalid item: " + item.getClass() );
+            default:
+                throw new RuntimeException( "invalid item: " + item.getClass() );
             }
         }
 

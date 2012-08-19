@@ -1,5 +1,6 @@
 package net.minecraft.src;
 
-public interface EntityLiving {
+public interface EntityLiving
+{
 
 }

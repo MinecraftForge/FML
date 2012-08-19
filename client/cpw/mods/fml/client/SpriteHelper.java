@@ -29,9 +29,10 @@ public class SpriteHelper
 {
     private static HashMap<String, BitSet> spriteInfo = new HashMap<String, BitSet>();
 
-    private static void initMCSpriteMaps() {
+    private static void initMCSpriteMaps()
+    {
         BitSet slots =
-                SpriteHelper.toBitSet(
+            SpriteHelper.toBitSet(
                 "0000000000000000" +
                 "0000000000110000" +
                 "0000000001100000" +
@@ -51,22 +52,22 @@ public class SpriteHelper
         spriteInfo.put("/terrain.png", slots);
 
         slots = SpriteHelper.toBitSet(
-                "0000000000000000" +
-                "0000000000000000" +
-                "0000000000000000" +
-                "0000000000000000" +
-                "0000000000000000" +
-                "0000000000000000" +
-                "0000001000000000" +
-                "0000001110000000" +
-                "0000001000000000" +
-                "1111101010000000" +
-                "1111101010000000" +
-                "1111101110000000" +
-                "1111111111110000" +
-                "1111111111111111" +
-                "1111111111111111" +
-                "0000000000000000");
+                    "0000000000000000" +
+                    "0000000000000000" +
+                    "0000000000000000" +
+                    "0000000000000000" +
+                    "0000000000000000" +
+                    "0000000000000000" +
+                    "0000001000000000" +
+                    "0000001110000000" +
+                    "0000001000000000" +
+                    "1111101010000000" +
+                    "1111101010000000" +
+                    "1111101110000000" +
+                    "1111111111110000" +
+                    "1111111111111111" +
+                    "1111111111111111" +
+                    "0000000000000000");
         spriteInfo.put("/gui/items.png", slots);
     }
     /**
@@ -75,11 +76,14 @@ public class SpriteHelper
      *
      *
      */
-    public static void registerSpriteMapForFile(String file, String spriteMap) {
-        if (spriteInfo.size() == 0) {
+    public static void registerSpriteMapForFile(String file, String spriteMap)
+    {
+        if (spriteInfo.size() == 0)
+        {
             initMCSpriteMaps();
         }
-        if (spriteInfo.containsKey(file)) {
+        if (spriteInfo.containsKey(file))
+        {
             FMLCommonHandler.instance().getFMLLogger().finer(String.format("Duplicate attempt to register a sprite file %s for overriding -- ignoring",file));
             return;
         }

@@ -29,49 +29,55 @@ public class Start
         }
         else
         {
-            try {
-                String parameters = "http://login.minecraft.net/?user=" + URLEncoder.encode(args[0], "UTF-8") + 
-                        "&password=" + URLEncoder.encode(args[1], "UTF-8") + 
-                        "&version=" + 13;
+            try
+            {
+                String parameters = "http://login.minecraft.net/?user=" + URLEncoder.encode(args[0], "UTF-8") +
+                                    "&password=" + URLEncoder.encode(args[1], "UTF-8") +
+                                    "&version=" + 13;
                 String result = openUrl(parameters);
-                
-                if (result == null) 
+
+                if (result == null)
                 {
-                  System.out.println("Can't connect to minecraft.net");
-                  return;
+                    System.out.println("Can't connect to minecraft.net");
+                    return;
                 }
-                
-                if (!result.contains(":")) 
+
+                if (!result.contains(":"))
                 {
-                  System.out.println("Login Failed: " + result);
-                  return;
+                    System.out.println("Login Failed: " + result);
+                    return;
                 }
-                //latestVersion, downloadTicket, userName, sessionId    
-                String[] values = result.split(":");    
-                Minecraft.main(new String[]{values[2].trim(), values[3].trim()});
-            } catch (Exception e) {
+                //latestVersion, downloadTicket, userName, sessionId
+                String[] values = result.split(":");
+                Minecraft.main(new String[] {values[2].trim(), values[3].trim()});
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace();
             }
         }
     }
-    
+
     private static String openUrl(String addr)
     {
-        try {
+        try
+        {
             URL url = new URL(addr);
             java.io.InputStream is;
             is = url.openConnection().getInputStream();
-    
+
             java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(is));
             String buf = "";
             String line = null;
             while((line = reader.readLine() ) != null)
             {
-               buf += "\n" + line;
+                buf += "\n" + line;
             }
             reader.close();
             return buf;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
         return null;

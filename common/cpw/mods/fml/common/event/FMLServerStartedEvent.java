@@ -9,7 +9,7 @@ public class FMLServerStartedEvent extends FMLStateEvent
     {
         super(data);
     }
-    
+
     @Override
     public ModState getModState()
     {

@@ -24,18 +24,21 @@ class OverrideInfo
     public int imageIndex;
     public TextureFX textureFX;
     public boolean added;
-    
+
     @Override
     public boolean equals(Object obj)
     {
-        try {
+        try
+        {
             OverrideInfo inf=(OverrideInfo) obj;
             return index==inf.index && imageIndex==inf.imageIndex;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return false;
         }
     }
-    
+
     @Override
     public int hashCode()
     {

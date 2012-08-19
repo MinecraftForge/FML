@@ -317,7 +317,10 @@ public class Loader
                 foundDupe = true;
             }
         }
-        if (foundDupe) { throw new LoaderException(); }
+        if (foundDupe)
+        {
+            throw new LoaderException();
+        }
     }
 
     /**
@@ -341,7 +344,7 @@ public class Loader
         catch (IOException ioe)
         {
             FMLLog.log(Level.SEVERE, ioe, "Failed to resolve loader directories: mods : %s ; config %s", canonicalModsDir.getAbsolutePath(),
-                            configDir.getAbsolutePath());
+                       configDir.getAbsolutePath());
             throw new LoaderException(ioe);
         }
 
@@ -559,7 +562,7 @@ public class Loader
             // before elements are things we are loaded before (so they are our dependants)
             if ("required-before".equals(instruction) || "before".equals(instruction))
             {
-            	dependants.add(VersionParser.parseVersionReference(target));
+                dependants.add(VersionParser.parseVersionReference(target));
             }
             // after elements are things that load before we do (so they are out dependencies)
             else if ("required-after".equals(instruction) || "after".equals(instruction))
@@ -597,7 +600,8 @@ public class Loader
 
     public Callable getCallableCrashInformation()
     {
-        return new Callable<String>() {
+        return new Callable<String>()
+        {
             @Override
             public String call() throws Exception
             {

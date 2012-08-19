@@ -240,7 +240,7 @@ public class MCPMerger
                 }
             }
 
-            for (String name : new String[]{SideOnly.class.getName(), Side.class.getName()})
+            for (String name : new String[] {SideOnly.class.getName(), Side.class.getName()})
             {
                 String eName = name.replace(".", "/");
                 byte[] data = getClassBytes(name);
@@ -262,21 +262,37 @@ public class MCPMerger
         {
             if (cInJar != null)
             {
-                try { cInJar.close(); } catch (IOException e){}
+                try
+                {
+                    cInJar.close();
+                }
+                catch (IOException e) {}
             }
 
             if (sInJar != null)
             {
-                try { sInJar.close(); } catch (IOException e) {}
+                try
+                {
+                    sInJar.close();
+                }
+                catch (IOException e) {}
             }
             if (cOutJar != null)
             {
-                try { cOutJar.close(); } catch (IOException e){}
+                try
+                {
+                    cOutJar.close();
+                }
+                catch (IOException e) {}
             }
 
             if (sOutJar != null)
             {
-                try { sOutJar.close(); } catch (IOException e) {}
+                try
+                {
+                    sOutJar.close();
+                }
+                catch (IOException e) {}
             }
         }
     }
@@ -306,7 +322,7 @@ public class MCPMerger
         AnnotationNode ann = new AnnotationNode(Type.getDescriptor(SideOnly.class));
         ann.values = new ArrayList<Object>();
         ann.values.add("value");
-        ann.values.add(new String[]{ Type.getDescriptor(Side.class), (isClientOnly ? "CLIENT" : "SERVER")});
+        ann.values.add(new String[] { Type.getDescriptor(Side.class), (isClientOnly ? "CLIENT" : "SERVER")});
         return ann;
     }
 
@@ -355,7 +371,8 @@ public class MCPMerger
             {
                 entryBuffer.write(data, 0, len);
             }
-        } while (len != -1);
+        }
+        while (len != -1);
 
         return entryBuffer.toByteArray();
     }
@@ -366,8 +383,14 @@ public class MCPMerger
         public ArrayList<FieldNode> sField = new ArrayList<FieldNode>();
         public ArrayList<MethodNode> cMethods = new ArrayList<MethodNode>();
         public ArrayList<MethodNode> sMethods = new ArrayList<MethodNode>();
-        public ClassInfo(String name){ this.name = name; }
-        public boolean isSame() { return (cField.size() == 0 && sField.size() == 0 && cMethods.size() == 0 && sMethods.size() == 0); }
+        public ClassInfo(String name)
+        {
+            this.name = name;
+        }
+        public boolean isSame()
+        {
+            return (cField.size() == 0 && sField.size() == 0 && cMethods.size() == 0 && sMethods.size() == 0);
+        }
     }
 
     public static byte[] processClass(byte[] cIn, byte[] sIn, ClassInfo info)
@@ -623,7 +646,7 @@ public class MCPMerger
                 {
                     classStream.close();
                 }
-                catch (IOException e){}
+                catch (IOException e) {}
             }
         }
     }

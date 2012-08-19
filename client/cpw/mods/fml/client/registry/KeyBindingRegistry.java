@@ -26,7 +26,8 @@ public class KeyBindingRegistry
      *
      * @param handler
      */
-    public static void registerKeyBinding(KeyHandler handler) {
+    public static void registerKeyBinding(KeyHandler handler)
+    {
         instance().keyHandlers.add(handler);
         if (!handler.isDummy)
         {

@@ -44,7 +44,7 @@ public class ModLoader
      * This method is a call in hook from modified external code. Implemented elsewhere.
      *
      * {@link FMLCommonHandler#fuelLookup(int, int)}
-     * 
+     *
      * @param id
      * @param metadata
      * @return
@@ -132,7 +132,7 @@ public class ModLoader
 
     /**
      * Unimplemented on the server as it does not render textures
-     * 
+     *
      * @param fileToOverride
      * @param fileToAdd
      * @return
@@ -144,7 +144,7 @@ public class ModLoader
 
     /**
      * Unimplemented on the server as it does not render textures
-     * 
+     *
      * @param path
      * @param overlayPath
      * @param index
@@ -372,7 +372,7 @@ public class ModLoader
     /**
      * Get a value from a field using reflection
      * {@link ReflectionHelper#getPrivateValue(Class, Object, String)}
-     * 
+     *
      * @param instanceclass
      * @param instance
      * @param field
@@ -385,7 +385,7 @@ public class ModLoader
 
     /**
      * Stubbed method on the server to return a unique model id
-     * 
+     *
      */
     public static int getUniqueBlockModelID(BaseMod mod, boolean inventoryRenderer)
     {
@@ -407,11 +407,11 @@ public class ModLoader
     {
         return -1;
     }
-    
+
     /**
      * To properly implement packet 250 protocol you should always check your
      * channel is active prior to sending the packet
-     * 
+     *
      * @param player
      * @param channel
      * @return
@@ -429,7 +429,7 @@ public class ModLoader
     /**
      * Is the named mod loaded?
      * {@link Loader#isModLoaded(String)}
-     * 
+     *
      * @param modname
      * @return
      */
@@ -502,7 +502,7 @@ public class ModLoader
 
     /**
      * Register a new block
-     * 
+     *
      * @param block
      */
     public static void registerBlock(Block block)
@@ -512,7 +512,7 @@ public class ModLoader
 
     /**
      * Register a new block
-     * 
+     *
      * @param block
      * @param itemclass
      */
@@ -523,7 +523,7 @@ public class ModLoader
 
     /**
      * Register a new entity ID
-     * 
+     *
      * @param entityClass
      * @param entityName
      * @param id
@@ -535,7 +535,7 @@ public class ModLoader
 
     /**
      * Register a new entity ID
-     * 
+     *
      * @param entityClass
      * @param entityName
      * @param id
@@ -557,7 +557,7 @@ public class ModLoader
      * channel with Forge Mod Loader, not with clients connecting- use
      * BaseMod.onClientLogin to tell them about your custom channel
      * {@link FMLCommonHandler#registerChannel(cpw.mods.fml.common.ModContainer, String)}
-     * 
+     *
      * @param mod
      * @param channel
      */
@@ -568,7 +568,7 @@ public class ModLoader
 
     /**
      * Register a new tile entity class
-     * 
+     *
      * @param tileEntityClass
      * @param id
      */
@@ -584,7 +584,7 @@ public class ModLoader
 
     /**
      * Remove a biome from the list of generated biomes
-     *  
+     *
      * @param biome
      */
     public static void removeBiome(BiomeBase biome)
@@ -594,7 +594,7 @@ public class ModLoader
 
     /**
      * Remove a spawn
-     * 
+     *
      * @param entityClass
      * @param spawnList
      */
@@ -605,7 +605,7 @@ public class ModLoader
 
     /**
      * Remove a spawn
-     * 
+     *
      * @param entityClass
      * @param spawnList
      * @param biomes
@@ -617,7 +617,7 @@ public class ModLoader
 
     /**
      * Remove a spawn
-     * 
+     *
      * @param entityName
      * @param spawnList
      */
@@ -628,7 +628,7 @@ public class ModLoader
 
     /**
      * Remove a spawn
-     * 
+     *
      * @param entityName
      * @param spawnList
      * @param biomes
@@ -668,7 +668,7 @@ public class ModLoader
     /**
      * Send a chat message to the server
      * {@link FMLServerHandler#handleChatPacket(Packet3Chat, EntityPlayer)}
-     * 
+     *
      * @param text
      */
     @Deprecated
@@ -692,10 +692,10 @@ public class ModLoader
      */
     public static void setInGameHook(BaseMod mod, boolean enable, boolean useClock)
     {
-    	ModLoaderHelper.updateStandardTicks(mod, enable, useClock);
+        ModLoaderHelper.updateStandardTicks(mod, enable, useClock);
     }
 
-    
+
     public static void setInGUIHook(BaseMod mod, boolean enable, boolean useClock)
     {
         ModLoaderHelper.updateGUITicks(mod, enable, useClock);
@@ -704,7 +704,7 @@ public class ModLoader
     /**
      * Set a private field to a value using reflection
      * {@link ReflectionHelper#setPrivateValue(Class, Object, int, Object)}
-     * 
+     *
      * @param instanceclass
      * @param instance
      * @param fieldindex
@@ -718,7 +718,7 @@ public class ModLoader
     /**
      * Set a private field to a value using reflection
      * {@link ReflectionHelper#setPrivateValue(Class, Object, String, Object)}
-     * 
+     *
      * @param instanceclass
      * @param instance
      * @param field
@@ -732,7 +732,7 @@ public class ModLoader
     /**
      * This method is a call in hook from modified external code. Implemented elsewhere.
      * {@link FMLBukkitHandler#onItemCrafted(EntityHuman, ItemStack, IInventory)}
-     * 
+     *
      * @param player
      * @param item
      * @param matrix
@@ -745,7 +745,7 @@ public class ModLoader
     /**
      * This method is a call in hook from modified external code. Implemented elsewhere.
      * {@link FMLBukkitHandler#onItemSmelted(EntityHuman, ItemStack)}
-     * 
+     *
      * @param player
      * @param item
      */

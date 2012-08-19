@@ -1,5 +1,6 @@
 package net.minecraft.src;
 
-public interface Block {
+public interface Block
+{
 
 }

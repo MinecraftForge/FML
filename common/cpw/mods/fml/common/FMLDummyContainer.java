@@ -34,10 +34,10 @@ public class FMLDummyContainer extends DummyModContainer
         meta.credits="Made possible with help from many people";
         meta.authorList=Arrays.asList("cpw, LexManos");
         meta.description="The Forge Mod Loader provides the ability for systems to load mods " +
-                    "from the file system. It also provides key capabilities for mods to be able " +
-                    "to cooperate and provide a good modding environment. " +
-                    "The mod loading system is compatible with ModLoader, all your ModLoader " +
-                    "mods should work.";
+                         "from the file system. It also provides key capabilities for mods to be able " +
+                         "to cooperate and provide a good modding environment. " +
+                         "The mod loading system is compatible with ModLoader, all your ModLoader " +
+                         "mods should work.";
         meta.url="https://github.com/cpw/FML/wiki";
         meta.updateUrl="https://github.com/cpw/FML/wiki";
         meta.screenshots=new String[0];

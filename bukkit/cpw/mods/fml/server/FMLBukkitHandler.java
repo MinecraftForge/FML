@@ -92,7 +92,7 @@ public class FMLBukkitHandler implements IFMLSidedHandler
      */
     private BiomeBase[] defaultOverworldBiomes;
 
-	FMLBukkitProfiler profiler;
+    FMLBukkitProfiler profiler;
 
     /**
      * Called to start the whole game off from {@link MinecraftServer#startServer}
@@ -104,25 +104,25 @@ public class FMLBukkitHandler implements IFMLSidedHandler
         {
             Class.forName("BaseModMp", false, getClass().getClassLoader());
             MinecraftServer.log.severe(""
-                    + "Forge Mod Loader has detected that this server has an ModLoaderMP installed alongside Forge Mod Loader.\n"
-                    + "This will cause a serious problem with compatibility. To protect your worlds, this minecraft server will now shutdown.\n"
-                    + "You should follow the installation instructions of either Minecraft Forge of Forge Mod Loader and NOT install ModLoaderMP \n"
-                    + "into the minecraft_server.jar file "
-                    + "before this server will be allowed to start up.\n\nFailure to do so will simply result in more startup failures.\n\n"
-                    + "The authors of Minecraft Forge and Forge Mod Loader strongly suggest you talk to your mod's authors and get them to\nupdate their "
-                    + "requirements. ModLoaderMP is not compatible with Minecraft Forge on the server and they will need to update their mod\n"
-                    + "for Minecraft Forge and other server compatibility, unless they are Minecraft Forge mods, in which case they already\n"
-                    + "don't need ModLoaderMP and the mod author simply has failed to update his requirements and should be informed appropriately.\n\n"
-                    + "The authors of Forge Mod Loader would like to be compatible with ModLoaderMP but it is closed source and owned by SDK.\n"
-                    + "SDK, the author of ModLoaderMP, has a standing invitation to submit compatibility patches \n"
-                    + "to the open source community project that is Forge Mod Loader so that this incompatibility doesn't last. \n"
-                    + "Users who wish to enjoy mods of both types are "
-                    + "encouraged to request of SDK that he submit a\ncompatibility patch to the Forge Mod Loader project at \n"
-                    + "http://github.com/cpw/FML.\nPosting on the minecraft forums at\nhttp://www.minecraftforum.net/topic/86765- (the MLMP thread)\n"
-                    + "may encourage him in this effort. However, I ask that your requests be polite.\n"
-                    + "Now, the server has to shutdown so you can reinstall your minecraft_server.jar\nproperly, until such time as we can work together.");
+                                       + "Forge Mod Loader has detected that this server has an ModLoaderMP installed alongside Forge Mod Loader.\n"
+                                       + "This will cause a serious problem with compatibility. To protect your worlds, this minecraft server will now shutdown.\n"
+                                       + "You should follow the installation instructions of either Minecraft Forge of Forge Mod Loader and NOT install ModLoaderMP \n"
+                                       + "into the minecraft_server.jar file "
+                                       + "before this server will be allowed to start up.\n\nFailure to do so will simply result in more startup failures.\n\n"
+                                       + "The authors of Minecraft Forge and Forge Mod Loader strongly suggest you talk to your mod's authors and get them to\nupdate their "
+                                       + "requirements. ModLoaderMP is not compatible with Minecraft Forge on the server and they will need to update their mod\n"
+                                       + "for Minecraft Forge and other server compatibility, unless they are Minecraft Forge mods, in which case they already\n"
+                                       + "don't need ModLoaderMP and the mod author simply has failed to update his requirements and should be informed appropriately.\n\n"
+                                       + "The authors of Forge Mod Loader would like to be compatible with ModLoaderMP but it is closed source and owned by SDK.\n"
+                                       + "SDK, the author of ModLoaderMP, has a standing invitation to submit compatibility patches \n"
+                                       + "to the open source community project that is Forge Mod Loader so that this incompatibility doesn't last. \n"
+                                       + "Users who wish to enjoy mods of both types are "
+                                       + "encouraged to request of SDK that he submit a\ncompatibility patch to the Forge Mod Loader project at \n"
+                                       + "http://github.com/cpw/FML.\nPosting on the minecraft forums at\nhttp://www.minecraftforum.net/topic/86765- (the MLMP thread)\n"
+                                       + "may encourage him in this effort. However, I ask that your requests be polite.\n"
+                                       + "Now, the server has to shutdown so you can reinstall your minecraft_server.jar\nproperly, until such time as we can work together.");
             throw new RuntimeException(
-                    "This FML based server has detected an installation of ModLoaderMP alongside. This will cause serious compatibility issues, so the server will now shut down.");
+                "This FML based server has detected an installation of ModLoaderMP alongside. This will cause serious compatibility issues, so the server will now shut down.");
         }
         catch (ClassNotFoundException e)
         {
@@ -135,22 +135,24 @@ public class FMLBukkitHandler implements IFMLSidedHandler
     }
 
     /**
-	 * Called a bit later on during server initialization to finish loading mods
-	 */
-	public void onLoadComplete()
-	{
-	    Loader.instance().initializeMods();
-	    for (Item i : Item.byId) {
-	    	if (i!=null && Material.getMaterial(i.id).name().startsWith("X")) {
-	    		Material.setMaterialName(i.id, i.l());
-	    	}
-	    }
-	}
+     * Called a bit later on during server initialization to finish loading mods
+     */
+    public void onLoadComplete()
+    {
+        Loader.instance().initializeMods();
+        for (Item i : Item.byId)
+        {
+            if (i!=null && Material.getMaterial(i.id).name().startsWith("X"))
+            {
+                Material.setMaterialName(i.id, i.l());
+            }
+        }
+    }
 
-	public void onWorldLoadTick()
-	{
-		FMLCommonHandler.instance().tickStart(EnumSet.of(TickType.WORLDLOAD));
-	}
+    public void onWorldLoadTick()
+    {
+        FMLCommonHandler.instance().tickStart(EnumSet.of(TickType.WORLDLOAD));
+    }
 
     /**
      * Every tick just before world and other ticks occur
@@ -200,7 +202,7 @@ public class FMLBukkitHandler implements IFMLSidedHandler
      */
     public void onChunkPopulate(IChunkProvider chunkProvider, int chunkX, int chunkZ, World world, IChunkProvider generator)
     {
-    	FMLCommonHandler.instance().handleWorldGeneration(chunkX, chunkZ, world.getSeed(), world, generator, chunkProvider);
+        FMLCommonHandler.instance().handleWorldGeneration(chunkX, chunkZ, world.getSeed(), world, generator, chunkProvider);
     }
 
     /**
@@ -415,7 +417,8 @@ public class FMLBukkitHandler implements IFMLSidedHandler
      */
     private void handleClientRegistration(Packet250CustomPayload packet, EntityHuman player)
     {
-        if (packet.data==null) {
+        if (packet.data==null)
+        {
             return;
         }
         try
@@ -456,12 +459,14 @@ public class FMLBukkitHandler implements IFMLSidedHandler
         packet.tag = "REGISTER";
         packet.data = FMLCommonHandler.instance().getPacketRegistry();
         packet.length = packet.data.length;
-        if (packet.length>0) {
+        if (packet.length>0)
+        {
             networkManager.queue(packet);
         }
     }
 
-    public void announceLogin(EntityHuman player) {
+    public void announceLogin(EntityHuman player)
+    {
         for (ModContainer mod : Loader.getModList())
         {
             if (mod.wantsPlayerTracking())
@@ -474,9 +479,12 @@ public class FMLBukkitHandler implements IFMLSidedHandler
     @Override
     public File getMinecraftRootDirectory()
     {
-        try {
+        try
+        {
             return server.a(".").getCanonicalFile();
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe)
+        {
             return new File(".");
         }
     }
@@ -487,8 +495,10 @@ public class FMLBukkitHandler implements IFMLSidedHandler
      */
     public boolean handleServerCommand(String command, String player, ICommandListener listener)
     {
-        for (ModContainer mod : Loader.getModList()) {
-            if (mod.wantsConsoleCommands() && mod.getConsoleHandler().handleCommand(command, player, listener)) {
+        for (ModContainer mod : Loader.getModList())
+        {
+            if (mod.wantsConsoleCommands() && mod.getConsoleHandler().handleCommand(command, player, listener))
+            {
                 return true;
             }
         }
@@ -539,83 +549,99 @@ public class FMLBukkitHandler implements IFMLSidedHandler
         WorldType.NORMAL.removeBiome(biome);
     }
 
-	@Override
-	public Object getMinecraftInstance() {
-		return server;
-	}
+    @Override
+    public Object getMinecraftInstance()
+    {
+        return server;
+    }
 
-	@Override
+    @Override
     public String getCurrentLanguage()
     {
         return LocaleLanguage.a().getCurrentLanguage();
-	}
+    }
 
-	@Override
+    @Override
     public Properties getCurrentLanguageTable()
     {
         return LocaleLanguage.a().getCurrentLanguageTable();
-	}
+    }
 
-	@Override
+    @Override
     public String getObjectName(Object instance)
     {
         String objectName;
-        if (instance instanceof Item) {
+        if (instance instanceof Item)
+        {
             objectName=((Item)instance).getName();
-        } else if (instance instanceof Block) {
+        }
+        else if (instance instanceof Block)
+        {
             objectName=((Block)instance).getName();
-        } else if (instance instanceof ItemStack) {
+        }
+        else if (instance instanceof ItemStack)
+        {
             objectName=Item.byId[((ItemStack)instance).id].a((ItemStack)instance);
-        } else {
+        }
+        else
+        {
             throw new IllegalArgumentException(String.format("Illegal object for naming %s",instance));
         }
         objectName+=".name";
         return objectName;
-	}
+    }
 
-	@Override
-	public ModMetadata readMetadataFrom(InputStream input, ModContainer mod) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public ModMetadata readMetadataFrom(InputStream input, ModContainer mod) throws Exception
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void profileStart(String profileLabel) {
-		if (profiler!=null)
-		{
-			profiler.start(profileLabel);
-		}
-	}
+    @Override
+    public void profileStart(String profileLabel)
+    {
+        if (profiler!=null)
+        {
+            profiler.start(profileLabel);
+        }
+    }
 
-	@Override
-	public void profileEnd() {
-		if (profiler!=null)
-		{
-			profiler.end();
-		}
-	}
+    @Override
+    public void profileEnd()
+    {
+        if (profiler!=null)
+        {
+            profiler.end();
+        }
+    }
 
-	@Override
-	public ModProperty getModLoaderPropertyFor(Field f) {
-		if (f.isAnnotationPresent(MLProp.class)) {
+    @Override
+    public ModProperty getModLoaderPropertyFor(Field f)
+    {
+        if (f.isAnnotationPresent(MLProp.class))
+        {
             MLProp prop = f.getAnnotation(MLProp.class);
             return new ModProperty(prop.info(), prop.min(), prop.max(), prop.name());
         }
         return null;
-	}
+    }
 
-	@Override
-	public List<String> getAdditionalBrandingInformation() {
-		return null;
-	}
+    @Override
+    public List<String> getAdditionalBrandingInformation()
+    {
+        return null;
+    }
 
-	@Override
-	public Side getSide() {
-		return Side.BUKKIT;
-	}
+    @Override
+    public Side getSide()
+    {
+        return Side.BUKKIT;
+    }
 
-	@Override
-	public ProxyInjector findSidedProxyOn(cpw.mods.fml.common.modloader.BaseMod mod) {
+    @Override
+    public ProxyInjector findSidedProxyOn(cpw.mods.fml.common.modloader.BaseMod mod)
+    {
         for (Field f : mod.getClass().getDeclaredFields())
         {
             if (f.isAnnotationPresent(SidedProxy.class))
@@ -625,13 +651,15 @@ public class FMLBukkitHandler implements IFMLSidedHandler
             }
         }
         return null;
-	}
+    }
 
-	public void onServerPostTick() {
-		FMLCommonHandler.instance().tickEnd(EnumSet.of(TickType.GAME));
-	}
+    public void onServerPostTick()
+    {
+        FMLCommonHandler.instance().tickEnd(EnumSet.of(TickType.GAME));
+    }
 
-	public void onServerPreTick() {
-		FMLCommonHandler.instance().tickStart(EnumSet.of(TickType.GAME));
-	}
+    public void onServerPreTick()
+    {
+        FMLCommonHandler.instance().tickStart(EnumSet.of(TickType.GAME));
+    }
 }
