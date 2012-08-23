@@ -14,6 +14,7 @@ package cpw.mods.fml.relauncher;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
 /**
  * Some reflection helper code.
  *
@@ -178,4 +179,17 @@ public class ReflectionHelper
         }
         throw new UnableToFindMethodException(methodNames, failed);
     }
+    
+    
+	public static <C extends Enum> C getEnumConstant(String name, Class<? extends C> clazz) {
+		for(C constant : clazz.getEnumConstants())
+		{
+			if(constant.name() == name)
+			{
+				return constant;
+			}
+		}
+				
+		return null;
+	}
 }
