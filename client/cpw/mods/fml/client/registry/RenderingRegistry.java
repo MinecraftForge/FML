@@ -38,7 +38,7 @@ public class RenderingRegistry
      * @param armor
      * @return
      */
-    public static int addNewArmourRendererPrefix(String armor)
+    public static int addArmor(String armor)
     {
         RenderPlayer.field_77110_j = ObjectArrays.concat(RenderPlayer.field_77110_j, armor);
         return RenderPlayer.field_77110_j.length - 1;
