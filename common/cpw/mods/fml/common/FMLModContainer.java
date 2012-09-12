@@ -36,6 +36,7 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
+import cpw.mods.fml.common.Mod.Block;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.Metadata;
 import cpw.mods.fml.common.discovery.ASMDataTable;
@@ -49,6 +50,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.event.FMLStateEvent;
 import cpw.mods.fml.common.network.FMLNetworkHandler;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 
@@ -349,6 +351,24 @@ public class FMLModContainer implements ModContainer
             processFieldAnnotations(event.getASMHarvestedData());
         }
         catch (Throwable e)
+        {
+            controller.errorOccurred(this, e);
+            Throwables.propagateIfPossible(e);
+        }
+    }
+
+    @Subscribe
+    public void performedDelayedConstruction(FMLPreInitializationEvent event)
+    {
+        try
+        {
+            for (Object o : annotations.get(Block.class))
+            {
+                Field f = (Field) o;
+                f.set(modInstance, GameRegistry.buildBlock(this, f.getType(), f.getAnnotation(Block.class)));
+            }
+        }
+        catch (Exception e)
         {
             controller.errorOccurred(this, e);
             Throwables.propagateIfPossible(e);

@@ -2,10 +2,13 @@ package cpw.mods.fml.common.network;
 
 import static cpw.mods.fml.common.network.FMLPacket.Type.MOD_IDENTIFIERS;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.minecraft.src.NBTBase;
+import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.NetworkManager;
 
@@ -14,10 +17,12 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+
 public class ModIdentifiersPacket extends FMLPacket
 {
-
     private Map<String, Integer> modIds = Maps.newHashMap();
+    private NBTTagCompound blockData;
 
     public ModIdentifiersPacket()
     {
@@ -37,6 +42,15 @@ public class ModIdentifiersPacket extends FMLPacket
             dat.writeInt(handler.getNetworkId());
         }
 
+        try
+        {
+            NBTBase.func_74731_a(GameRegistry.getBlockData(), dat);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
         // TODO send the other id maps as well
         return dat.toByteArray();
     }
@@ -52,6 +66,20 @@ public class ModIdentifiersPacket extends FMLPacket
             int networkId = dat.readInt();
             modIds.put(modId, networkId);
         }
+
+        try
+        {
+            NBTBase blockData = NBTBase.func_74739_b(dat);
+            if (!(blockData instanceof NBTTagCompound)) {
+                throw new RuntimeException("Invalid data in packet");
+            }
+            this.blockData = (NBTTagCompound) blockData;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
         return this;
     }
 
@@ -63,5 +91,7 @@ public class ModIdentifiersPacket extends FMLPacket
             handler.bindNetworkId(idEntry.getKey(), idEntry.getValue());
         }
         // TODO other id maps
+
+        GameRegistry.setBlockData(blockData);
     }
 }

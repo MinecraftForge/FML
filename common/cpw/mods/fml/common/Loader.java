@@ -419,7 +419,12 @@ public class Loader
 
     public List<ModContainer> getModList()
     {
-        return ImmutableList.copyOf(instance().mods);
+        return ImmutableList.copyOf(mods);
+    }
+    
+    public ModContainer getModById(String modId)
+    {
+        return namedMods.get(modId);
     }
 
     /**

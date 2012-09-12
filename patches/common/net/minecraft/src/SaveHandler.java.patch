@@ -1,0 +1,72 @@
+--- ../src-base/common/net/minecraft/src/SaveHandler.java
++++ ../src-work/common/net/minecraft/src/SaveHandler.java
+@@ -7,6 +7,8 @@
+ import java.io.FileOutputStream;
+ import java.io.IOException;
+ import java.util.logging.Logger;
++
++import cpw.mods.fml.common.registry.GameRegistry;
+ 
+ public class SaveHandler implements ISaveHandler, IPlayerFileData
+ {
+@@ -16,6 +18,7 @@
+     private final File field_75768_d;
+     private final long field_75769_e = System.currentTimeMillis();
+     private final String field_75767_f;
++    private WorldInfo worldInfo;
+ 
+     public SaveHandler(File p_i3912_1_, String p_i3912_2_, boolean p_i3912_3_)
+     {
+@@ -94,6 +97,14 @@
+ 
+     public WorldInfo func_75757_d()
+     {
++        if (worldInfo == null) {
++            worldInfo = realLoadWorldInfo();
++        }
++        return worldInfo;
++    }
++    
++    private WorldInfo realLoadWorldInfo()
++    {
+         File var1 = new File(this.field_75770_b, "level.dat");
+         NBTTagCompound var2;
+         NBTTagCompound var3;
+@@ -104,7 +115,9 @@
+             {
+                 var2 = CompressedStreamTools.func_74796_a(new FileInputStream(var1));
+                 var3 = var2.func_74775_l("Data");
+-                return new WorldInfo(var3);
++                WorldInfo r = new WorldInfo(var3);
++                GameRegistry.setBlockData(var2.func_74775_l("cpw.mods.fml.blockRegistry"));
++                return r;
+             }
+             catch (Exception var5)
+             {
+@@ -120,7 +133,9 @@
+             {
+                 var2 = CompressedStreamTools.func_74796_a(new FileInputStream(var1));
+                 var3 = var2.func_74775_l("Data");
+-                return new WorldInfo(var3);
++                WorldInfo r = new WorldInfo(var3);
++                GameRegistry.setBlockData(var2.func_74775_l("cpw.mods.fml.blockRegistry"));
++                return r;
+             }
+             catch (Exception var4)
+             {
+@@ -136,6 +151,7 @@
+         NBTTagCompound var3 = p_75755_1_.func_76082_a(p_75755_2_);
+         NBTTagCompound var4 = new NBTTagCompound();
+         var4.func_74782_a("Data", var3);
++        var4.func_74782_a("cpw.mods.fml.blockRegistry", GameRegistry.getBlockData());
+ 
+         try
+         {
+@@ -174,6 +190,7 @@
+         NBTTagCompound var2 = p_75761_1_.func_76066_a();
+         NBTTagCompound var3 = new NBTTagCompound();
+         var3.func_74782_a("Data", var2);
++        var3.func_74782_a("cpw.mods.fml.blockRegistry", GameRegistry.getBlockData());
+ 
+         try
+         {
