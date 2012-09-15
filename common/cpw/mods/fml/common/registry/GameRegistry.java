@@ -1,6 +1,12 @@
 package cpw.mods.fml.common.registry;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
@@ -13,15 +19,19 @@ import net.minecraft.src.FurnaceRecipes;
 import net.minecraft.src.IChunkProvider;
 import net.minecraft.src.IInventory;
 import net.minecraft.src.IRecipe;
+import net.minecraft.src.Item;
 import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.NBTBase;
+import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.NBTTagInt;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
+import net.minecraft.src.WorldInfo;
 import net.minecraft.src.WorldType;
 
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import cpw.mods.fml.common.FMLLog;
@@ -38,10 +48,25 @@ import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.Mod.Block;
 import cpw.mods.fml.common.ModContainer;
 
+@SuppressWarnings("serial")
+class InvalidBlockAnnotation extends RuntimeException
+{
+    InvalidBlockAnnotation(String modId, String typeName, Throwable e)
+    {
+        super("The mod " + modId + " has an invalid block annotation or uses invalid block type " + typeName + ".", e);
+    }
+
+    public InvalidBlockAnnotation(String modId, String reason)
+    {
+        super("The mod " + modId + " has an invalid block annotation: " + reason);
+    }
+}
+
 public class GameRegistry
 {
-    private static Multimap<ModContainer, BlockProxy> blockRegistry = ArrayListMultimap.create();
-    private static Multimap<ModContainer, ItemProxy> itemRegistry = ArrayListMultimap.create();
+    private static HashMap<ModContainer, HashMap<String, net.minecraft.src.Block>> blockRegistry = new HashMap();
+    private static BitSet movableBlocks = new BitSet(4096);
+    // private static Multimap<ModContainer, ItemProxy> itemRegistry = ArrayListMultimap.create();
     private static Set<IWorldGenerator> worldGenerators = Sets.newHashSet();
     private static List<IFuelHandler> fuelHandlers = Lists.newArrayList();
     private static List<ICraftingHandler> craftingHandlers = Lists.newArrayList();
@@ -132,18 +157,64 @@ public class GameRegistry
         }
         return -1;
     }
+
     /**
      * Internal method for creating an @Block instance
+     *
      * @param container
      * @param type
      * @param annotation
-     * @return
-     * @throws Exception
+     * @return Block instance that was created
+     * @throws InvalidBlockAnnotation
      */
-    public static Object buildBlock(ModContainer container, Class<?> type, Block annotation) throws Exception
+    public static net.minecraft.src.Block buildBlock(ModContainer container, Class<?> type, Block annotation)
+            throws InvalidBlockAnnotation
     {
-        Object o = type.getConstructor(int.class).newInstance(findSpareBlockId());
-        registerBlock((net.minecraft.src.Block) o);
+        Class<? extends net.minecraft.src.Block> typeCast;
+        try
+        {
+            typeCast = type.asSubclass(net.minecraft.src.Block.class);
+        }
+        catch (ClassCastException e)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+
+        Class<? extends ItemBlock> itemTypeClass = annotation.itemTypeClass();
+        if (itemTypeClass == null)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), "The itemTypeClass parameter is null.");
+        }
+
+        net.minecraft.src.Block o;
+        try
+        {
+            o = typeCast.getConstructor(int.class).newInstance(findSpareBlockId());
+        }
+        // TODO: use java7 multi-catch when available.
+        catch (NoSuchMethodException e)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+        catch (InstantiationException e)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+        catch (InvocationTargetException e)
+        {
+            Throwables.propagateIfPossible(e.getTargetException());
+            throw new InvalidBlockAnnotation(container.getModId(), type.getName(), e);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        registerManagedBlock(annotation.name(), o, itemTypeClass);
         return o;
     }
 
@@ -190,7 +261,165 @@ public class GameRegistry
             FMLLog.log(Level.SEVERE, e, "Caught an exception during block registration");
             throw new LoaderException(e);
         }
-        blockRegistry.put(Loader.instance().activeModContainer(), (BlockProxy) block);
+    }
+
+    /**
+     * Register an FML-managed block with the world. This block's ID may be changed by FML at world load time.
+     *
+     * @param name (optional) Name under which the block ID will be stored. If null, the block's class name will be used.
+     * @param block Block object that should be registered. It must have a valid block ID.
+     */
+    public static void registerManagedBlock(String name, net.minecraft.src.Block block)
+    {
+        registerManagedBlock(name, block, ItemBlock.class);
+    }
+
+    /**
+     * Register an FML-managed block with the world using a custom ItemBlock. This block's ID may be changed by FML at world load time.
+     *
+     * @param name (optional) Name under which the block ID will be stored. If null, the block's class name will be used.
+     * @param block Block object that should be registered. It must have a valid block ID.
+     * @param itemclass Custom ItemBlock class to use with this block.
+     */
+    public static void registerManagedBlock(String name, net.minecraft.src.Block block, Class<? extends ItemBlock> itemclass)
+    {
+        ModContainer activeModContainer = Loader.instance().activeModContainer();
+
+        registerBlock(block, itemclass);
+
+        if (name == null) {
+            name = block.getClass().getName();
+        }
+        HashMap<String, net.minecraft.src.Block> blockMap = blockRegistry.get(activeModContainer);
+        if (blockMap == null)
+        {
+            blockMap = new HashMap();
+            blockRegistry.put(activeModContainer, blockMap);
+        }
+        if (blockMap.containsKey(name)) {
+            FMLLog.warning(
+                    "The mod %s is attempting to register multiple blocks under name %s. This is almost always an error.",
+                    activeModContainer, name);
+            return;
+        }
+        blockMap.put(name, block);
+        movableBlocks.set(block.field_71990_ca);
+    }
+
+    /**
+     * FML internal use only.
+     */
+    public static NBTTagCompound getBlockData()
+    {
+        NBTTagCompound blockData = new NBTTagCompound();
+        for (Entry<ModContainer, HashMap<String, net.minecraft.src.Block>> modEntry : blockRegistry.entrySet())
+        {
+            ModContainer container = modEntry.getKey();
+            NBTTagCompound modData = new NBTTagCompound();
+            for (Entry<String, net.minecraft.src.Block> blockEntry : modEntry.getValue().entrySet())
+            {
+                String name = blockEntry.getKey();
+                net.minecraft.src.Block block = blockEntry.getValue();
+                modData.func_74768_a(name, block.field_71990_ca);
+            }
+            blockData.func_74782_a(container.getModId(), modData);
+        }
+        return blockData;
+    }
+
+    /**
+     * FML internal use only.
+     */
+    public static void setBlockData(NBTTagCompound blockData)
+    {
+        Loader loader = Loader.instance();
+        for (Object modObj : blockData.func_74758_c())
+        {
+            if (!(modObj instanceof NBTTagCompound))
+            {
+                throw new RuntimeException("Corruption detected in world save FML data");
+            }
+
+            NBTTagCompound modNbt = (NBTTagCompound) modObj;
+            String modId = modNbt.func_74740_e();
+            ModContainer mod = loader.getModById(modId);
+
+            if (mod == null)
+            {
+                throw new RuntimeException("World info references missing mod " + modId);
+            }
+
+            HashMap<String, net.minecraft.src.Block> blockMap = blockRegistry.get(mod);
+            if (blockMap == null)
+            {
+                throw new RuntimeException("World/Mod mismatch: mod " + modId + " has no registered blocks.");
+            }
+
+            for (Object blockObj : modNbt.func_74758_c())
+            {
+                if (!(blockObj instanceof NBTTagInt))
+                {
+                    throw new RuntimeException("Corruption detected in world save for mod " + modId);
+                }
+
+                NBTTagInt blockNbt = (NBTTagInt) blockObj;
+                String blockName = blockNbt.func_74740_e();
+                net.minecraft.src.Block block = blockMap.get(blockName);
+                if (block == null)
+                {
+                    throw new RuntimeException("World/Mod mismatch: mod " + modId + " has no block " + blockName);
+                }
+                forceBlockId(block, blockNbt.field_74748_a);
+            }
+        }
+    }
+
+    private static void forceBlockId(net.minecraft.src.Block block, int newBlockId)
+    {
+        int curBlockId = block.field_71990_ca;
+        if (curBlockId == newBlockId)
+        {
+            return;
+        }
+
+        assert movableBlocks.get(curBlockId);
+
+        net.minecraft.src.Block[] blockList = net.minecraft.src.Block.field_71973_m;
+        Item[] itemList = Item.field_77698_e;
+        Item item = itemList[curBlockId];
+
+        if (blockList[newBlockId] != null)
+        {
+            // Swap the blocks if possible.
+            if (!movableBlocks.get(newBlockId))
+            {
+                throw new RuntimeException("Unable to relocate block id " + newBlockId);
+            }
+
+            net.minecraft.src.Block movingBlock = blockList[newBlockId];
+            Item movingItem = itemList[newBlockId];
+
+            blockList[curBlockId] = movingBlock;
+            itemList[curBlockId] = movingItem;
+
+            movingBlock.field_71990_ca = curBlockId;
+            movingItem.field_77779_bT = curBlockId;
+        } else {
+            BlockTracker.releaseBlockId(curBlockId);
+            movableBlocks.clear(curBlockId);
+
+            blockList[curBlockId] = null;
+            itemList[curBlockId] = null;
+
+            BlockTracker.reserveBlockId(newBlockId);
+            movableBlocks.set(newBlockId);
+        }
+
+        blockList[newBlockId] = block;
+        itemList[newBlockId] = item;
+
+        block.field_71990_ca = newBlockId;
+        item.field_77779_bT = newBlockId;
     }
 
     public static void addRecipe(ItemStack output, Object... params)

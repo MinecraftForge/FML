@@ -3,6 +3,7 @@ package cpw.mods.fml.common.registry;
 import java.util.BitSet;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.Item;
 
 class BlockTracker
 {
@@ -11,39 +12,70 @@ class BlockTracker
 
     private BlockTracker()
     {
-        allocatedBlocks = new BitSet(4096);
-        allocatedBlocks.set(0, 4096);
-        for (int i = 0; i < Block.field_71973_m.length; i++)
+        if (allocatedBlocks != null)
         {
-            if (Block.field_71973_m[i]!=null)
+            return;
+        }
+
+        allocatedBlocks = new BitSet(4096);
+        allocatedBlocks.set(0);  // Never use ID 0.
+        Block[] blockList = Block.field_71973_m;
+        for (int i = 1; i < blockList.length; i++)
+        {
+            if (blockList[i] != null)
             {
-                allocatedBlocks.clear(i);
+                allocatedBlocks.set(i);
+            }
+        }
+        // We also do not want to use a block ID that conflicts with an item.
+        Item[] itemList = Item.field_77698_e;
+        for (int i = 1; i < blockList.length && i < itemList.length; i++)
+        {
+            if (itemList[i] != null)
+            {
+                allocatedBlocks.set(i);
             }
         }
     }
+
     public static int nextBlockId()
     {
-        return instance().getNextBlockId();
+        Block[] blockList = Block.field_71973_m;
+        Item[] itemList = Item.field_77698_e;
+
+        int blockId;
+        do
+        {
+            blockId = INSTANCE.getNextBlockId();
+        } while (blockList[blockId] != null || itemList[blockId] != null);
+
+        return blockId;
     }
 
     private int getNextBlockId()
     {
-        int idx = allocatedBlocks.nextSetBit(0);
-        allocatedBlocks.clear(idx);
+        int idx = allocatedBlocks.nextClearBit(1);
+        allocatedBlocks.set(idx);
         return idx;
     }
-    private static BlockTracker instance()
-    {
-        return INSTANCE;
-    }
+
     public static void reserveBlockId(int id)
     {
-        instance().doReserveId(id);
+        INSTANCE.doReserveId(id);
     }
+
     private void doReserveId(int id)
+    {
+		allocatedBlocks.set(id);
+	}
+
+    public static void releaseBlockId(int id)
+    {
+        INSTANCE.doReleaseId(id);
+    }
+
+    private void doReleaseId(int id)
     {
         allocatedBlocks.clear(id);
     }
-
-
 }
