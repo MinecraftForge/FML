@@ -277,6 +277,7 @@ public class EntityRegistry
     {
         for (BiomeGenBase biome : biomes)
         {
+            if (biome == null) continue;
             @SuppressWarnings("unchecked")
             Iterator<SpawnListEntry> spawns = biome.func_76747_a(typeOfCreature).iterator();
 
