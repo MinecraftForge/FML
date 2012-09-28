@@ -74,9 +74,9 @@ public class LanguageRegistry
     public static void reloadLanguageTable()
     {
         // reload language table by forcing lang to null and reloading the properties file
-        String lang = StringTranslate.getInstance().getCurrentLanguage();
-        StringTranslate.getInstance().currentLanguage = null;
-        StringTranslate.getInstance().setLanguage(lang);
+        String lang = StringTranslate.func_74808_a().func_74811_c();
+        StringTranslate.func_74808_a().field_74813_d = null;
+        StringTranslate.func_74808_a().func_74810_a(lang);
     }
 
 
@@ -84,11 +84,11 @@ public class LanguageRegistry
     {
         String objectName;
         if (objectToName instanceof Item) {
-            objectName=((Item)objectToName).getItemName();
+            objectName=((Item)objectToName).func_77658_a();
         } else if (objectToName instanceof Block) {
-            objectName=((Block)objectToName).getBlockName();
+            objectName=((Block)objectToName).func_71917_a();
         } else if (objectToName instanceof ItemStack) {
-            objectName=((ItemStack)objectToName).getItem().getItemNameIS((ItemStack)objectToName);
+            objectName=((ItemStack)objectToName).func_77973_b().func_77667_c((ItemStack)objectToName);
         } else {
             throw new IllegalArgumentException(String.format("Illegal object for naming %s",objectToName));
         }
