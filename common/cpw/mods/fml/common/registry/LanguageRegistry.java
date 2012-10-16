@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.StringTranslate;
@@ -25,7 +26,7 @@ public class LanguageRegistry
 
     public String getStringLocalization(String key)
     {
-        return getStringLocalization(key, StringTranslate.func_74808_a().func_74811_c());
+        return getStringLocalization(key, StringTranslate.getInstance().getCurrentLanguage());
     }
 
     public String getStringLocalization(String key, String lang)
@@ -74,9 +75,9 @@ public class LanguageRegistry
     public static void reloadLanguageTable()
     {
         // reload language table by forcing lang to null and reloading the properties file
-        String lang = StringTranslate.func_74808_a().func_74811_c();
-        StringTranslate.func_74808_a().field_74813_d = null;
-        StringTranslate.func_74808_a().func_74810_a(lang);
+        String lang = StringTranslate.getInstance().getCurrentLanguage();
+        StringTranslate.getInstance().currentLanguage = null;
+        StringTranslate.getInstance().setLanguage(lang);
     }
 
 
@@ -84,16 +85,33 @@ public class LanguageRegistry
     {
         String objectName;
         if (objectToName instanceof Item) {
-            objectName=((Item)objectToName).func_77658_a();
+            objectName=((Item)objectToName).getItemName();
         } else if (objectToName instanceof Block) {
-            objectName=((Block)objectToName).func_71917_a();
+            objectName=((Block)objectToName).getBlockName();
         } else if (objectToName instanceof ItemStack) {
-            objectName=((ItemStack)objectToName).func_77973_b().func_77667_c((ItemStack)objectToName);
+            objectName=((ItemStack)objectToName).getItem().getItemNameIS((ItemStack)objectToName);
+        //briman0094: added CreativeTabs to nameable objects
         } else {
             throw new IllegalArgumentException(String.format("Illegal object for naming %s",objectToName));
         }
         objectName+=".name";
         addStringLocalization(objectName, lang, name);
+    }
+    
+    public void addNameForCreativeTab(CreativeTabs tab, String lang, String name)
+    {
+    	 String tName = "itemGroup." + tab.getTabLabel();
+    	 addStringLocalization(tName, lang, name);
+    }
+    
+    public void addNameForCreativeTab(CreativeTabs tab, String name)
+    {
+    	addNameForCreativeTab(tab, "en_US", name);
+    }
+    
+    public static void addName(CreativeTabs tab, String name)
+    {
+    	instance().addNameForCreativeTab(tab, name);
     }
 
     public static void addName(Object objectToName, String name)
