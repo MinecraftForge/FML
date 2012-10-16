@@ -90,7 +90,6 @@ public class LanguageRegistry
             objectName=((Block)objectToName).func_71917_a();
         } else if (objectToName instanceof ItemStack) {
             objectName=((ItemStack)objectToName).func_77973_b().func_77667_c((ItemStack)objectToName);
-        //briman0094: added CreativeTabs to nameable objects
         } else {
             throw new IllegalArgumentException(String.format("Illegal object for naming %s",objectToName));
         }
