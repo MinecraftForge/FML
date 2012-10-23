@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.CreativeTabs;
 import net.minecraft.src.Item;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.StringTranslate;
@@ -94,6 +95,22 @@ public class LanguageRegistry
         }
         objectName+=".name";
         addStringLocalization(objectName, lang, name);
+    }
+    
+    public void addNameForCreativeTab(CreativeTabs tab, String lang, String name)
+    {
+    	 String tName = "itemGroup." + tab.getTabLabel();
+    	 addStringLocalization(tName, lang, name);
+    }
+    
+    public void addNameForCreativeTab(CreativeTabs tab, String name)
+    {
+    	addNameForCreativeTab(tab, "en_US", name);
+    }
+    
+    public static void addName(CreativeTabs tab, String name)
+    {
+    	instance().addNameForCreativeTab(tab, name);
     }
 
     public static void addName(Object objectToName, String name)
