@@ -1,6 +1,7 @@
 package cpw.mods.fml.common.registry;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
@@ -15,12 +16,14 @@ import net.minecraft.src.IInventory;
 import net.minecraft.src.IRecipe;
 import net.minecraft.src.ItemBlock;
 import net.minecraft.src.ItemStack;
+import net.minecraft.src.Potion;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldType;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
@@ -42,6 +45,7 @@ public class GameRegistry
 {
     private static Multimap<ModContainer, BlockProxy> blockRegistry = ArrayListMultimap.create();
     private static Multimap<ModContainer, ItemProxy> itemRegistry = ArrayListMultimap.create();
+    private static Map<Integer, Potion[]> potionRegistry = Maps.newHashMap();
     private static Set<IWorldGenerator> worldGenerators = Sets.newHashSet();
     private static List<IFuelHandler> fuelHandlers = Lists.newArrayList();
     private static List<ICraftingHandler> craftingHandlers = Lists.newArrayList();
@@ -104,6 +108,36 @@ public class GameRegistry
                 return handler.dispense(x, y, z, xVelocity, zVelocity, world, item, random, entX, entY, entZ);
             }
         });
+    }
+    
+    /**
+     * Register an array of potions
+     * 
+     * @param potions
+     * @param id
+     * @throws IllegalArgumentException
+     */
+    public static void registerPotions(Potion[] potions, int id)
+    {
+    	if (potionRegistry.containsKey(id))
+    	{
+    		potionRegistry.put(id, potions);
+    	}
+    	else
+    	{
+    		throw new IllegalArgumentException("Slot " + id + " is already occupied by " + potionRegistry.get(id) + " when adding " + potions);
+    	}
+    }
+    public static Potion getPotionFromArrayIdAndIndex(int id, int index)
+    {
+    	if (potionRegistry.containsKey(id))
+    	{
+    		if (potionRegistry.get(id).length > index)
+    		{
+    			return potionRegistry.get(id)[index];
+    		}
+    	}
+    	return null;
     }
 
 
