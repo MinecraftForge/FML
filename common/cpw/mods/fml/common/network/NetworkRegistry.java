@@ -333,7 +333,7 @@ public class NetworkRegistry
             chat = s.isClient() ? listener.clientChat(handler, chat) : listener.serverChat(handler, chat);
         }
 
-        return chat;
+        if (chat != null) return chat;
     }
     public void handleTinyPacket(NetHandler handler, Packet131MapData mapData)
     {
