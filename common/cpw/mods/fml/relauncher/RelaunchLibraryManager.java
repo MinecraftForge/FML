@@ -300,7 +300,7 @@ public class RelaunchLibraryManager
             @Override
             public boolean accept(File dir, String name)
             {
-                return name.endsWith(".jar");
+                return name.endsWith(".jar") || name.endsWith(".zip");
             }
         };
         File[] coreModList = coreMods.listFiles(ff);
@@ -314,7 +314,11 @@ public class RelaunchLibraryManager
             try
             {
                 jar = new JarFile(coreMod);
-                mfAttributes = jar.getManifest().getMainAttributes();
+                if (jar.getManifest() != null) {
+                    mfAttributes = jar.getManifest().getMainAttributes();
+                } else {
+                    mfAttributes = new Attributes();
+                }
             }
             catch (IOException ioe)
             {
