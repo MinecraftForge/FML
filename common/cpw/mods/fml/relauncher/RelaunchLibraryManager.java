@@ -314,7 +314,11 @@ public class RelaunchLibraryManager
             try
             {
                 jar = new JarFile(coreMod);
-                mfAttributes = jar.getManifest().getMainAttributes();
+                if (jar.getManifest() != null) {
+                    mfAttributes = jar.getManifest().getMainAttributes();
+                } else {
+                    mfAttributes = new Attributes();
+                }
             }
             catch (IOException ioe)
             {
