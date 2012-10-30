@@ -300,7 +300,7 @@ public class RelaunchLibraryManager
             @Override
             public boolean accept(File dir, String name)
             {
-                return name.endsWith(".jar");
+                return name.endsWith(".jar") || name.endsWith(".zip");
             }
         };
         File[] coreModList = coreMods.listFiles(ff);
