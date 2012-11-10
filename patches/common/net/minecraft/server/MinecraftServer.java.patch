@@ -10,7 +10,7 @@
  import net.minecraft.src.AnvilSaveConverter;
  import net.minecraft.src.AxisAlignedBB;
  import net.minecraft.src.BehaviorArrowDispense;
-@@ -385,7 +388,10 @@
+@@ -382,7 +385,10 @@
          {
              if (this.func_71197_b())
              {
@@ -21,7 +21,7 @@
  
                  for (long var50 = 0L; this.field_71317_u; this.field_71296_Q = true)
                  {
-@@ -424,6 +430,7 @@
+@@ -421,6 +427,7 @@
  
                      Thread.sleep(1L);
                  }
@@ -29,7 +29,7 @@
              }
              else
              {
-@@ -487,8 +494,10 @@
+@@ -484,8 +491,10 @@
  
      public void func_71217_p()
      {
@@ -40,7 +40,7 @@
          ++this.field_71315_w;
  
          if (this.field_71295_T)
-@@ -534,6 +543,7 @@
+@@ -531,6 +540,7 @@
  
          this.field_71304_b.func_76319_b();
          this.field_71304_b.func_76319_b();
@@ -48,18 +48,23 @@
      }
  
      public void func_71190_q()
-@@ -560,8 +570,10 @@
+@@ -558,6 +568,7 @@
                  }
  
                  this.field_71304_b.func_76320_a("tick");
 +                FMLCommonHandler.instance().onPreWorldTick(var4);
-                 var4.func_72835_b();
-                 var4.func_72939_s();
+                 CrashReport var6;
+ 
+                 try
+@@ -582,6 +593,7 @@
+                     throw new ReportedException(var6);
+                 }
+ 
 +                FMLCommonHandler.instance().onPostWorldTick(var4);
                  this.field_71304_b.func_76319_b();
                  this.field_71304_b.func_76320_a("tracker");
                  var4.func_73039_n().func_72788_a();
-@@ -1149,6 +1161,12 @@
+@@ -1150,6 +1162,12 @@
      @SideOnly(Side.SERVER)
      public static void main(String[] p_main_0_)
      {
