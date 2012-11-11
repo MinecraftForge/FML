@@ -1,4 +1,4 @@
-package keepcalm.mods.urlshortener;
+package cpw.mods.fml.common;
 
 import java.util.Map;
 import java.util.regex.Pattern;
