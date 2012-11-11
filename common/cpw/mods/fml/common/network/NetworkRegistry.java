@@ -210,7 +210,7 @@ public class NetworkRegistry
     {
         for (IConnectionHandler handler : connectionHandlers)
         {
-            handler.connectionClosed(manager, player);
+            handler.connectionClosed(manager, (Player)player);
         }
         activeChannels.removeAll(player);
     }
