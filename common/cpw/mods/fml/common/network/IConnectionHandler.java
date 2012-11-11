@@ -57,7 +57,7 @@ public interface IConnectionHandler
      *
      * @param manager
      */
-    void connectionClosed(INetworkManager manager, Entityplayer player);
+    void connectionClosed(INetworkManager manager, Player player);
 
     /**
      * Fired when the client established the connection to the server
