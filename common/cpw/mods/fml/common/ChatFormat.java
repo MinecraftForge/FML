@@ -2,14 +2,13 @@ package cpw.mods.fml.common;
 
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.HashMap;
 
-
-import com.google.common.collect.Maps;
 
 /**
  * All supported color values for chat
  */
-public enum ChatColor {
+public enum ChatFormat {
     /**
      * Represents black
      */
@@ -110,14 +109,14 @@ public enum ChatColor {
     private final char code;
     private final boolean isFormat;
     private final String toString;
-    private final static Map<Integer, ChatColor> BY_ID = Maps.newHashMap();
-    private final static Map<Character, ChatColor> BY_CHAR = Maps.newHashMap();
+    private final static Map<Integer, ChatFormat> BY_ID = new HashMap<Integer, ChatFormat>();
+    private final static Map<Character, ChatFormat> BY_CHAR = new HashMap<Character,ChatFormat>();
 
-    private ChatColor(char code, int intCode) {
+    private ChatFormat(char code, int intCode) {
         this(code, intCode, false);
     }
 
-    private ChatColor(char code, int intCode, boolean isFormat) {
+    private ChatFormat(char code, int intCode, boolean isFormat) {
         this.code = code;
         this.intCode = intCode;
         this.isFormat = isFormat;
@@ -156,9 +155,9 @@ public enum ChatColor {
      * Gets the color represented by the specified color code
      *
      * @param code Code to check
-     * @return Associative {@link keepcalm.mods.urlshortener.ChatColor} with the given code, or null if it doesn't exist
+     * @return Associative {@link keepcalm.mods.urlshortener.ChatFormat} with the given code, or null if it doesn't exist
      */
-    public static ChatColor getByChar(char code) {
+    public static ChatFormat getByChar(char code) {
         return BY_CHAR.get(code);
     }
 
@@ -166,9 +165,9 @@ public enum ChatColor {
      * Gets the color represented by the specified color code
      *
      * @param code Code to check
-     * @return Associative {@link keepcalm.mods.urlshortener.ChatColor} with the given code, or null if it doesn't exist
+     * @return Associative {@link keepcalm.mods.urlshortener.ChatFormat} with the given code, or null if it doesn't exist
      */
-    public static ChatColor getByChar(String code) {
+    public static ChatFormat getByChar(String code) {
         if (code == null) {
 	       	throw new RuntimeException("Code cannot be null");
 	}
@@ -196,18 +195,18 @@ public enum ChatColor {
 
     /**
      * Translates a string using an alternate color code character into a string that uses the internal
-     * ChatColor.COLOR_CODE color code character. The alternate color code character will only be replaced
+     * ChatFormat.COLOR_CODE color code character. The alternate color code character will only be replaced
      * if it is immediately followed by 0-9, A-F, or a-f.
      * 
      * @param altColorChar The alternate color code character to replace. Ex: &
      * @param textToTranslate Text containing the alternate color code character. 
-     * @return Text containing the ChatColor.COLOR_CODE color code character.
+     * @return Text containing the ChatFormat.COLOR_CODE color code character.
      */
     public static String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
         char[] b = textToTranslate.toCharArray();
         for (int i = 0; i < b.length - 1; i++) {
             if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i+1]) > -1) {
-                b[i] = ChatColor.COLOR_CHAR;
+                b[i] = ChatFormat.COLOR_CHAR;
                 b[i+1] = Character.toLowerCase(b[i+1]);
             }
         }
@@ -215,10 +214,10 @@ public enum ChatColor {
     }
 
     /**
-     * Gets the ChatColors used at the end of the given input string.
+     * Gets the ChatFormats used at the end of the given input string.
      *
      * @param input Input string to retrieve the colors from.
-     * @return Any remaining ChatColors to pass onto the next line.
+     * @return Any remaining ChatFormats to pass onto the next line.
      */
     public static String getLastColors(String input) {
         String result = "";
@@ -229,7 +228,7 @@ public enum ChatColor {
             char section = input.charAt(index);
             if (section == COLOR_CHAR && index < length - 1) {
                 char c = input.charAt(index + 1);
-                ChatColor color = getByChar(c);
+                ChatFormat color = getByChar(c);
 
                 if (color != null) {
                     result = color.toString() + result;
@@ -246,7 +245,7 @@ public enum ChatColor {
     }
 
     static {
-        for (ChatColor color : values()) {
+        for (ChatFormat color : values()) {
             BY_ID.put(color.intCode, color);
             BY_CHAR.put(color.code, color);
         }
