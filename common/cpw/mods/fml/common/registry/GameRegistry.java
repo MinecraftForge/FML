@@ -83,6 +83,10 @@ public class GameRegistry
         }
     }
 
+    /**
+     * Deprecated in favor for Minecraft's default Diespenser Handler.'
+     */
+    @Deprecated
     public static void registerDispenserHandler(IDispenserHandler handler)
     {
         dispenserHandlers.add(handler);
