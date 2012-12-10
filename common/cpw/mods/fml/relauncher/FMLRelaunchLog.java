@@ -180,7 +180,14 @@ public class FMLRelaunchLog
         {
             configureLogging();
         }
-        log.myLog.log(level, String.format(format, data));
+        if(data.length >= 1)
+        {
+            log.myLog.log(level, String.format(format, data));
+        }
+        else
+        {
+            log.myLog.log(level, format);
+        }
     }
 
     public static void log(Level level, Throwable ex, String format, Object... data)
@@ -189,7 +196,14 @@ public class FMLRelaunchLog
         {
             configureLogging();
         }
-        log.myLog.log(level, String.format(format, data), ex);
+        if(data.length >= 1)
+        {
+            log.myLog.log(level, String.format(format, data), ex);
+        }
+        else
+        {
+            log.myLog.log(level, format, ex);
+        }
     }
 
     public static void severe(String format, Object... data)
