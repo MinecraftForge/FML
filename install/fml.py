@@ -1,4 +1,4 @@
-import os, os.path, sys
+import os, os.path, sys, platform
 import urllib, zipfile
 import shutil, glob, fnmatch
 import subprocess, logging, re, shlex
@@ -658,6 +658,10 @@ def setup_mcp(fml_dir, mcp_dir, dont_gen_conf=True):
     if os.sep == '\\':
         cmd = cmd.replace('\\', '\\\\')
     cmd = shlex.split(cmd)
+
+    osx = platform.system() == 'Darwin'
+    if osx:
+        os.chmod(os.path.join(mcp_dir, 'runtime', 'bin', 'astyle-osx'), 0755)
     
     fix_patch(patch, temp)
     process = subprocess.Popen(cmd, cwd=os.path.join(mcp_dir, 'runtime'), bufsize=-1)
