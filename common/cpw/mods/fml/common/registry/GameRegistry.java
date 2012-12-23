@@ -267,6 +267,11 @@ public class GameRegistry
     {
         FurnaceRecipes.func_77602_a().func_77600_a(input, output, xp);
     }
+    
+    public static void addSmelting(int input, int metadata, ItemStack output, float xp)
+    {
+        FurnaceRecipes.func_77602_a().func_77600_a(input, metadata, output, xp);
+    }
 
     public static void registerTileEntity(Class<? extends TileEntity> tileEntityClass, String id)
     {
