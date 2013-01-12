@@ -28,7 +28,7 @@ final class FMLLogFormatter extends Formatter
             name = lvl.getName();        	
         }
 
-        if ( ( name != null ) && ( name.length() != 0 ) )
+        if ( ( name != null ) && ( name.length() > 0 ) )
         {
             msg.append(" [" + name + "] ");
         }
