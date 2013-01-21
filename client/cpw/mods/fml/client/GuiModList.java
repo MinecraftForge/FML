@@ -121,17 +121,38 @@ public class GuiModList extends GuiScreen
                     int texture = this.field_73882_e.field_71446_o.func_78341_b(selectedMod.getMetadata().logoFile);
                     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                     this.field_73882_e.field_71446_o.func_78342_b(texture);
-                    Dimension dim = TextureFXManager.instance().getTextureDimensions(texture);
+                     Dimension dimensions = TextureFXManager.instance().getTextureDimensions(texture);
+                    Dimension boundry = new Dimension(200,65);
+                    
+                    int imageWidth = dimensions.width;
+                    int imageHeight = dimensions.height;
+                    int boundryWidth = boundry.width;
+                    int boundryHeight = boundry.height; 
+                    int newWidth = 0;
+                    int newHeight = 0;
+                    
+                    boolean flagResize = imageWidth > boundryWidth;
+                    
+                    if(flagResize){
+                        newWidth = boundryWidth;
+                        newHeight = (newWidth * imageHeight) / imageWidth;
+                        if(newHeight > boundryHeight){
+                    		newHeight = boundryHeight;
+                    		newWidth = (newHeight * imageWidth) / imageHeight;
+                    	}
+                    	dimensions = new Dimension(newWidth,newHeight);
+                    }
+                        
                     int top = 32;
                     Tessellator tess = Tessellator.field_78398_a;
                     tess.func_78382_b();
-                    tess.func_78374_a(offset,             top + dim.height, field_73735_i, 0, 1);
-                    tess.func_78374_a(offset + dim.width, top + dim.height, field_73735_i, 1, 1);
-                    tess.func_78374_a(offset + dim.width, top,              field_73735_i, 1, 0);
+                    tess.func_78374_a(offset,             top + dimensions.height, field_73735_i, 0, 1);
+                    tess.func_78374_a(offset + dimensions.width, top + dimensions.height, field_73735_i, 1, 1);
+                    tess.func_78374_a(offset + dimensions.width, top,              field_73735_i, 1, 0);
                     tess.func_78374_a(offset,             top,              field_73735_i, 0, 0);
                     tess.func_78381_a();
-
-                    shifty += 65;
+                    
+                    shifty += dimensions.height;
                 }
                 this.field_73886_k.func_78261_a(selectedMod.getMetadata().name, offset, shifty, 0xFFFFFF);
                 shifty += 12;
