@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
@@ -84,6 +85,7 @@ public class ModLoader
     // TODO dirty workaround for millinaire
     @Deprecated
     public static final Map<String,Map<String,String>> localizedStrings=Collections.emptyMap();
+    public static final Properties props = new Properties();
 
     /**
      * Adds localization info for an achievement, Not used on the server.
