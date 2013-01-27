@@ -136,4 +136,10 @@ public class InjectedModContainer implements ModContainer
     {
         return wrappedContainer.getSigningCertificate();
     }
+
+    @Override
+    public Object getModConfigGui()
+    {
+        return wrappedContainer.getModConfigGui();
+    }
 }

@@ -16,6 +16,7 @@ package cpw.mods.fml.client;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -28,6 +29,7 @@ import net.minecraft.util.StringTranslate;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
@@ -44,6 +46,7 @@ public class GuiModList extends GuiScreen
     private ModContainer selectedMod;
     private int listWidth;
     private ArrayList<ModContainer> mods;
+    private Map<ModContainer, GuiButton> modConfigButtons;
 
     /**
      * @param mainMenu
@@ -52,6 +55,7 @@ public class GuiModList extends GuiScreen
     {
         this.mainMenu=mainMenu;
         this.mods=new ArrayList<ModContainer>();
+        this.modConfigButtons = Maps.newHashMap();
         FMLClientHandler.instance().addSpecialModEntries(mods);
         for (ModContainer mod : Loader.instance().getModList()) {
             if (mod.getMetadata()!=null && mod.getMetadata().parentMod==null && !Strings.isNullOrEmpty(mod.getMetadata().parent)) {
@@ -75,9 +79,17 @@ public class GuiModList extends GuiScreen
     @Override
     public void func_73866_w_()
     {
-        for (ModContainer mod : mods) {
+        for (int i = 0; i < mods.size(); i++) {
+            ModContainer mod = mods.get(i);
             listWidth=Math.max(listWidth,getFontRenderer().func_78256_a(mod.getName()) + 10);
             listWidth=Math.max(listWidth,getFontRenderer().func_78256_a(mod.getVersion()) + 10);
+            if (mod.getModConfigGui() != null)
+            {
+                GuiButton configButton = new GuiButton(-(i + 1), 10, this.field_73881_g - 38, 120, 20, "Configure Mod");
+                configButton.field_73748_h = mod == selectedMod;
+                modConfigButtons.put(mod, configButton);
+                this.field_73887_h.add(configButton);
+            }
         }
         listWidth=Math.min(listWidth, 150);
         StringTranslate translations = StringTranslate.func_74808_a();
@@ -90,6 +102,16 @@ public class GuiModList extends GuiScreen
     protected void func_73875_a(GuiButton button) {
         if (button.field_73742_g)
         {
+            if (button.field_73741_f < 0)
+            {
+                try
+                {
+                    field_73882_e.func_71373_a((GuiScreen)mods.get(-button.field_73741_f - 1).getModConfigGui());
+                } catch (Throwable t)
+                {
+                    // discard silently ?
+                }
+            }
             switch (button.field_73741_f)
             {
                 case 6:
@@ -174,8 +196,22 @@ public class GuiModList extends GuiScreen
         this.selected=var1;
         if (var1>=0 && var1<=mods.size()) {
             this.selectedMod=mods.get(selected);
+            disableButtons();
+            if (modConfigButtons.containsKey(selectedMod))
+            {
+                modConfigButtons.get(selectedMod).field_73748_h = true;
+            }
         } else {
             this.selectedMod=null;
+            disableButtons();
+        }
+    }
+    
+    private void disableButtons()
+    {
+        for (GuiButton button : modConfigButtons.values())
+        {
+            button.field_73748_h = false;
         }
     }
 

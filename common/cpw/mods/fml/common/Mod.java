@@ -112,6 +112,12 @@ public @interface Mod
      */
     String certificateFingerprint() default "";
     /**
+     * Specifying a class name here will make a "Configure Mod" Button appear in the Mod List.
+     * If that button is clicked, the given Class will be shown. It must extend GuiScreen.   
+     * @return the name of the Mod Config GuiScreen class 
+     */
+    String configurationScreen() default "";
+    /**
      * Mark the designated method as to be called at if there is something wrong with the certificate fingerprint of
      * the mod's jar, or it is missing, or otherwise a problem.
      * @author cpw

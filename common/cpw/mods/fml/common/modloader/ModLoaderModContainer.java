@@ -622,4 +622,10 @@ public class ModLoaderModContainer implements ModContainer
     {
         return null;
     }
+
+    @Override
+    public Object getModConfigGui()
+    {
+        return null;
+    }
 }
