@@ -86,6 +86,7 @@ public class FMLModContainer implements ModContainer
     private Multimap<Class<? extends Annotation>, Object> annotations;
     private DefaultArtifactVersion processedVersion;
     private boolean isNetworkMod;
+    private Object configGui;
 
     private static final BiMap<Class<? extends FMLEvent>, Class<? extends Annotation>> modAnnotationTypes = ImmutableBiMap.<Class<? extends FMLEvent>, Class<? extends Annotation>>builder()
         .put(FMLPreInitializationEvent.class, Mod.PreInit.class)
@@ -463,6 +464,14 @@ public class FMLModContainer implements ModContainer
             }
             ProxyInjector.inject(this, event.getASMHarvestedData(), FMLCommonHandler.instance().getSide());
             processFieldAnnotations(event.getASMHarvestedData());
+            if (descriptor.get("configurationScreen").equals(""))
+            {
+                configGui = null;
+            }
+            else
+            {
+                configGui = Class.forName((String)descriptor.get("configurationScreen")).newInstance();
+            }
         }
         catch (Throwable e)
         {
@@ -531,5 +540,11 @@ public class FMLModContainer implements ModContainer
     public Certificate getSigningCertificate()
     {
         return certificate;
+    }
+
+    @Override
+    public Object getModConfigGui()
+    {
+        return configGui;
     }
 }

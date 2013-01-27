@@ -132,4 +132,10 @@ public interface ModContainer
     VersionRange acceptableMinecraftVersionRange();
 
     Certificate getSigningCertificate();
+    
+    /**
+     * gets a GuiScreen that should be shown when the "Configure Mod" button is pressed in the Mod List.
+     * @return the Mod Config Gui or null if none
+     */
+    Object getModConfigGui();
 }

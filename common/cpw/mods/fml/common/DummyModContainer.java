@@ -145,4 +145,10 @@ public class DummyModContainer implements ModContainer
     {
         return null;
     }
+
+    @Override
+    public Object getModConfigGui()
+    {
+        return null;
+    }
 }
