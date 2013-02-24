@@ -352,19 +352,9 @@ public class MCPMerger
     }
     private static byte[] readFully(InputStream stream) throws IOException
     {
-        byte[] data = new byte[4096];
-        ByteArrayOutputStream entryBuffer = new ByteArrayOutputStream();
-        int len;
-        do
-        {
-            len = stream.read(data);
-            if (len > 0)
-            {
-                entryBuffer.write(data, 0, len);
-            }
-        } while (len != -1);
-
-        return entryBuffer.toByteArray();
+    	byte[] arr = new byte[stream.available()];
+    	stream.read(arr, 0, stream.available());
+        return arr;
     }
     private static class ClassInfo
     {

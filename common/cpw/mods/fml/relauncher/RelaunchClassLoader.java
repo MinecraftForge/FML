@@ -247,14 +247,9 @@ public class RelaunchClassLoader extends URLClassLoader
     {
         try
         {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(stream.available());
-            int r;
-            while ((r = stream.read()) != -1)
-            {
-                bos.write(r);
-            }
-
-            return bos.toByteArray();
+        	byte[] arr = new byte[stream.available()];
+        	stream.read(arr, 0, stream.available());
+            return arr;
         }
         catch (Throwable t)
         {
