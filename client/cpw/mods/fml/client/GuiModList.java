@@ -120,7 +120,7 @@ public class GuiModList extends GuiScreen
                 if (!selectedMod.getMetadata().logoFile.isEmpty())
                 {
                     List<Texture> texList = TextureManager.func_94267_b().func_94266_e(selectedMod.getMetadata().logoFile);
-                    if (texList != null)// Potentially could not find the texture
+                    if (texList != null && texList.size() != 0)// Potentially could not find the texture
                     {
                         Texture texture = texList.get(0);
                         texture.func_94277_a(0);
