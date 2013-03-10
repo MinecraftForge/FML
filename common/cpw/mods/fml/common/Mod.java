@@ -240,6 +240,7 @@ public @interface Mod
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @Deprecated
     public @interface Block {
         /**
          * The block's name
@@ -257,6 +258,7 @@ public @interface Mod
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @Deprecated
     public @interface Item {
         /**
          * The name of the item
