@@ -18,6 +18,24 @@
  
  class Commands(object):
      """Contains the commands and initialisation for a full mcp run"""
+@@ -718,6 +718,8 @@
+                     results.append('')
+                 except (CalledProcessError, OSError):
+                     pass
++            if not results:
++                results.extend(whereis('javac.exe', os.getenv("JAVA_HOME")))
+             if not results and 'ProgramW6432' in os.environ:
+                 results.extend(whereis('javac.exe', os.environ['ProgramW6432']))
+             if not results and 'ProgramFiles' in os.environ:
+@@ -732,6 +734,8 @@
+                 except (CalledProcessError, OSError):
+                     pass
+             if not results:
++                results.extend(whereis('javac', os.getenv("JAVA_HOME")))
++            if not results:
+                 results.extend(whereis('javac', '/usr/bin'))
+             if not results:
+                 results.extend(whereis('javac', '/usr/local/bin'))
 @@ -796,6 +800,8 @@
          binlk = {CLIENT: self.binclient, SERVER: self.binserver}
          testlk = {CLIENT: self.testclient, SERVER: self.testserver}
