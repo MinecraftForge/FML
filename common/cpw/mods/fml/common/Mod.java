@@ -126,6 +126,19 @@ public @interface Mod
      */
     String asmHookClass() default "";
     /**
+     * An optional GuiScreen class that can be used by a modder for anything the modder wants
+     * (i.e. Info/Options/Whatever the modder want's to use it for).
+     * @author ExE Boss
+     * 
+     */
+    public @interface String GuiScreenClass() {}
+    /**
+     * Required if mod has a GuiScreen class
+     * @author ExE Boss
+     * 
+     */
+    public @interface GuiScreenName {}
+    /**
      * Mark the designated method as to be called at if there is something wrong with the certificate fingerprint of
      * the mod's jar, or it is missing, or otherwise a problem.
      * @author cpw
