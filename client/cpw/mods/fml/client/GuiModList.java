@@ -15,7 +15,9 @@
 package cpw.mods.fml.client;
 
 import java.awt.Dimension;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -30,6 +32,8 @@ import org.lwjgl.opengl.GL11;
 import com.google.common.base.Strings;
 
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod.GuiScreenClass;
+import cpw.mods.fml.common.Mod.GuiScreenName;
 import cpw.mods.fml.common.ModContainer;
 
 /**
@@ -82,8 +86,45 @@ public class GuiModList extends GuiScreen
         listWidth=Math.min(listWidth, 150);
         StringTranslate translations = StringTranslate.func_74808_a();
         this.field_73887_h.add(new GuiSmallButton(6, this.field_73880_f / 2 - 75, this.field_73881_g - 38, translations.func_74805_b("gui.done")));
+        if(getModGuiScreenName() != null && getModGuiScreenClass() != null)
+            this.field_73887_h.add(new GuiSmallButton(9, this.field_73880_f - 75, 25, getModGuiScreenName())
         this.modList=new GuiSlotModList(this, mods, listWidth);
         this.modList.registerScrollButtons(this.field_73887_h, 7, 8);
+    }
+    
+    private GuiScreen getModGuiScreenClass()
+    {
+    	for(Field field : selectedMod.getMod().getClass.getDeclaredFields())
+    		if(field.isAnnotationPresent(GuiScreenClass.class) && (field.getModifiers() & Modifier.STATIC) == 0)
+    		{
+    			try{
+    				return (GuiScreen)field.get(selectedMod.getMod());
+    			} catch(Exception e) {
+    				e.printStackTrace();
+    			}
+    		}
+		return null;
+    }
+    
+    private String getModGuiScreenName()
+    {
+    	for(Field field : selectedMod.getMod().getClass.getDeclaredFields())
+    		if(field.isAnnotationPresent(GuiScreenName.class))
+    		{
+    			try{
+    				return ((String)field.get(selectedMod.getMod()))
+    			} catch (IllegalArgumentException e) {
+    				e.printStackTrace();
+    				return null;
+    			} catch (IllegalAccessException e) {
+					FMLLog.log(Level.WARNING, e, "Field %s must be public", field.getType().getName())
+    				return null;
+    			} catch (ClassCastException e){
+					FMLLog.log(Level.WARNING, e, "Cannot cast %s to a String", field.getType().getName())
+    				return null;
+				}
+    		}
+		return null;
     }
 
     @Override
@@ -95,6 +136,12 @@ public class GuiModList extends GuiScreen
                 case 6:
                     this.field_73882_e.func_71373_a(this.mainMenu);
                     return;
+                case 9:
+                	if(getModGuiScreenClass() != null)
+                        this.field_73882_e.func_71373_a(getModGuiScreenClass());
+                	else
+                		button.field_73748_h = false;
+                	return;
             }
         }
         super.func_73875_a(button);
