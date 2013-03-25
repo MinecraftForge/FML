@@ -14,6 +14,7 @@ package cpw.mods.fml.relauncher;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 /**
  * Some reflection helper code.
  *
@@ -121,6 +122,7 @@ public class ReflectionHelper
         {
             Field f = classToAccess.getDeclaredFields()[fieldIndex];
             f.setAccessible(true);
+            unfinalize(f);
             f.set(instance, value);
         }
         catch (Exception e)
@@ -133,7 +135,9 @@ public class ReflectionHelper
     {
         try
         {
-            findField(classToAccess, fieldNames).set(instance, value);
+            Field f = findField(classToAccess, fieldNames);
+            unfinalize(f);
+            f.set(instance, value);
         }
         catch (Exception e)
         {
@@ -177,5 +181,16 @@ public class ReflectionHelper
             }
         }
         throw new UnableToFindMethodException(methodNames, failed);
+    }
+    
+    public static void unfinalize(Field field) throws ReflectiveOperationException
+    {
+        // remove Modifier.FINAL flag if set
+        if ((field.getModifiers() & Modifier.FINAL) != 0)
+        {
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+        }
     }
 }
