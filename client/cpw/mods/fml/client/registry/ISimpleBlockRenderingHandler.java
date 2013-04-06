@@ -22,7 +22,7 @@ public interface ISimpleBlockRenderingHandler
 
     public abstract boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer);
 
-    public abstract boolean shouldRender3DInInventory(int modelId);
+    public abstract boolean shouldRender3DInInventory();
 
     public abstract int getRenderId();
 }

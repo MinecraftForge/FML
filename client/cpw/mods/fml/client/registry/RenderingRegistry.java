@@ -38,6 +38,8 @@ public class RenderingRegistry
     private int nextRenderId = 40;
 
     private Map<Integer, ISimpleBlockRenderingHandler> blockRenderers = Maps.newHashMap();
+	
+	private Map<Integer, Boolean> render3dInInventory = Maps.newHashMap();
 
     private List<EntityRendererInfo> entityRenderers = Lists.newArrayList();
 
@@ -86,6 +88,22 @@ public class RenderingRegistry
     public static void registerBlockHandler(int renderId, ISimpleBlockRenderingHandler handler)
     {
         instance().blockRenderers.put(renderId, handler);
+    }
+	
+	/**
+     * Register the simple block rendering handler
+     * This version will not call getRenderId on the passed in handler, instead using the supplied ID, so you
+     * can easily re-use the same rendering handler for multiple IDs, and it will set if the renderId given
+	 * should be rendered 3D in the inventory
+     *
+     * @param renderId
+     * @param handler
+	 * @param render3dInInventory
+     */
+    public static void registerBlockHandler(int renderId, ISimpleBlockRenderingHandler handler, boolean render3dInInventory)
+    {
+        instance().blockRenderers.put(renderId, handler);
+		instance().render3dInInventory.put(renderId, render3dInInventory);
     }
     /**
      * Get the next available renderId from the block render ID list
@@ -163,7 +181,7 @@ public class RenderingRegistry
     public boolean renderItemAsFull3DBlock(int modelId)
     {
         ISimpleBlockRenderingHandler bri = blockRenderers.get(modelId);
-        return bri != null && bri.shouldRender3DInInventory(modelId);
+        return bri != null && (bri.shouldRender3DInInventory() || (render3dInInventory.containsKey(modelId) && render3dInInventory.get(modelId)));
     }
 
     public void loadEntityRenderers(Map<Class<? extends Entity>, Render> rendererMap)
