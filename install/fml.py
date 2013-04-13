@@ -653,6 +653,82 @@ def download_mcp(mcp_dir, fml_dir, version=None):
         output, _ = process.communicate()
         
     return True
+
+def gen_source_names_conf(mcp_dir, fml_dir):    
+    srg_file = os.path.join(mcp_dir, 'conf', 'packaged.srg')
+    fml_file = os.path.join(fml_dir, 'mod_deobf.srg')
+    
+    methods_file = os.path.join(fml_dir, 'conf', 'methods.csv')
+    fields_file = os.path.join(fml_dir, 'conf', 'fields.csv')
+
+    def read_file(filename):
+        result = dict()
+        with open(filename, 'rb') as f:
+            reader = csv.reader(f)
+            reader.next()
+            for row in reader:
+                srg = row[0]
+                fml = row[1]
+                result[srg] = fml
+        return result
+    
+    methods = read_file(methods_file)
+    fields = read_file(fields_file)
+
+    def translate_srg(srg_name, map):
+        parts = srg_name.split('/')
+        cls = '/'.join(parts[0:-1])
+        name = parts[-1]
+
+        try:
+            return cls + '/' + map[name]
+        except KeyError:
+            return None
+    
+    def translate_field(data):
+        srg_name = data[1]
+        fml_name = translate_srg(srg_name, fields)
+        if not fml_name or fml_name == srg_name:
+            yield data
+        else:
+            obf_to_fml = list(data)
+            obf_to_fml[1] = fml_name
+            yield obf_to_fml
+
+            srg_to_fml = list(obf_to_fml)
+            srg_to_fml[0] = srg_name
+            yield srg_to_fml
+
+    def translate_method(data):
+        srg_name = data[2]
+        srg_sig = data[3]
+        fml_name = translate_srg(srg_name, methods)
+        if not fml_name or fml_name == srg_name:
+            yield data
+        else:
+            obf_to_fml = list(data)
+            obf_to_fml[2] = fml_name
+            yield obf_to_fml
+
+            srg_to_fml = list(obf_to_fml)
+            srg_to_fml[0] = srg_name
+            srg_to_fml[1] = srg_sig
+            yield srg_to_fml
+
+    actions = {
+        'FD:' : translate_field,
+        'MD:' : translate_method
+    }
+
+    with open(srg_file, 'r') as srg, open(fml_file, 'w') as fml:
+        for line in srg:
+            values = line.split()
+            entry_type = values[0]
+            try:
+                for entry in actions[entry_type](values[1:]):
+                    fml.write("%s %s\n" % (entry_type, ' '.join(entry)))
+            except KeyError:
+                fml.write(line)
     
 def setup_mcp(fml_dir, mcp_dir, dont_gen_conf=True):
     global mcp_version
@@ -727,6 +803,7 @@ def setup_mcp(fml_dir, mcp_dir, dont_gen_conf=True):
     shutil.copytree(fml_conf, mcp_conf)
     
     gen_renamed_conf(mcp_dir, fml_dir)
+    gen_source_names_conf(mcp_dir, fml_dir)
     
     #update workspace
     if not os.path.isfile(os.path.join(fml_dir, 'fmlbuild.properties-sample')):

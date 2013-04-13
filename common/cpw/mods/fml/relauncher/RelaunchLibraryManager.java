@@ -49,6 +49,11 @@ public class RelaunchLibraryManager
     private static List<IFMLLoadingPlugin> loadPlugins;
     private static List<ILibrarySet> libraries;
     private static boolean deobfuscatedEnvironment;
+    
+    public static boolean isInDeobfuscatedEnvironment() 
+    {
+        return deobfuscatedEnvironment;
+    }
 
     public static void handleLaunch(File mcDir, RelaunchClassLoader actualClassLoader)
     {
@@ -58,7 +63,7 @@ public class RelaunchLibraryManager
             byte[] bs = actualClassLoader.getClassBytes("net.minecraft.world.World");
             if (bs != null)
             {
-                FMLRelaunchLog.info("Managed to load a deobfuscated Minecraft name- we are in a deobfuscated environment. Skipping runtime deobfuscation");
+                FMLRelaunchLog.info("Managed to load a deobfuscated Minecraft name - we are in a deobfuscated environment. Only selected classes will be transformed.");
                 deobfuscatedEnvironment = true;
             }
         }
@@ -268,15 +273,13 @@ public class RelaunchLibraryManager
             {
                 for (String xformClass : plug.getASMTransformerClass())
                 {
-                    actualClassLoader.registerTransformer(xformClass);
+                    actualClassLoader.registerTransformer(xformClass, false);
                 }
             }
         }
+        
         // Deobfuscation transformer, always last
-        if (!deobfuscatedEnvironment)
-        {
-            actualClassLoader.registerTransformer("cpw.mods.fml.common.asm.transformers.DeobfuscationTransformer");
-        }
+        actualClassLoader.registerTransformer("cpw.mods.fml.common.asm.transformers.DeobfuscationTransformer", !deobfuscatedEnvironment);
         downloadMonitor.updateProgressString("Running coremod plugins");
         Map<String,Object> data = new HashMap<String,Object>();
         data.put("mcLocation", mcDir);
@@ -298,6 +301,7 @@ public class RelaunchLibraryManager
                     callData.put("classLoader", actualClassLoader);
                     callData.put("coremodLocation", pluginLocations.get(plugin));
                     callData.put("deobfuscationFileName", FMLInjectionData.debfuscationDataName());
+                    callData.put("runtimeDeobfuscationEnabled", !deobfuscatedEnvironment);
                     call.injectData(callData);
                     call.call();
                 }

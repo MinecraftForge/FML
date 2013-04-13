@@ -12,26 +12,76 @@
 
 package cpw.mods.fml.common.asm.transformers;
 
+import java.util.List;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.RemappingClassAdapter;
-import org.objectweb.asm.tree.ClassNode;
 
 import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import cpw.mods.fml.common.asm.transformers.deobf.FMLRemappingAdapter;
 import cpw.mods.fml.relauncher.IClassNameTransformer;
 import cpw.mods.fml.relauncher.IClassTransformer;
+import cpw.mods.fml.relauncher.RelaunchLibraryManager;
+import cpw.mods.fml.relauncher.FMLRelaunchLog;
 
 public class DeobfuscationTransformer implements IClassTransformer, IClassNameTransformer {
 
+    private static List<String> forcedPrefixes;
+    
+    private static List<String> getForcedPrefixes() 
+    {
+        if (forcedPrefixes == null) 
+        {
+            String prefixList = System.getProperty("fml.forcedDeobfuscationPrefixes");
+            if (prefixList != null && FMLDeobfuscatingRemapper.INSTANCE.isDeobfuscationDataLoaded())
+            {
+                forcedPrefixes = ImmutableList.copyOf(Splitter.on(';').split(prefixList));
+                FMLRelaunchLog.fine("Prefixes selected for deobfuscation: " + prefixList);
+            } 
+            else
+            {
+                forcedPrefixes = ImmutableList.of();
+            }
+        }
+        
+        return forcedPrefixes;
+    }
+    
+    private static boolean canTransform(String name) 
+    {
+        if (!RelaunchLibraryManager.isInDeobfuscatedEnvironment())
+        {
+            return true;
+        }
+        
+        if (!FMLDeobfuscatingRemapper.INSTANCE.isDeobfuscationDataLoaded())
+        {
+            return false;
+        }
+        
+        for (String prefix : getForcedPrefixes())
+        {
+            if (name.startsWith(prefix))
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+  
     @Override
     public byte[] transform(String name, String transformedName, byte[] bytes)
     {
-        if (bytes == null)
+        if (bytes == null || !canTransform(name))
         {
-            return null;
+            return bytes;
         }
+        
         ClassReader classReader = new ClassReader(bytes);
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         RemappingClassAdapter remapAdapter = new FMLRemappingAdapter(classWriter);
