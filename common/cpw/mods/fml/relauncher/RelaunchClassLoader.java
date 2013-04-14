@@ -115,13 +115,13 @@ public class RelaunchClassLoader extends URLClassLoader
         }
     }
 
-    public void registerTransformer(String transformerClassName)
+    public void registerTransformer(String transformerClassName, boolean setRenameTransformer)
     {
         try
         {
             IClassTransformer transformer = (IClassTransformer) loadClass(transformerClassName).newInstance();
             transformers.add(transformer);
-            if (transformer instanceof IClassNameTransformer && renameTransformer == null)
+            if (setRenameTransformer && transformer instanceof IClassNameTransformer && renameTransformer == null)
             {
                 renameTransformer = (IClassNameTransformer) transformer;
             }

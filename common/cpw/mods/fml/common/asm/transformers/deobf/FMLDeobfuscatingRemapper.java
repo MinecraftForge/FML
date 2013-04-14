@@ -43,6 +43,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.ImmutableBiMap.Builder;
+import com.google.common.io.Files;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 
@@ -69,19 +70,45 @@ public class FMLDeobfuscatingRemapper extends Remapper {
         classNameBiMap=ImmutableBiMap.of();
         mcpNameBiMap=ImmutableBiMap.of();
     }
+    
+    private boolean deobfDataLoaded;
+    
+    public boolean isDeobfuscationDataLoaded()
+    {
+        return deobfDataLoaded;
+    }
 
-    public void setup(File mcDir, RelaunchClassLoader classLoader, String deobfFileName)
+    public void setup(File mcDir, RelaunchClassLoader classLoader, String deobfFileName, boolean deobfuscationFromRaw)
     {
         this.classLoader = classLoader;
         try
         {
             File libDir = new File(mcDir, "lib");
-            File mapData = new File(libDir, deobfFileName);
-            mapData = mapData.getCanonicalFile();
-            ZipFile mapZip = new ZipFile(mapData);
-            ZipEntry classData = mapZip.getEntry("joined.srg");
-            ZipInputSupplier zis = new ZipInputSupplier(mapZip, classData);
-            InputSupplier<InputStreamReader> srgSupplier = CharStreams.newReaderSupplier(zis,Charsets.UTF_8);
+            InputSupplier<? extends InputStream> suplier;
+            if (deobfuscationFromRaw)
+            {
+                File mapData = new File(libDir, deobfFileName);
+                mapData = mapData.getCanonicalFile();
+                ZipFile mapZip = new ZipFile(mapData);
+                ZipEntry classData = mapZip.getEntry("joined.srg");
+                suplier = new ZipInputSupplier(mapZip, classData);
+            }
+            else
+            {
+                File mapData = new File(libDir, "mod_deobf.srg");
+                if (!mapData.exists()) 
+                {
+                    String prefixList = System.getProperty("fml.forcedDeobfuscationPrefixes");
+                    if (prefixList != null)
+                    {
+                        FMLRelaunchLog.warning("fml.forcedDeobfuscationPrefixes is set, but file %s is not found", mapData.getAbsolutePath());
+                    }
+                    return;
+                }
+                suplier = Files.newInputStreamSupplier(mapData);
+            }
+            
+            InputSupplier<InputStreamReader> srgSupplier = CharStreams.newReaderSupplier(suplier,Charsets.UTF_8);
             List<String> srgList = CharStreams.readLines(srgSupplier);
             rawMethodMaps = Maps.newHashMap();
             rawFieldMaps = Maps.newHashMap();
@@ -114,6 +141,7 @@ public class FMLDeobfuscatingRemapper extends Remapper {
             mcpBuilder.put("MLProp","net/minecraft/src/MLProp");
             mcpBuilder.put("TradeEntry","net/minecraft/src/TradeEntry");
             mcpNameBiMap = mcpBuilder.build();
+            deobfDataLoaded = true;
         }
         catch (IOException ioe)
         {
