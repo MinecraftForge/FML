@@ -73,7 +73,7 @@ public class Downloader extends JOptionPane implements IDownloadDisplay
                 }
             }
         });
-        container = new JDialog(null, "Hello", ModalityType.MODELESS);
+        container = new JDialog(null, "FML", ModalityType.MODELESS);
         container.setResizable(false);
         container.setLocationRelativeTo(null);
         container.add(this);
