@@ -75,6 +75,7 @@ public class ModLoaderModContainer implements ModContainer
     public Set<ArtifactVersion> requirements = Sets.newHashSet();
     public ArrayList<ArtifactVersion> dependencies = Lists.newArrayList();
     public ArrayList<ArtifactVersion> dependants = Lists.newArrayList();
+    public ArrayList<ArtifactVersion> optionals = Lists.newArrayList();
     private ContainerType sourceType;
     private ModMetadata metadata;
     private ProxyInjector sidedProxy;
@@ -399,6 +400,11 @@ public class ModLoaderModContainer implements ModContainer
         return dependencies;
     }
 
+    @Override
+    public List<ArtifactVersion> getOptionals()
+    {
+        return optionals;
+    }
 
     public String toString()
     {
@@ -442,7 +448,7 @@ public class ModLoaderModContainer implements ModContainer
     {
         Map<String, Object> dummyMetadata = ImmutableMap.<String,Object>builder().put("name", modId).put("version", "1.0").build();
         this.metadata = mc.getMetadataForId(modId, dummyMetadata);
-        Loader.instance().computeDependencies(sortingProperties, getRequirements(), getDependencies(), getDependants());
+        Loader.instance().computeDependencies(sortingProperties, getRequirements(), getDependencies(), getDependants(), getOptionals());
     }
 
     @Override

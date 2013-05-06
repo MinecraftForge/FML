@@ -92,6 +92,12 @@ public interface ModContainer
     List<ArtifactVersion> getDependants();
 
     /**
+     * A list of modids that are the mod wants but doesn't crash if not found
+     * only disables the mod
+     */
+    List<ArtifactVersion> getOptionals();
+
+    /**
      * A representative string encapsulating the sorting preferences for this
      * mod
      */

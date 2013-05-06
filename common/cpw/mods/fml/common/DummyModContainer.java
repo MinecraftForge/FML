@@ -56,6 +56,12 @@ public class DummyModContainer implements ModContainer
     }
 
     @Override
+    public List<ArtifactVersion> getOptionals()
+    {
+        return Collections.emptyList();
+    }
+
+    @Override
     public Set<ArtifactVersion> getRequirements()
     {
         return Collections.emptySet();

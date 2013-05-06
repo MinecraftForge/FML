@@ -83,6 +83,11 @@ public class InjectedModContainer implements ModContainer
         return wrappedContainer.getDependants();
     }
 
+    public List<ArtifactVersion> getOptionals()
+    {
+        return wrappedContainer.getOptionals();
+    }
+
     public String getSortingRules()
     {
         return wrappedContainer.getSortingRules();

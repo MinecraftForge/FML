@@ -166,8 +166,9 @@ public class FMLModContainer implements ModContainer
             Set<ArtifactVersion> requirements = Sets.newHashSet();
             List<ArtifactVersion> dependencies = Lists.newArrayList();
             List<ArtifactVersion> dependants = Lists.newArrayList();
+            List<ArtifactVersion> optionals = Lists.newArrayList();
             annotationDependencies = (String) descriptor.get("dependencies");
-            Loader.instance().computeDependencies(annotationDependencies, requirements, dependencies, dependants);
+            Loader.instance().computeDependencies(annotationDependencies, requirements, dependencies, dependants, optionals);
             modMetadata.requiredMods = requirements;
             modMetadata.dependencies = dependencies;
             modMetadata.dependants = dependants;
@@ -275,6 +276,12 @@ public class FMLModContainer implements ModContainer
     public List<ArtifactVersion> getDependants()
     {
         return modMetadata.dependants;
+    }
+
+    @Override
+    public List<ArtifactVersion> getOptionals()
+    {
+        return modMetadata.optionals;
     }
 
     @Override
