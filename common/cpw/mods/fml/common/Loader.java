@@ -206,6 +206,8 @@ public class Loader
                 modVersions.put(mod.getModId(), mod.getProcessedVersion());
             }
 
+            List<ModContainer> disabledMods = Lists.newArrayList();
+
             for (ModContainer mod : getActiveModList())
             {
                 if (!mod.acceptableMinecraftVersionRange().containsVersion(minecraft.getProcessedVersion()))
@@ -247,6 +249,29 @@ public class Loader
                     FMLLog.severe("The mod %s (%s) requires mod versions %s to be available", mod.getModId(), mod.getName(), versionMissingMods);
                     throw new MissingModsException(versionMissingMods);
                 }
+                Set<ArtifactVersion> optionalMissingMods = Sets.newHashSet();
+                ImmutableList<ArtifactVersion> allOptionals = ImmutableList.<ArtifactVersion>builder().addAll(mod.getOptionals()).build();
+                for (ArtifactVersion v : allOptionals)
+                {
+                    if (modVersions.containsKey(v.getLabel()))
+                    {
+                        if (!v.containsVersion(modVersions.get(v.getLabel())))
+                        {
+                            optionalMissingMods.add(v);
+                        }
+                    }
+                }
+                if (!optionalMissingMods.isEmpty())
+                {
+                    FMLLog.severe("The mod %s (%s) wanted mod versions %s to be available. Disabling it.", mod.getModId(), mod.getName(), optionalMissingMods);
+                    disabledMods.add(mod);
+                }
+            }
+
+            for(ModContainer mod : disabledMods)
+            {
+                mods.remove(mod);
+                modController.removeModContainer(mod);
             }
 
             FMLLog.finer("All mod requirements are satisfied");
@@ -606,7 +631,7 @@ public class Loader
         return modClassLoader;
     }
 
-    public void computeDependencies(String dependencyString, Set<ArtifactVersion> requirements, List<ArtifactVersion> dependencies, List<ArtifactVersion> dependants)
+    public void computeDependencies(String dependencyString, Set<ArtifactVersion> requirements, List<ArtifactVersion> dependencies, List<ArtifactVersion> dependants, List<ArtifactVersion> optionals)
     {
         if (dependencyString == null || dependencyString.length() == 0)
         {
@@ -665,6 +690,11 @@ public class Loader
             else if ("required-after".equals(instruction) || "after".equals(instruction))
             {
                 dependencies.add(VersionParser.parseVersionReference(target));
+            }
+            // option elements are things that will disable the mod but not throw a crash
+            else if("optional-after".equals(instruction) || "optional-before".equals(instruction))
+            {
+                optionals.add(VersionParser.parseVersionReference(target));
             }
             else
             {

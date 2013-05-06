@@ -267,4 +267,9 @@ public class LoadController
     {
         this.state = newState;
     }
+
+    public void removeModContainer(ModContainer mod)
+    {
+        activeModList.remove(mod);
+    }
 }
