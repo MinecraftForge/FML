@@ -28,16 +28,31 @@
      private final ILogAgent field_98214_c;
      private MemoryConnection field_74443_c;
      private NetHandler field_74440_d;
-@@ -65,7 +71,7 @@
+@@ -38,6 +44,10 @@
+ 
+     public void func_74429_a(Packet p_74429_1_)
+     {
++        p_74429_1_ = FMLNetworkHandler.handleOutgoingPacket(p_74429_1_, this, this.field_74440_d);
++        if (p_74429_1_ == null)
++            return;
++
+         if (!this.field_74441_e)
+         {
+             this.field_74443_c.func_74436_b(p_74429_1_);
+@@ -65,7 +75,11 @@
  
          while (i-- >= 0 && !this.field_74442_b.isEmpty())
          {
 -            Packet packet = (Packet)this.field_74442_b.remove(0);
 +            Packet packet = field_74442_b.poll();
++            packet = FMLNetworkHandler.handleIncomingPacket(packet, this, this.field_74440_d);
++            if (packet == null)
++                continue;
++
              packet.func_73279_a(this.field_74440_d);
          }
  
-@@ -77,6 +83,7 @@
+@@ -77,6 +91,7 @@
          if (this.field_74441_e && this.field_74442_b.isEmpty())
          {
              this.field_74440_d.func_72515_a(this.field_74438_f, this.field_74439_g);
