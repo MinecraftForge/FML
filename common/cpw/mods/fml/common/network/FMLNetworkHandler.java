@@ -472,7 +472,11 @@ public class FMLNetworkHandler
 
     public static final Packet handleOutgoingPacket(final Packet packet, final INetworkManager networkManager, final NetHandler netHandler)
     {
-        for (final PacketListener handler : outgoingPacketListenersBaked[packet.func_73281_k()])
+        final int packetId = packet.func_73281_k();
+        if (packetId == 250)
+            return packet;
+
+        for (final PacketListener handler : outgoingPacketListenersBaked[packetId])
         {
             try
             {
@@ -491,7 +495,11 @@ public class FMLNetworkHandler
 
     public static final Packet handleIncomingPacket(final Packet packet, final INetworkManager networkManager, final NetHandler netHandler)
     {
-        for (final PacketListener handler : incomingPacketListenersBaked[packet.func_73281_k()])
+        final int packetId = packet.func_73281_k();
+        if (packetId == 250)
+            return packet;
+
+        for (final PacketListener handler : incomingPacketListenersBaked[packetId])
         {
             try
             {
