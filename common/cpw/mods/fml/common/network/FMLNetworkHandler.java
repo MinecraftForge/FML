@@ -473,14 +473,12 @@ public class FMLNetworkHandler
     public static final Packet handleOutgoingPacket(final Packet packet, final INetworkManager networkManager, final NetHandler netHandler)
     {
         final int packetId = packet.func_73281_k();
-        if (packetId == 250)
-            return packet;
 
         for (final PacketListener handler : outgoingPacketListenersBaked[packetId])
         {
             try
             {
-                if (!handler.onOutgoingPacket(packet, networkManager, netHandler))
+                if (!handler.onOutgoingPacket(packet, networkManager, netHandler) && packetId != 250)
                     return null;
             }
             catch (Throwable e)
@@ -496,14 +494,12 @@ public class FMLNetworkHandler
     public static final Packet handleIncomingPacket(final Packet packet, final INetworkManager networkManager, final NetHandler netHandler)
     {
         final int packetId = packet.func_73281_k();
-        if (packetId == 250)
-            return packet;
 
         for (final PacketListener handler : incomingPacketListenersBaked[packetId])
         {
             try
             {
-                if (!handler.onIncomingPacket(packet, networkManager, netHandler))
+                if (!handler.onIncomingPacket(packet, networkManager, netHandler) && packetId != 250)
                     return null;
             }
             catch (Throwable e)
