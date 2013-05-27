@@ -12,6 +12,7 @@ mcp_version = '7.42'
 
 def download_deps(mcp_path):
     baseURL = 'http://files.minecraftforge.net/fmllibs/'
+    ret = True
     
     for lib in ['argo-3.2-src.jar','guava-14.0-rc3.jar','asm-4.1.tar.gz','asm-debug-all-4.1.jar','bcprov-debug-jdk15on-148.jar','bcprov-jdk15on-148-src.zip','guava-14.0-rc3-sources.jar', 'scala-library.jar']:
         libF = os.path.join(mcp_path, 'lib')
@@ -21,9 +22,12 @@ def download_deps(mcp_path):
         target = os.path.normpath(os.path.join(libF, lib))
         
         if not download_file(baseURL + lib, target):
-            print 'All libraries may be downloaded from http://files.minecraftforge.net/fmllibs/fml_libs_dev15.zip and placed in mcp/lib'
-            return False
-    return True
+            ret = False
+
+    if not ret:
+        print 'All libraries may be downloaded from http://files.minecraftforge.net/fmllibs/fml_libs_dev15.zip and placed in mcp/lib'
+        
+    return ret
 
 def config_get_section(config, section):
     dict = {}
