@@ -44,8 +44,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
+
+import net.minecraftforge.event.Event;
+import net.minecraftforge.event.EventBus;
+import net.minecraftforge.event.ForgeSubscribe;
 
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.Metadata;
@@ -418,7 +420,7 @@ public class FMLModContainer implements ModContainer
         }
     }
 
-    @Subscribe
+    @ForgeSubscribe
     public void constructMod(FMLConstructionEvent event)
     {
         try
@@ -483,7 +485,7 @@ public class FMLModContainer implements ModContainer
     }
 
     @Deprecated // Remove in 1.6
-    @Subscribe
+    @ForgeSubscribe
     public void handleModStateEvent(FMLEvent event)
     {
         Class<? extends Annotation> annotation = modAnnotationTypes.get(event.getClass());
@@ -506,7 +508,7 @@ public class FMLModContainer implements ModContainer
     }
     
     @Override
-    public void post(Object event)
+    public void post(Event event)
     {
         try
         {

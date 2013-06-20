@@ -35,8 +35,10 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
+
+import net.minecraftforge.event.Event;
+import net.minecraftforge.event.EventBus;
+import net.minecraftforge.event.ForgeSubscribe;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
@@ -470,7 +472,7 @@ public class ModLoaderModContainer implements ModContainer
 
     // Lifecycle mod events
 
-    @Subscribe
+    @ForgeSubscribe
     public void constructMod(FMLConstructionEvent event)
     {
         try
@@ -506,7 +508,7 @@ public class ModLoaderModContainer implements ModContainer
         }
     }
 
-    @Subscribe
+    @ForgeSubscribe
     public void preInit(FMLPreInitializationEvent event)
     {
         try
@@ -530,7 +532,7 @@ public class ModLoaderModContainer implements ModContainer
     }
 
 
-    @Subscribe
+    @ForgeSubscribe
     public void init(FMLInitializationEvent event)
     {
         try
@@ -544,7 +546,7 @@ public class ModLoaderModContainer implements ModContainer
         }
     }
 
-    @Subscribe
+    @ForgeSubscribe
     public void postInit(FMLPostInitializationEvent event)
     {
         try
@@ -558,13 +560,13 @@ public class ModLoaderModContainer implements ModContainer
         }
     }
 
-    @Subscribe
+    @ForgeSubscribe
     public void loadComplete(FMLLoadCompleteEvent complete)
     {
         ModLoaderHelper.finishModLoading(this);
     }
 
-    @Subscribe
+    @ForgeSubscribe
     public void serverStarting(FMLServerStartingEvent evt)
     {
         for (ICommand cmd : serverCommands)
@@ -617,7 +619,7 @@ public class ModLoaderModContainer implements ModContainer
     }
 
     @Override
-    public void post(Object event)
+    public void post(Event event)
     {
         if (this.bus != null)
         {

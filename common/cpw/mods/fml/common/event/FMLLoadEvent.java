@@ -12,7 +12,9 @@
 
 package cpw.mods.fml.common.event;
 
-public class FMLLoadEvent
+import net.minecraftforge.event.Event;
+
+public class FMLLoadEvent extends Event
 {
 
 }

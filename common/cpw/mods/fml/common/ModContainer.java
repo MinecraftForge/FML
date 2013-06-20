@@ -17,7 +17,8 @@ import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.eventbus.EventBus;
+import net.minecraftforge.event.Event;
+import net.minecraftforge.event.EventBus;
 
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionRange;
@@ -136,5 +137,5 @@ public interface ModContainer
      * Instructs this ModContainer to fire off an event on the internal 
      * EventBus passed in to registerBus
      */
-    void post(Object event);
+    void post(Event event);
 }

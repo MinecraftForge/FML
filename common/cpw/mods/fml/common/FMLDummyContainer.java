@@ -24,7 +24,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.storage.SaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 
-import com.google.common.eventbus.EventBus;
+import net.minecraftforge.event.Event;
+import net.minecraftforge.event.EventBus;
 
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;

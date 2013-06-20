@@ -30,6 +30,7 @@ public class FMLCorePlugin implements IFMLLoadingPlugin
                              "cpw.mods.fml.common.asm.transformers.AccessTransformer",
                              "cpw.mods.fml.common.asm.transformers.MarkerTransformer",
                              "cpw.mods.fml.common.asm.transformers.SideTransformer",
+                             "cpw.mods.fml.common.asm.transformers.EventTransformer",
                             };
     }
 

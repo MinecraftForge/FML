@@ -12,9 +12,10 @@
 
 package cpw.mods.fml.common.event;
 
+import net.minecraftforge.event.Event;
 import cpw.mods.fml.common.ModContainer;
 
-public class FMLEvent
+public class FMLEvent extends Event
 {
     public final String getEventType()
     {

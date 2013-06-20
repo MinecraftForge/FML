@@ -12,7 +12,7 @@
 
 package cpw.mods.fml.common;
 
-import com.google.common.eventbus.EventBus;
+import net.minecraftforge.event.EventBus;
 
 public class MCPDummyContainer extends DummyModContainer {
 	public MCPDummyContainer(ModMetadata metadata) {

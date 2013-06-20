@@ -34,8 +34,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
+
+import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.event.Event;
+import net.minecraftforge.event.EventBus;
 
 import cpw.mods.fml.common.LoaderState.ModState;
 import cpw.mods.fml.common.event.FMLEvent;
@@ -57,25 +59,17 @@ public class LoadController
     private List<ModContainer> activeModList = Lists.newArrayList();
     private ModContainer activeContainer;
     private BiMap<ModContainer, Object> modObjectList;
-    /*
-     * Only used for backwards compatibility until 1.6 release,
-     * For the breaking change to ModContainer 
-     */
-    @Deprecated
-    private List<ModContainer> oldstylePost = Lists.newArrayList();
 
     public LoadController(Loader loader)
     {
         this.loader = loader;
-        this.masterChannel = new EventBus("FMLMainChannel");
+        this.masterChannel = new EventBus(); //"FMLMainChannel";
         this.masterChannel.register(this);
 
         state = LoaderState.NOINIT;
-
-
     }
 
-    @Subscribe
+    @ForgeSubscribe
     public void buildModList(FMLLoadEvent event)
     {
         this.modList = loader.getIndexedModList();
@@ -83,7 +77,7 @@ public class LoadController
 
         for (ModContainer mod : loader.getModList())
         {
-            EventBus bus = new EventBus(mod.getModId());
+            EventBus bus = new EventBus(); //mod.getModId());
             boolean isActive = mod.registerBus(bus, this);
             if (isActive)
             {
@@ -93,19 +87,6 @@ public class LoadController
                 activeModList.add(mod);
                 modStates.put(mod.getModId(), ModState.UNLOADED);
                 eventBus.put(mod.getModId(), bus);
-                //Test if the ModContainer has a concrete implementation of the new post function
-                try
-                {
-                    Method post = mod.getClass().getMethod("post", Object.class);
-                    if (post.getDeclaringClass().isInterface() || Modifier.isAbstract(post.getModifiers()))
-                    {
-                        oldstylePost.add(mod);
-                    }
-                }
-                catch (NoSuchMethodException e)
-                {
-                    oldstylePost.add(mod);
-                }
             }
             else
             {
@@ -182,7 +163,7 @@ public class LoadController
         return activeContainer;
     }
 
-    @Subscribe
+    @ForgeSubscribe
     public void propogateStateMessage(FMLEvent stateEvent)
     {
         if (stateEvent instanceof FMLPreInitializationEvent)
@@ -211,14 +192,7 @@ public class LoadController
         activeContainer = mc;
         stateEvent.applyModContainer(activeContainer());
         FMLLog.log(modId, Level.FINEST, "Sending event %s to mod %s", stateEvent.getEventType(), modId);
-        if (oldstylePost.contains(mc))
-        {
-            eventChannels.get(modId).post(stateEvent);
-        }
-        else
-        {
-            mc.post(stateEvent);
-        }
+        mc.post(stateEvent);
         FMLLog.log(modId, Level.FINEST, "Sent event %s to mod %s", stateEvent.getEventType(), modId);
         activeContainer = null;
         if (stateEvent instanceof FMLStateEvent)
@@ -286,7 +260,7 @@ public class LoadController
         return Iterables.getLast(modStates.get(selectedMod.getModId()), ModState.AVAILABLE);
     }
 
-    public void distributeStateMessage(Class<?> customEvent)
+    public void distributeStateMessage(Class<? extends Event> customEvent)
     {
         try
         {

@@ -17,7 +17,8 @@ import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.eventbus.EventBus;
+import net.minecraftforge.event.Event;
+import net.minecraftforge.event.EventBus;
 
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionRange;
@@ -156,7 +157,7 @@ public class InjectedModContainer implements ModContainer
     }
 
     @Override
-    public void post(Object event)
+    public void post(Event event)
     {
         wrappedContainer.post(event);
     }
