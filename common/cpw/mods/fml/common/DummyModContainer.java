@@ -29,6 +29,7 @@ public class DummyModContainer implements ModContainer
     private ModMetadata md;
     private ArtifactVersion processedVersion;
     private String label;
+    protected EventBus eventBus;
 
     public DummyModContainer(ModMetadata md)
     {
@@ -121,6 +122,7 @@ public class DummyModContainer implements ModContainer
     @Override
     public boolean registerBus(EventBus bus, LoadController controller)
     {
+        this.eventBus = bus;
         return false;
     }
 
@@ -167,5 +169,14 @@ public class DummyModContainer implements ModContainer
     public String toString()
     {
         return md != null ? getModId() : "Dummy Container ("+label+") @" + System.identityHashCode(this);
+    }
+
+    @Override
+    public void post(Object event)
+    {
+        if (eventBus != null)
+        {
+            eventBus.post(event);
+        }
     }
 }

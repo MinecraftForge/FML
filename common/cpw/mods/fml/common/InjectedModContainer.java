@@ -154,4 +154,10 @@ public class InjectedModContainer implements ModContainer
     {
         return "Wrapped{"+wrappedContainer.toString()+"}";
     }
+
+    @Override
+    public void post(Object event)
+    {
+        wrappedContainer.post(event);
+    }
 }

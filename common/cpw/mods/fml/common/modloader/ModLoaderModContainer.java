@@ -615,4 +615,13 @@ public class ModLoaderModContainer implements ModContainer
     {
         return null;
     }
+
+    @Override
+    public void post(Object event)
+    {
+        if (this.bus != null)
+        {
+            bus.post(event);
+        }
+    }
 }

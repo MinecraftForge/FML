@@ -13,6 +13,8 @@
 package cpw.mods.fml.common;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -54,6 +57,12 @@ public class LoadController
     private List<ModContainer> activeModList = Lists.newArrayList();
     private ModContainer activeContainer;
     private BiMap<ModContainer, Object> modObjectList;
+    /*
+     * Only used for backwards compatibility until 1.6 release,
+     * For the breaking change to ModContainer 
+     */
+    @Deprecated
+    private List<ModContainer> oldstylePost = Lists.newArrayList();
 
     public LoadController(Loader loader)
     {
@@ -84,6 +93,19 @@ public class LoadController
                 activeModList.add(mod);
                 modStates.put(mod.getModId(), ModState.UNLOADED);
                 eventBus.put(mod.getModId(), bus);
+                //Test if the ModContainer has a concrete implementation of the new post function
+                try
+                {
+                    Method post = mod.getClass().getMethod("post", Object.class);
+                    if (post.getDeclaringClass().isInterface() || Modifier.isAbstract(post.getModifiers()))
+                    {
+                        oldstylePost.add(mod);
+                    }
+                }
+                catch (NoSuchMethodException e)
+                {
+                    oldstylePost.add(mod);
+                }
             }
             else
             {
@@ -189,7 +211,14 @@ public class LoadController
         activeContainer = mc;
         stateEvent.applyModContainer(activeContainer());
         FMLLog.log(modId, Level.FINEST, "Sending event %s to mod %s", stateEvent.getEventType(), modId);
-        eventChannels.get(modId).post(stateEvent);
+        if (oldstylePost.contains(mc))
+        {
+            eventChannels.get(modId).post(stateEvent);
+        }
+        else
+        {
+            mc.post(stateEvent);
+        }
         FMLLog.log(modId, Level.FINEST, "Sent event %s to mod %s", stateEvent.getEventType(), modId);
         activeContainer = null;
         if (stateEvent instanceof FMLStateEvent)

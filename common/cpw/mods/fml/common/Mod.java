@@ -12,15 +12,18 @@
 
 package cpw.mods.fml.common;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.TYPE;
 
 import net.minecraft.item.ItemBlock;
 
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
+
 
 /**
  * The new mod style in FML 1.3
@@ -28,8 +31,8 @@ import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
  * @author cpw
  *
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Retention(RUNTIME)
+@Target(TYPE)
 public @interface Mod
 {
     /**
@@ -125,95 +128,13 @@ public @interface Mod
      * @return The name of a class to be loaded and executed. Must implement {@link IASMHook}.
      */
     String asmHookClass() default "";
-    /**
-     * Mark the designated method as to be called at if there is something wrong with the certificate fingerprint of
-     * the mod's jar, or it is missing, or otherwise a problem.
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface FingerprintWarning {}
-    /**
-     * Mark the designated method as being called at the "pre-initialization" phase
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface PreInit {}
-    /**
-     * Mark the designated method as being called at the "initialization" phase
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface Init {}
-    /**
-     * Mark the designated method as being called at the "post-initialization" phase
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface PostInit {}
-    /**
-     * Mark the designated method as being called at the "server-about-to-start" phase
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface ServerAboutToStart {}
-    /**
-     * Mark the designated method as being called at the "server-starting" phase
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface ServerStarting {}
-    /**
-     * Mark the designated method as being called at the "server-started" phase
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface ServerStarted {}
-    /**
-     * Mark the designated method as being called at the "server-stopping" phase
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface ServerStopping {}
-    /**
-     * Mark the designated method as being called at the "server-stopped" phase
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface ServerStopped {}
-    /**
-     * Mark the designated method as the receiver for {@link FMLInterModComms} messages
-     * Called between {@link Init} and {@link PostInit}
-     * @author cpw
-     *
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface IMCCallback {}
+
     /**
      * Populate the annotated field with the mod instance.
      * @author cpw
-     *
      */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
+    @Retention(RUNTIME)
+    @Target(FIELD)
     public @interface Instance {
         /**
          * The mod object to inject into this field
@@ -223,23 +144,75 @@ public @interface Mod
     /**
      * Populate the annotated field with the mod's metadata.
      * @author cpw
-     *
      */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
+    @Retention(RUNTIME)
+    @Target(FIELD)
     public @interface Metadata {
         /**
          * The mod id specifying the metadata to load here
          */
         String value() default "";
     }
+    
+    /*******************************************************************************
+     * The below per-event annotations have been deprecated and will be removed 
+     * in 1.6. To gain access to the events use the standard {@link com.google.common.eventbus.Subscribe}
+     * 
+     * Your main mod class will automatically be registered to your internal EventBus.
+     * See available events in {@link cpw.mods.fml.common.event}
+     *******************************************************************************/
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface FingerprintWarning {}
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface PreInit {}
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface Init {}
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface PostInit {}
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface ServerAboutToStart {}
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface ServerStarting {}
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface ServerStarted {}
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface ServerStopping {}
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface ServerStopped {}
+    @Deprecated
+    @Retention(RUNTIME)
+    @Target(METHOD)
+    public @interface IMCCallback {}
+
+    /*******************************************************************************
+     * The below is deprecated on the bases that it was a idea that never got fully
+     * implemented. It may return at any time but until it is fully implemented 
+     * modders should not rely on it.
+     *******************************************************************************/
     /**
      * Populate the annotated field with an instance of the Block as specified
      * @author cpw
-     *
      */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
+    @Retention(RUNTIME)
+    @Target(FIELD)
     public @interface Block {
         /**
          * The block's name
@@ -253,10 +226,9 @@ public @interface Mod
     /**
      * Populate the annotated field with an Item
      * @author cpw
-     *
      */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
+    @Retention(RUNTIME)
+    @Target(FIELD)
     public @interface Item {
         /**
          * The name of the item

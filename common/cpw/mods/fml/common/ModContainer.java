@@ -131,4 +131,10 @@ public interface ModContainer
     VersionRange acceptableMinecraftVersionRange();
 
     Certificate getSigningCertificate();
+
+    /**
+     * Instructs this ModContainer to fire off an event on the internal 
+     * EventBus passed in to registerBus
+     */
+    void post(Object event);
 }

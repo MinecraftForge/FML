@@ -87,6 +87,7 @@ public class FMLModContainer implements ModContainer
     private DefaultArtifactVersion processedVersion;
     private boolean isNetworkMod;
 
+    @Deprecated //To be removed in 1.6
     private static final BiMap<Class<? extends FMLEvent>, Class<? extends Annotation>> modAnnotationTypes = ImmutableBiMap.<Class<? extends FMLEvent>, Class<? extends Annotation>>builder()
         .put(FMLPreInitializationEvent.class, Mod.PreInit.class)
         .put(FMLInitializationEvent.class, Mod.Init.class)
@@ -99,6 +100,7 @@ public class FMLModContainer implements ModContainer
         .put(IMCEvent.class,Mod.IMCCallback.class)
         .put(FMLFingerprintViolationEvent.class, Mod.FingerprintWarning.class)
         .build();
+    @Deprecated //To be removed in 1.6
     private static final BiMap<Class<? extends Annotation>, Class<? extends FMLEvent>> modTypeAnnotations = modAnnotationTypes.inverse();
     private String annotationDependencies;
     private VersionRange minecraftAccepted;
@@ -312,6 +314,7 @@ public class FMLModContainer implements ModContainer
         }
     }
 
+    @Deprecated //Remove in 1.6
     private Multimap<Class<? extends Annotation>, Object> gatherAnnotations(Class<?> clazz) throws Exception
     {
         Multimap<Class<? extends Annotation>,Object> anns = ArrayListMultimap.create();
@@ -464,6 +467,7 @@ public class FMLModContainer implements ModContainer
             annotations = gatherAnnotations(clazz);
             isNetworkMod = FMLNetworkHandler.instance().registerNetworkMod(this, clazz, event.getASMHarvestedData());
             modInstance = getLanguageAdapter().getNewInstance(this,clazz, modClassLoader);
+            eventBus.register(modInstance);
             if (fingerprintNotPresent)
             {
                 eventBus.post(new FMLFingerprintViolationEvent(source.isDirectory(), source, ImmutableSet.copyOf(this.sourceFingerprints), expectedFingerprint));
@@ -478,6 +482,7 @@ public class FMLModContainer implements ModContainer
         }
     }
 
+    @Deprecated // Remove in 1.6
     @Subscribe
     public void handleModStateEvent(FMLEvent event)
     {
@@ -492,6 +497,22 @@ public class FMLModContainer implements ModContainer
             {
                 Method m = (Method) o;
                 m.invoke(modInstance, event);
+            }
+        }
+        catch (Throwable t)
+        {
+            Throwables.propagateIfPossible(t);
+        }
+    }
+    
+    @Override
+    public void post(Object event)
+    {
+        try
+        {
+            if (eventBus != null)
+            {
+                eventBus.post(event);
             }
         }
         catch (Throwable t)
