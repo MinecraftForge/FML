@@ -38,6 +38,7 @@ import net.minecraft.world.WorldType;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
+import com.google.common.collect.ArrayListMultimap;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
@@ -439,5 +440,80 @@ public class FMLNetworkHandler
     public static boolean vanillaLoginPacketCompatibility()
     {
         return FMLCommonHandler.instance().getSidedDelegate().getClientCompatibilityLevel() == 0;
+    }
+
+
+    // Packet Listeners
+    private static final ArrayListMultimap<Integer,PacketListener> outgoingPacketListeners = ArrayListMultimap.create();
+    private static final ArrayListMultimap<Integer,PacketListener> incomingPacketListeners = ArrayListMultimap.create();
+
+    private static final int NPACKETS = 256;
+    private static final PacketListener[][] outgoingPacketListenersBaked = new PacketListener[NPACKETS][];
+    private static final PacketListener[][] incomingPacketListenersBaked = new PacketListener[NPACKETS][];
+
+
+    static void registerOutgoingPacketListener(PacketListener packetListener, int packetId)
+    {
+        outgoingPacketListeners.put(packetId, packetListener);
+        bakePacketListeners(outgoingPacketListeners, outgoingPacketListenersBaked);
+    }
+
+    static void registerIncomingPacketListener(PacketListener packetListener, int packetId)
+    {
+        incomingPacketListeners.put(packetId, packetListener);
+        bakePacketListeners(incomingPacketListeners, incomingPacketListenersBaked);
+    }
+
+    private static void bakePacketListeners(ArrayListMultimap<Integer, PacketListener> multiMap, PacketListener[][] ret)
+    {
+        for (int i = 0; i < NPACKETS; ++i)
+        {
+            final List<PacketListener> handlers = multiMap.get(i);
+
+            ret[i] = handlers.toArray(new PacketListener[handlers.size()]);
+        }
+    }
+
+
+    public static final Packet handleOutgoingPacket(final Packet packet, final INetworkManager networkManager, final NetHandler netHandler)
+    {
+        final int packetId = packet.func_73281_k();
+
+        for (final PacketListener handler : outgoingPacketListenersBaked[packetId])
+        {
+            try
+            {
+                if (!handler.onOutgoingPacket(packet, networkManager, netHandler) && packetId != 250)
+                    return null;
+            }
+            catch (Throwable e)
+            {
+                e.printStackTrace();
+                continue;
+            }
+        }
+
+        return packet;
+    }
+
+    public static final Packet handleIncomingPacket(final Packet packet, final INetworkManager networkManager, final NetHandler netHandler)
+    {
+        final int packetId = packet.func_73281_k();
+
+        for (final PacketListener handler : incomingPacketListenersBaked[packetId])
+        {
+            try
+            {
+                if (!handler.onIncomingPacket(packet, networkManager, netHandler) && packetId != 250)
+                    return null;
+            }
+            catch (Throwable e)
+            {
+                e.printStackTrace();
+                continue;
+            }
+        }
+
+        return packet;
     }
 }

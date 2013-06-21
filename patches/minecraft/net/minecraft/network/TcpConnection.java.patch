@@ -7,7 +7,30 @@
  import cpw.mods.fml.relauncher.Side;
  import cpw.mods.fml.relauncher.SideOnly;
  import java.io.BufferedOutputStream;
-@@ -394,6 +395,7 @@
+@@ -118,6 +119,10 @@
+ 
+     public void func_74429_a(Packet p_74429_1_)
+     {
++        p_74429_1_ = FMLNetworkHandler.handleOutgoingPacket(p_74429_1_, this, this.field_74485_r);
++        if (p_74429_1_ == null)
++            return;
++
+         if (!this.field_74484_s)
+         {
+             Object object = this.field_74478_h;
+@@ -386,6 +391,11 @@
+         while (!this.field_74473_o.isEmpty() && i-- >= 0)
+         {
+             Packet packet = (Packet)this.field_74473_o.remove(0);
++
++            packet = FMLNetworkHandler.handleIncomingPacket(packet, this, this.field_74485_r);
++            if (packet == null)
++                continue;
++
+             packet.func_73279_a(this.field_74485_r);
+         }
+ 
+@@ -394,6 +404,7 @@
          if (this.field_74472_n && this.field_74473_o.isEmpty())
          {
              this.field_74485_r.func_72515_a(this.field_74481_v, this.field_74480_w);
