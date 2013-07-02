@@ -342,7 +342,7 @@ public class FMLModContainer implements ModContainer
                     if (m.getParameterTypes().length == 1 && modAnnotationTypes.containsKey(m.getParameterTypes()[0]))
                     {
                         m.setAccessible(true);
-                        eventMethods.put((Class<? extends FMLEvent>) m.getParameterTypes()[1],m);
+                        eventMethods.put((Class<? extends FMLEvent>) m.getParameterTypes()[0],m);
                     }
                     else
                     {
