@@ -40,7 +40,7 @@ public class JarDiscoverer implements ITypeDiscoverer
         {
             jar = new JarFile(candidate.getModContainer());
 
-            if (jar.getManifest()!=null && jar.getManifest().getMainAttributes().getValue("FMLCorePlugin") != null)
+            if (!candidate.isClasspath() && jar.getManifest()!=null && jar.getManifest().getMainAttributes().getValue("FMLCorePlugin") != null)
             {
                 FMLLog.finest("Ignoring coremod %s", candidate.getModContainer());
                 return foundMods;
