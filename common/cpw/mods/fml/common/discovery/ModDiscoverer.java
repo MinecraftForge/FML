@@ -79,9 +79,19 @@ public class ModDiscoverer
 
     public void findModDirMods(File modsDir)
     {
-        File[] modList = modsDir.listFiles();
+        List<File> modList = new ArrayList<File>(Arrays.asList(modsDir.listFiles()));
+
+        // Skip files already added as candidates
+        for (ModCandidate candidate : candidates)
+        {
+            if (modList.remove(candidate.getModContainer()))
+            {
+                FMLLog.fine("Skipping already added candidate %s", candidate.getModContainer().getName());
+            }
+        }
+
         // Sort the files into alphabetical order first
-        Arrays.sort(modList);
+        Collections.sort(modList);
 
         for (File modFile : modList)
         {
