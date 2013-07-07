@@ -5,7 +5,7 @@
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * 
+ *
  * Contributors:
  *     cpw - implementation
  */
@@ -35,7 +35,7 @@ import cpw.mods.fml.relauncher.CoreModManager;
 public class ModDiscoverer
 {
     private static Pattern zipJar = Pattern.compile("(.+).(zip|jar)$");
-    
+
     private List<ModCandidate> candidates = Lists.newArrayList();
 
     private ASMDataTable dataTable = new ASMDataTable();
@@ -44,7 +44,10 @@ public class ModDiscoverer
 
     public void findClasspathMods(ModClassLoader modClassLoader)
     {
-        List<String> knownLibraries = ImmutableList.<String>builder().addAll(modClassLoader.getDefaultLibraries()).addAll(CoreModManager.getLibraries()).build();
+        List<String> knownLibraries = ImmutableList.<String>builder()
+                .addAll(modClassLoader.getDefaultLibraries())
+                .addAll(CoreModManager.getLibraries())
+                .build();
         File[] minecraftSources = modClassLoader.getParentSources();
         if (minecraftSources.length == 1 && minecraftSources[0].isFile())
         {
@@ -78,59 +81,59 @@ public class ModDiscoverer
     }
 
     public void findModDirMods(File modsDir)
-    {        
+    {
         File[] modList = modsDir.listFiles();
-        
+
         // Sort the files into alphabetical order first
         Arrays.sort(modList);
-        
+
         for (File modFile : modList)
         {
         	atemptToLoadMod(modFile);
         }
     }
-    
+
     private void atemptToLoadMod(File modFile)
     { 
     	String fileName = modFile.getName();
     	
         Matcher matcherZip = zipJar.matcher(fileName);
 
-		Path modPath = modFile.toPath();
-		boolean isLink = Files.isSymbolicLink(modPath);
+        Path modPath = modFile.toPath();
+        boolean isLink = Files.isSymbolicLink(modPath);
 
-		if (isLink) 
-		{			
-			try 
-			{
-        		FMLLog.fine("Found a Link file (%s)", fileName);
-        		
-    			Path lnkLocation = Files.readSymbolicLink(modPath);
-        		File newModFile = lnkLocation.toFile().getCanonicalFile();
-        		FMLLog.fine("%s redirects to %s, recursing", fileName, newModFile.getAbsolutePath());
+        if (isLink) 
+        {			
+                try 
+                {
+                        FMLLog.fine("Found a Link file (%s)", fileName);
 
-        		atemptToLoadMod(newModFile);
-			} 
-			catch (IOException e) 
-			{
-				FMLLog.warning("Failed to recurse into link file %s", fileName);
-				e.printStackTrace();
-			}
-		}    
-		else if (modFile.isDirectory())
+                        Path lnkLocation = Files.readSymbolicLink(modPath);
+                        File newModFile = lnkLocation.toFile().getCanonicalFile();
+                        FMLLog.fine("%s redirects to %s, recursing", fileName, newModFile.getAbsolutePath());
+
+                        atemptToLoadMod(newModFile);
+                } 
+                catch (IOException e) 
+                {
+                        FMLLog.warning("Failed to recurse into link file %s", fileName);
+                        e.printStackTrace();
+                }
+        }    
+        else if (modFile.isDirectory())
         {
             FMLLog.fine("Found a candidate mod directory %s", modFile.getName());
             candidates.add(new ModCandidate(modFile, modFile, ContainerType.DIR));
         }
-		else if (matcherZip.matches())
+        else if (matcherZip.matches())
         {
             FMLLog.fine("Found a candidate zip or jar file %s", matcherZip.group(0));
             candidates.add(new ModCandidate(modFile, modFile, ContainerType.JAR));
         }
-		else 
-		{
-            FMLLog.fine("Ignoring unknown file %s in mods directory", modFile.getName());
-		}
+        else 
+        {
+                FMLLog.fine("Ignoring unknown file %s in mods directory", modFile.getName());
+        }
     }
 
     public List<ModContainer> identifyMods()
