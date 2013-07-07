@@ -46,7 +46,7 @@ public class ModDiscoverer
     {
         List<String> knownLibraries = ImmutableList.<String>builder()
                 .addAll(modClassLoader.getDefaultLibraries())
-                .addAll(CoreModManager.getLibraries())
+                .addAll(CoreModManager.getLoadedCoremods())
                 .build();
         File[] minecraftSources = modClassLoader.getParentSources();
         if (minecraftSources.length == 1 && minecraftSources[0].isFile())
