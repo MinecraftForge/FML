@@ -13,6 +13,9 @@
 package cpw.mods.fml.common.discovery;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -80,30 +83,56 @@ public class ModDiscoverer
     public void findModDirMods(File modsDir)
     {
         File[] modList = modsDir.listFiles();
+
         // Sort the files into alphabetical order first
         Arrays.sort(modList);
 
         for (File modFile : modList)
         {
-            if (modFile.isDirectory())
-            {
-                FMLLog.fine("Found a candidate mod directory %s", modFile.getName());
-                candidates.add(new ModCandidate(modFile, modFile, ContainerType.DIR));
-            }
-            else
-            {
-                Matcher matcher = zipJar.matcher(modFile.getName());
+        	atemptToLoadMod(modFile);
+        }
+    }
 
-                if (matcher.matches())
+    private void atemptToLoadMod(File modFile)
+    { 
+    	String fileName = modFile.getName();
+    	
+        Matcher matcherZip = zipJar.matcher(fileName);
+
+        Path modPath = modFile.toPath();
+        boolean isLink = Files.isSymbolicLink(modPath);
+
+        if (isLink) 
+        {			
+                try 
                 {
-                    FMLLog.fine("Found a candidate zip or jar file %s", matcher.group(0));
-                    candidates.add(new ModCandidate(modFile, modFile, ContainerType.JAR));
-                }
-                else
+                        FMLLog.fine("Found a Link file (%s)", fileName);
+
+                        Path lnkLocation = Files.readSymbolicLink(modPath);
+                        File newModFile = lnkLocation.toFile().getCanonicalFile();
+                        FMLLog.fine("%s redirects to %s, recursing", fileName, newModFile.getAbsolutePath());
+
+                        atemptToLoadMod(newModFile);
+                } 
+                catch (IOException e) 
                 {
-                    FMLLog.fine("Ignoring unknown file %s in mods directory", modFile.getName());
+                        FMLLog.warning("Failed to recurse into link file %s", fileName);
+                        e.printStackTrace();
                 }
-            }
+        }    
+        else if (modFile.isDirectory())
+        {
+            FMLLog.fine("Found a candidate mod directory %s", modFile.getName());
+            candidates.add(new ModCandidate(modFile, modFile, ContainerType.DIR));
+        }
+        else if (matcherZip.matches())
+        {
+            FMLLog.fine("Found a candidate zip or jar file %s", matcherZip.group(0));
+            candidates.add(new ModCandidate(modFile, modFile, ContainerType.JAR));
+        }
+        else 
+        {
+                FMLLog.fine("Ignoring unknown file %s in mods directory", modFile.getName());
         }
     }
 
