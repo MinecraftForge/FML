@@ -46,7 +46,12 @@ public class LanguageRegistry
 
     public String getStringLocalization(String key)
     {
-        return getStringLocalization(key, Minecraft.func_71410_x().func_135016_M().func_135041_c().func_135034_a());
+        try {
+        	return getStringLocalization(key, Minecraft.getMinecraft().func_135016_M().func_135041_c().func_135034_a());
+    	}
+        catch (NoClassDefFoundError e) {
+    		return getStringLocalization(key, "en_US");
+    	}
     }
 
     public String getStringLocalization(String key, String lang)
