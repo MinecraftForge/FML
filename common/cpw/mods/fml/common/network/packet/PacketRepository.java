@@ -41,7 +41,11 @@ public class PacketRepository {
     
     /**
      * Registers a packet class with the given id.
+<<<<<<< HEAD
+     * The ID of 0 is reserved and can not be used
+=======
      * The IDs of 1 and 0 are reserved and can not be used
+>>>>>>> 3bbf7581015a076c90b1527618475e7378aaa33f
      * 
      * The max id is 255
      * 

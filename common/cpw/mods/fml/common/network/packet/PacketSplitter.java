@@ -22,6 +22,11 @@ import cpw.mods.fml.common.FMLLog;
  *  ModPackets over minecraft channels.
  */
 public class PacketSplitter {
+<<<<<<< HEAD
+    
+    public static final int FRAGEMENT_PACKET_ID = 0;
+=======
+>>>>>>> 3bbf7581015a076c90b1527618475e7378aaa33f
 
     private final String channel;
     
@@ -78,8 +83,13 @@ public class PacketSplitter {
                     if(i == 0) {
                         //The first chunk needs additional header information
                         
+<<<<<<< HEAD
+                        //Packet ID of 0 signifies fragmented packet
+                        chunk[0] = PacketSplitter.FRAGEMENT_PACKET_ID;
+=======
                         //Packet ID of 1 signifies fragmented packet
                         chunk[0] = 0;
+>>>>>>> 3bbf7581015a076c90b1527618475e7378aaa33f
                         //The next four bytes are the total amount of chunks
                         // in the fragmented packet stored in Big-Endian order
                         chunk[1] = (byte) ((totalChunks >> 24) & 0xFF);
@@ -143,8 +153,13 @@ public class PacketSplitter {
                 data = packetData;
                 
                 
+<<<<<<< HEAD
+                if(data[0] == PacketSplitter.FRAGEMENT_PACKET_ID) {
+                    //ID of 0 signifies the start of fragmented packet
+=======
                 if(data[0] == 1) {
                     //ID of 1 signifies the start of fragmented packet
+>>>>>>> 3bbf7581015a076c90b1527618475e7378aaa33f
                     this.partialPacket = new ByteArrayOutputStream();
                     
                     //The four bytes after the id are the number of chunks
