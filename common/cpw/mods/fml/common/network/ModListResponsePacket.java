@@ -112,6 +112,11 @@ public class ModListResponsePacket extends FMLPacket
         {
             ModContainer mc = indexedModList.get(modVersion.getKey());
             NetworkModHandler networkMod = handler.findNetworkModHandler(mc);
+            if (networkMod==null)
+            {
+                FMLLog.warning("The mod %s has a null NetworkModHandler!", modVersion.getKey());
+                continue;
+            }
             if (!networkMod.acceptVersion(modVersion.getValue()))
             {
                 versionIncorrectMods.add(modVersion.getKey());

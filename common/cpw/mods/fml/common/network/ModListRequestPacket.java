@@ -112,6 +112,11 @@ public class ModListRequestPacket extends FMLPacket
                 if (e.getValue().isNetworkMod())
                 {
                     NetworkModHandler missingHandler = FMLNetworkHandler.instance().findNetworkModHandler(e.getValue());
+                    if (missingHandler==null)
+                    {
+                        FMLLog.warning("The mod %s has a null NetworkModHandler!", modVersion.getKey());
+                        continue;
+                    }
                     if (missingHandler.requiresServerSide())
                     {
                         // TODO : what should we do if a mod is marked "serverSideRequired"? Stop the connection?
