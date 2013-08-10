@@ -156,6 +156,12 @@ public class FMLCommonHandler
      */
     public ModContainer findContainerFor(Object mod)
     {
+        // allow this method to work on core mods
+        if( mod instanceof ModContainer )
+        {
+            return (ModContainer)mod;
+        }
+        
         return Loader.instance().getReversedModObjectList().get(mod);
     }
     /**
