@@ -29,6 +29,11 @@
       "url" : "http://repo.maven.apache.org/maven2",
       "comment" : "Important for FML, we add this"
     },
+	{
+		"name": "org.codehaus.groovy:groovy-all:2.1.6",
+		"url": "http://repo.maven.apache.org/maven2/",
+		"comment": "Needed for Groovy Support"
+	},
     {
       "name": "net.sf.jopt-simple:jopt-simple:4.5",
       "children" : ["sources"],

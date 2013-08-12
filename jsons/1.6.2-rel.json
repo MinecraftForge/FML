@@ -83,6 +83,10 @@
       {
         "name": "com.google.code.gson:gson:2.2.2"
       },
+	  {
+		"name": "org.codehaus.groovy:groovy-all:2.1.6",
+		"url": "http://repo.maven.apache.org/maven2/"
+	  },
       {
         "name": "org.lwjgl.lwjgl:lwjgl:2.9.0",
         "rules": [
