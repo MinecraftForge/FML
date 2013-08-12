@@ -1,15 +1,13 @@
 /*
- * The FML Forge Mod Loader suite.
- * Copyright (C) 2012 cpw
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Contributors:
+ *     cpw - implementation
  */
 
 package cpw.mods.fml.common;
@@ -18,6 +16,7 @@ import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -51,8 +50,8 @@ public class FMLDummyContainer extends DummyModContainer implements WorldAccessC
                     "to cooperate and provide a good modding environment. " +
                     "The mod loading system is compatible with ModLoader, all your ModLoader " +
                     "mods should work.";
-        meta.url="https://github.com/cpw/FML/wiki";
-        meta.updateUrl="https://github.com/cpw/FML/wiki";
+        meta.url="https://github.com/MinecraftForge/FML/wiki";
+        meta.updateUrl="https://github.com/MinecraftForge/FML/wiki";
         meta.screenshots=new String[0];
         meta.logoFile="";
     }
@@ -96,12 +95,12 @@ public class FMLDummyContainer extends DummyModContainer implements WorldAccessC
                 ModContainer container = Loader.instance().getIndexedModList().get(modId);
                 if (container == null)
                 {
-                    FMLLog.severe("This world was saved with mod %s which appears to be missing, things may not work well", modId);
+                    FMLLog.log("fml.ModTracker", Level.SEVERE, "This world was saved with mod %s which appears to be missing, things may not work well", modId);
                     continue;
                 }
                 if (!modVersion.equals(container.getVersion()))
                 {
-                    FMLLog.info("This world was saved with mod %s version %s and it is now at version %s, things may not work well", modId, modVersion, container.getVersion());
+                    FMLLog.log("fml.ModTracker", Level.INFO, "This world was saved with mod %s version %s and it is now at version %s, things may not work well", modId, modVersion, container.getVersion());
                 }
             }
         }
@@ -123,5 +122,11 @@ public class FMLDummyContainer extends DummyModContainer implements WorldAccessC
     {
         Certificate[] certificates = getClass().getProtectionDomain().getCodeSource().getCertificates();
         return certificates != null ? certificates[0] : null;
+    }
+
+    @Override
+    public Class<?> getCustomResourcePackClass()
+    {
+        return super.getCustomResourcePackClass();
     }
 }

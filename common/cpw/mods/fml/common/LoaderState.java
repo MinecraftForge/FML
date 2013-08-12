@@ -1,3 +1,15 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common;
 
 import com.google.common.base.Throwables;
@@ -8,6 +20,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
@@ -28,6 +41,7 @@ public enum LoaderState
     INITIALIZATION("Initializing mods", FMLInitializationEvent.class),
     POSTINITIALIZATION("Post-initializing mods", FMLPostInitializationEvent.class),
     AVAILABLE("Mod loading complete", FMLLoadCompleteEvent.class),
+    SERVER_ABOUT_TO_START("Server about to start", FMLServerAboutToStartEvent.class),
     SERVER_STARTING("Server starting", FMLServerStartingEvent.class),
     SERVER_STARTED("Server started", FMLServerStartedEvent.class),
     SERVER_STOPPING("Server stopping", FMLServerStoppingEvent.class),

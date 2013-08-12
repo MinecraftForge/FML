@@ -1,15 +1,13 @@
 /*
- * The FML Forge Mod Loader suite.
- * Copyright (C) 2012 cpw
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Contributors:
+ *     cpw - implementation
  */
 
 package cpw.mods.fml.common;
@@ -18,6 +16,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 import java.util.logging.Level;
+
+import com.google.common.base.Strings;
 
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
@@ -29,7 +29,7 @@ import cpw.mods.fml.relauncher.Side;
  */
 public class ProxyInjector
 {
-    public static void inject(ModContainer mod, ASMDataTable data, Side side)
+    public static void inject(ModContainer mod, ASMDataTable data, Side side, ILanguageAdapter languageAdapter)
     {
         FMLLog.fine("Attempting to inject @SidedProxy classes into %s", mod.getModId());
         Set<ASMData> targets = data.getAnnotationsFor(mod).get(SidedProxy.class.getName());
@@ -48,10 +48,16 @@ public class ProxyInjector
                     throw new LoaderException();
                 }
 
-                String targetType = side.isClient() ? target.getAnnotation(SidedProxy.class).clientSide() : target.getAnnotation(SidedProxy.class).serverSide();
+                SidedProxy annotation = target.getAnnotation(SidedProxy.class);
+                if (!Strings.isNullOrEmpty(annotation.modId()) && !annotation.modId().equals(mod.getModId()))
+                {
+                    FMLLog.fine("Skipping proxy injection for %s.%s since it is not for mod %s", targ.getClassName(), targ.getObjectName(), mod.getModId());
+                    continue;
+                }
+                String targetType = side.isClient() ? annotation.clientSide() : annotation.serverSide();
                 Object proxy=Class.forName(targetType, true, mcl).newInstance();
 
-                if ((target.getModifiers() & Modifier.STATIC) == 0 )
+                if (languageAdapter.supportsStatics() && (target.getModifiers() & Modifier.STATIC) == 0 )
                 {
                     FMLLog.severe("Attempted to load a proxy type %s into %s.%s, but the field is not static", targetType, targ.getClassName(), targ.getObjectName());
                     throw new LoaderException();
@@ -61,7 +67,7 @@ public class ProxyInjector
                     FMLLog.severe("Attempted to load a proxy type %s into %s.%s, but the types don't match", targetType, targ.getClassName(), targ.getObjectName());
                     throw new LoaderException();
                 }
-                target.set(null, proxy);
+                languageAdapter.setProxy(target, proxyTarget, proxy);
             }
             catch (Exception e)
             {
@@ -69,5 +75,8 @@ public class ProxyInjector
                 throw new LoaderException(e);
             }
         }
+
+        // Allow language specific proxy injection.
+        languageAdapter.setInternalProxies(mod, side, mcl);
     }
 }

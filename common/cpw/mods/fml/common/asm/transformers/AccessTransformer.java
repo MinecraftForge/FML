@@ -1,3 +1,15 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.asm.transformers;
 
 import static org.objectweb.asm.Opcodes.ACC_FINAL;
@@ -20,6 +32,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import net.minecraft.launchwrapper.IClassTransformer;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
@@ -35,7 +49,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.io.LineProcessor;
 import com.google.common.io.Resources;
 
-import cpw.mods.fml.relauncher.IClassTransformer;
+import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
+import cpw.mods.fml.relauncher.FMLRelaunchLog;
 
 public class AccessTransformer implements IClassTransformer
 {
@@ -139,18 +154,48 @@ public class AccessTransformer implements IClassTransformer
                 return true;
             }
         });
+        System.out.printf("Loaded %d rules from AccessTransformer config file %s\n", modifiers.size(), rulesFile);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public byte[] transform(String name, byte[] bytes)
+    public byte[] transform(String name, String transformedName, byte[] bytes)
     {
-    	if (bytes == null) { return null; }
-        if (!modifiers.containsKey(name)) { return bytes; }
+        if (bytes == null) { return null; }
+        boolean makeAllPublic = FMLDeobfuscatingRemapper.INSTANCE.isRemappedClass(name);
+
+        if (DEBUG)
+        {
+            FMLRelaunchLog.fine("Considering all methods and fields on %s (%s): %b\n", name, transformedName, makeAllPublic);
+        }
+        if (!makeAllPublic && !modifiers.containsKey(name)) { return bytes; }
 
         ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(bytes);
         classReader.accept(classNode, 0);
+
+        if (makeAllPublic)
+        {
+            // class
+            Modifier m = new Modifier();
+            m.targetAccess = ACC_PUBLIC;
+            m.modifyClassVisibility = true;
+            modifiers.put(name,m);
+            // fields
+            m = new Modifier();
+            m.targetAccess = ACC_PUBLIC;
+            m.name = "*";
+            modifiers.put(name,m);
+            // methods
+            m = new Modifier();
+            m.targetAccess = ACC_PUBLIC;
+            m.name = "*";
+            m.desc = "<dummy>";
+            modifiers.put(name,m);
+            if (DEBUG)
+            {
+                System.out.printf("Injected all public modifiers for %s (%s)\n", name, transformedName);
+            }
+        }
 
         Collection<Modifier> mods = modifiers.get(name);
         for (Modifier m : mods)
@@ -166,7 +211,7 @@ public class AccessTransformer implements IClassTransformer
             }
             if (m.desc.isEmpty())
             {
-                for (FieldNode n : (List<FieldNode>) classNode.fields)
+                for (FieldNode n : classNode.fields)
                 {
                     if (n.name.equals(m.name) || m.name.equals("*"))
                     {
@@ -185,7 +230,7 @@ public class AccessTransformer implements IClassTransformer
             }
             else
             {
-                for (MethodNode n : (List<MethodNode>) classNode.methods)
+                for (MethodNode n : classNode.methods)
                 {
                     if ((n.name.equals(m.name) && n.desc.equals(m.desc)) || m.name.equals("*"))
                     {
@@ -375,7 +420,7 @@ public class AccessTransformer implements IClassTransformer
 
                     for (AccessTransformer trans : transformers)
                     {
-                        entryData = trans.transform(name, entryData);
+                        entryData = trans.transform(name, name, entryData);
                     }
                 }
 

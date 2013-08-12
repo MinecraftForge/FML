@@ -1,16 +1,15 @@
 /*
- * The FML Forge Mod Loader suite.
- * Copyright (C) 2012 cpw
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Contributors:
+ *     cpw - implementation
  */
+
 package cpw.mods.fml.common;
 
 import java.io.File;
@@ -21,12 +20,14 @@ import java.net.URLClassLoader;
 import java.util.List;
 import java.util.logging.Level;
 
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.LaunchClassLoader;
+
 import com.google.common.collect.ImmutableList;
 
 import cpw.mods.fml.common.asm.ASMTransformer;
 import cpw.mods.fml.common.asm.transformers.AccessTransformer;
 import cpw.mods.fml.common.modloader.BaseModProxy;
-import cpw.mods.fml.relauncher.RelaunchClassLoader;
 
 /**
  * A simple delegating class loader used to load mods into the system
@@ -38,16 +39,16 @@ import cpw.mods.fml.relauncher.RelaunchClassLoader;
 public class ModClassLoader extends URLClassLoader
 {
     private static final List<String> STANDARD_LIBRARIES = ImmutableList.of("jinput.jar", "lwjgl.jar", "lwjgl_util.jar");
-    private RelaunchClassLoader mainClassLoader;
+    private LaunchClassLoader mainClassLoader;
 
     public ModClassLoader(ClassLoader parent) {
         super(new URL[0], null);
-        this.mainClassLoader = (RelaunchClassLoader)parent;
+        this.mainClassLoader = (LaunchClassLoader)parent;
     }
 
     public void addFile(File modFile) throws MalformedURLException
     {
-            URL url = modFile.toURI().toURL();
+        URL url = modFile.toURI().toURL();
         mainClassLoader.addURL(url);
     }
 
@@ -70,7 +71,7 @@ public class ModClassLoader extends URLClassLoader
         }
         catch (URISyntaxException e)
         {
-            FMLLog.log(Level.SEVERE, "Unable to process our input to locate the minecraft code", e);
+            FMLLog.log(Level.SEVERE, e, "Unable to process our input to locate the minecraft code");
             throw new LoaderException(e);
         }
     }
@@ -82,8 +83,21 @@ public class ModClassLoader extends URLClassLoader
 
     public Class<? extends BaseModProxy> loadBaseModClass(String modClazzName) throws Exception
     {
-        AccessTransformer transformer = (AccessTransformer)mainClassLoader.getTransformers().get(0);
-        transformer.ensurePublicAccessFor(modClazzName);
+        AccessTransformer accessTransformer = null;
+        for (IClassTransformer transformer : mainClassLoader.getTransformers())
+        {
+            if (transformer instanceof AccessTransformer)
+            {
+                accessTransformer = (AccessTransformer) transformer;
+                break;
+            }
+        }
+        if (accessTransformer == null)
+        {
+            FMLLog.log(Level.SEVERE, "No access transformer found");
+            throw new LoaderException();
+        }
+        accessTransformer.ensurePublicAccessFor(modClazzName);
         return (Class<? extends BaseModProxy>) Class.forName(modClazzName, true, this);
     }
 }

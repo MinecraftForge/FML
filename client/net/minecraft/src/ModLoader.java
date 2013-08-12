@@ -26,9 +26,7 @@ import net.minecraft.client.*;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderEngine;
 import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.texturefx.TextureFX;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.command.ICommand;
@@ -56,7 +54,6 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.SpriteHelper;
 import cpw.mods.fml.client.TextureFXManager;
 import cpw.mods.fml.client.modloader.ModLoaderClientHelper;
 import cpw.mods.fml.client.modloader.ModLoaderKeyBindingHandler;
@@ -118,12 +115,6 @@ public class ModLoader
     @SideOnly(CLIENT)
     public static void addAllRenderers(Map<Class<? extends Entity>, Render> renderers)
     {
-    }
-
-    @SideOnly(CLIENT)
-    public static void addAnimation(TextureFX anim)
-    {
-        TextureFXManager.instance().addAnimation(anim);
     }
 
     /**
@@ -230,6 +221,7 @@ public class ModLoader
      * @param fileToAdd The new image
      * @return The 'icon index' in the main image that the new image will be applied to
      */
+    @Deprecated
     @SideOnly(CLIENT)
     public static int addOverride(String fileToOverride, String fileToAdd)
     {
@@ -525,10 +517,11 @@ public class ModLoader
         return EntityRegistry.findGlobalUniqueEntityId();
     }
 
+    @Deprecated
     @SideOnly(CLIENT)
     public static int getUniqueSpriteIndex(String path)
     {
-        return SpriteHelper.getUniqueSpriteIndex(path);
+        return -1;
     }
 
     /**
@@ -547,7 +540,7 @@ public class ModLoader
     @SideOnly(CLIENT)
     public static boolean isGUIOpen(Class<? extends GuiScreen> gui)
     {
-        return FMLClientHandler.instance().getClient().field_71462_r != null && FMLClientHandler.instance().getClient().field_71462_r.equals(gui);
+        return FMLClientHandler.instance().isGUIOpen(gui);
     }
 
     /**
@@ -570,11 +563,11 @@ public class ModLoader
     {
     }
 
-    @SideOnly(CLIENT)
-    public static BufferedImage loadImage(RenderEngine renderEngine, String path) throws Exception
-    {
-        return TextureFXManager.instance().loadImageFromTexturePack(renderEngine, path);
-    }
+//    @SideOnly(CLIENT)
+//    public static BufferedImage loadImage(RenderEngine renderEngine, String path) throws Exception
+//    {
+//        return TextureFXManager.instance().loadImageFromTexturePack(renderEngine, path);
+//    }
 
     /**
      * Call in from elsewhere. Unimplemented here.
@@ -622,17 +615,18 @@ public class ModLoader
         return keys;
     }
 
-    @Deprecated
-    @SideOnly(CLIENT)
-    public static void registerAllTextureOverrides(RenderEngine cache)
-    {
-    }
+//    @Deprecated
+//    @SideOnly(CLIENT)
+//    public static void registerAllTextureOverrides(RenderEngine cache)
+//    {
+//    }
 
     /**
      * Register a new block
      *
      * @param block
      */
+    @SuppressWarnings("deprecation")
     public static void registerBlock(Block block)
     {
         GameRegistry.registerBlock(block);
@@ -644,6 +638,7 @@ public class ModLoader
      * @param block
      * @param itemclass
      */
+    @SuppressWarnings("deprecation")
     public static void registerBlock(Block block, Class<? extends ItemBlock> itemclass)
     {
         GameRegistry.registerBlock(block, itemclass);
@@ -816,14 +811,12 @@ public class ModLoader
     @Deprecated
     public static void serverChat(String text)
     {
-        //TODO
     }
 
     @Deprecated
     @SideOnly(CLIENT)
     public static void serverLogin(NetClientHandler handler, Packet1Login loginPacket)
     {
-        //TODO
     }
 
     public static void serverSendPacket(NetServerHandler handler, Packet packet)

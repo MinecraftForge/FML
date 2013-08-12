@@ -1,16 +1,15 @@
 /*
- * The FML Forge Mod Loader suite.
- * Copyright (C) 2012 cpw
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Contributors:
+ *     cpw - implementation
  */
+
 package cpw.mods.fml.common;
 
 import java.util.EnumSet;
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.crash.CrashReport;
@@ -30,12 +30,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.NetHandler;
 import net.minecraft.network.packet.Packet131MapData;
-import net.minecraft.server.*;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerListenThread;
+import net.minecraft.server.ThreadMinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.SaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -92,10 +95,10 @@ public class FMLCommonHandler
     public void beginLoading(IFMLSidedHandler handler)
     {
         sidedDelegate = handler;
-        FMLLog.info("Attempting early MinecraftForge initialization");
+        FMLLog.log("MinecraftForge", Level.INFO, "Attempting early MinecraftForge initialization");
         callForgeMethod("initialize");
         callForgeMethod("registerCrashCallable");
-        FMLLog.info("Completed early MinecraftForge initialization");
+        FMLLog.log("MinecraftForge", Level.INFO, "Completed early MinecraftForge initialization");
     }
 
     public void rescheduleTicks(Side side)
@@ -113,7 +116,7 @@ public class FMLCommonHandler
         for (IScheduledTickHandler ticker : scheduledTicks)
         {
             EnumSet<TickType> ticksToRun = EnumSet.copyOf(Objects.firstNonNull(ticker.ticks(), EnumSet.noneOf(TickType.class)));
-            ticksToRun.removeAll(EnumSet.complementOf(ticks));
+            ticksToRun.retainAll(ticks);
             if (!ticksToRun.isEmpty())
             {
                 ticker.tickStart(ticksToRun, data);
@@ -132,7 +135,7 @@ public class FMLCommonHandler
         for (IScheduledTickHandler ticker : scheduledTicks)
         {
             EnumSet<TickType> ticksToRun = EnumSet.copyOf(Objects.firstNonNull(ticker.ticks(), EnumSet.noneOf(TickType.class)));
-            ticksToRun.removeAll(EnumSet.complementOf(ticks));
+            ticksToRun.retainAll(ticks);
             if (!ticksToRun.isEmpty())
             {
                 ticker.tickEnd(ticksToRun, data);
@@ -189,7 +192,7 @@ public class FMLCommonHandler
      */
     public void raiseException(Throwable exception, String message, boolean stopGame)
     {
-        FMLCommonHandler.instance().getFMLLogger().throwing("FMLHandler", "raiseException", exception);
+        FMLLog.log(Level.SEVERE, exception, "Something raised an exception. The message was '%s'. 'stopGame' is %b", message, stopGame);
         if (stopGame)
         {
             getSidedDelegate().haltGame(message,exception);
@@ -242,12 +245,9 @@ public class FMLCommonHandler
             {
             	brd.addAll(sidedDelegate.getAdditionalBrandingInformation());
             }
-            try {
-                Properties props=new Properties();
-                props.load(getClass().getClassLoader().getResourceAsStream("fmlbranding.properties"));
-                brd.add(props.getProperty("fmlbranding"));
-            } catch (Exception ex) {
-                // Ignore - no branding file found
+            if (Loader.instance().getFMLBrandingProperties().containsKey("fmlbranding"))
+            {
+                brd.add(Loader.instance().getFMLBrandingProperties().get("fmlbranding"));
             }
             int tModCount = Loader.instance().getModList().size();
             int aModCount = Loader.instance().getActiveModList().size();
@@ -304,9 +304,14 @@ public class FMLCommonHandler
         }
     }
 
-    public void handleServerStarting(MinecraftServer server)
+    public boolean handleServerAboutToStart(MinecraftServer server)
     {
-        Loader.instance().serverStarting(server);
+        return Loader.instance().serverAboutToStart(server);
+    }
+
+    public boolean handleServerStarting(MinecraftServer server)
+    {
+        return Loader.instance().serverStarting(server);
     }
 
     public void handleServerStarted()
@@ -446,6 +451,10 @@ public class FMLCommonHandler
 
     public boolean shouldServerBeKilledQuietly()
     {
+        if (sidedDelegate == null)
+        {
+            return false;
+        }
         return sidedDelegate.shouldServerShouldBeKilledQuietly();
     }
 
@@ -456,6 +465,35 @@ public class FMLCommonHandler
 
     public void handleServerStopped()
     {
+        MinecraftServer server = getMinecraftServerInstance();
         Loader.instance().serverStopped();
+        // FORCE the internal server to stop: hello optifine workaround!
+        if (server!=null) ObfuscationReflectionHelper.setPrivateValue(MinecraftServer.class, server, false, "field_71316_v", "u", "serverStopped");
+    }
+
+    public String getModName()
+    {
+        List<String> modNames = Lists.newArrayListWithExpectedSize(3);
+        modNames.add("fml");
+        if (!noForge)
+        {
+            modNames.add("forge");
+        }
+
+        if (Loader.instance().getFMLBrandingProperties().containsKey("snooperbranding"))
+        {
+            modNames.add(Loader.instance().getFMLBrandingProperties().get("snooperbranding"));
+        }
+        return Joiner.on(',').join(modNames);
+    }
+
+    public void addModToResourcePack(ModContainer container)
+    {
+        sidedDelegate.addModAsResource(container);
+    }
+
+    public void updateResourcePackList()
+    {
+        sidedDelegate.updateResourcePackList();
     }
 }

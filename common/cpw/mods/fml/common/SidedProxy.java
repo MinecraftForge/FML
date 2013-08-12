@@ -1,15 +1,13 @@
 /*
- * The FML Forge Mod Loader suite.
- * Copyright (C) 2012 cpw
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Contributors:
+ *     cpw - implementation
  */
 
 package cpw.mods.fml.common;
@@ -20,6 +18,30 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Sided proxies are loaded based on the specific environment they find themselves loaded into.
+ * They are used to ensure that client-specific code (such as GUIs) is only loaded into the game
+ * on the client side.
+ * It is applied to static fields of a class, anywhere in your mod code. FML will scan
+ * and load any classes with this annotation at mod construction time.
+ *
+ * <p>
+ * This example will load a CommonProxy on the server side, and a ClientProxy on the client side.
+ *
+ * <pre>{@code
+ *  public class MySidedProxyHolder {
+ *      {@literal @}SidedProxy(modId="MyModId",clientSide="mymod.ClientProxy", serverSide="mymod.CommonProxy")
+ *      public static CommonProxy proxy;
+ *  }
+ *
+ *  public class CommonProxy {
+ *      // Common or server stuff here that needs to be overridden on the client
+ *  }
+ *
+ *  public class ClientProxy extends CommonProxy {
+ *      // Override common stuff with client specific stuff here
+ *  }
+ * }
+ * </pre>
  * @author cpw
  *
  */
@@ -37,8 +59,17 @@ public @interface SidedProxy
      */
     String serverSide() default "";
 
+    @Deprecated
     /**
+     * Not implemented
      * The name of a special bukkit plugin class to load and populate
      */
     String bukkitSide() default "";
+
+    /**
+     * The (optional) name of a mod to load this proxy for. This will help ensure correct behaviour when loading a combined
+     * scala/java mod package. It is almost never going to be required, unless you ship both Scala and Java {@link Mod} content
+     * in a single jar.
+     */
+    String modId() default "";
 }

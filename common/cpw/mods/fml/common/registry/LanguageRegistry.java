@@ -1,15 +1,34 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.registry;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+
+import com.google.common.base.Charsets;
 
 import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StringTranslate;
@@ -27,7 +46,7 @@ public class LanguageRegistry
 
     public String getStringLocalization(String key)
     {
-        return getStringLocalization(key, StringTranslate.func_74808_a().func_74811_c());
+        return getStringLocalization(key, Minecraft.func_71410_x().func_135016_M().func_135041_c().func_135034_a());
     }
 
     public String getStringLocalization(String key, String lang)
@@ -75,10 +94,9 @@ public class LanguageRegistry
 
     public static void reloadLanguageTable()
     {
-        // reload language table by forcing lang to null and reloading the properties file
-        String lang = StringTranslate.func_74808_a().func_74811_c();
-        StringTranslate.func_74808_a().field_74813_d = null;
-        StringTranslate.func_74808_a().func_74810_a(lang);
+//        // reload language table by forcing lang to null and reloading the properties file
+//        String lang = StringTranslate.func_74808_a().func_74811_c();
+//        StringTranslate.func_74808_a().func_74810_a(lang, true);
     }
 
 
@@ -103,22 +121,38 @@ public class LanguageRegistry
         instance().addNameForObject(objectToName, "en_US", name);
     }
 
-    public void loadLanguageTable(Properties languagePack, String lang)
+    public void loadLanguageTable(Map field_135032_a, String lang)
     {
         Properties usPack=modLanguageData.get("en_US");
         if (usPack!=null) {
-            languagePack.putAll(usPack);
+            field_135032_a.putAll(usPack);
         }
         Properties langPack=modLanguageData.get(lang);
         if (langPack==null) {
             return;
         }
-        languagePack.putAll(langPack);
+        field_135032_a.putAll(langPack);
     }
 
     public void loadLocalization(String localizationFile, String lang, boolean isXML)
     {
-        loadLocalization(this.getClass().getResource(localizationFile), lang, isXML);
+        URL urlResource = this.getClass().getResource(localizationFile);
+        if (urlResource != null)
+        {
+            loadLocalization(urlResource, lang, isXML);
+        }
+        else
+        {
+            ModContainer activeModContainer = Loader.instance().activeModContainer();
+            if (activeModContainer!=null)
+            {
+                FMLLog.log(activeModContainer.getModId(), Level.SEVERE, "The language resource %s cannot be located on the classpath. This is a programming error.", localizationFile);
+            }
+            else
+            {
+                FMLLog.log(Level.SEVERE, "The language resource %s cannot be located on the classpath. This is a programming error.", localizationFile);
+            }
+        }
     }
 
     public void loadLocalization(URL localizationFile, String lang, boolean isXML)
@@ -133,14 +167,13 @@ public class LanguageRegistry
                 langPack.loadFromXML(langStream);
             }
             else {
-                langPack.load(langStream);
+                langPack.load(new InputStreamReader(langStream,Charsets.UTF_8));
             }
 
             addStringLocalization(langPack, lang);
         }
         catch (IOException e) {
-            FMLLog.getLogger().severe("Unable to load localization from file: " + localizationFile);
-            e.printStackTrace();
+            FMLLog.log(Level.SEVERE, e, "Unable to load localization from file %s", localizationFile);
         }
         finally    {
             try    {
@@ -149,7 +182,7 @@ public class LanguageRegistry
                 }
             }
             catch (IOException ex) {
-                ex.printStackTrace();
+                // HUSH
             }
         }
     }

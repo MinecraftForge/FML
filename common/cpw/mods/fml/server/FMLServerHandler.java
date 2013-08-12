@@ -27,6 +27,7 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IFMLSidedHandler;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.network.EntitySpawnAdjustmentPacket;
 import cpw.mods.fml.common.network.EntitySpawnPacket;
@@ -42,7 +43,7 @@ import cpw.mods.fml.relauncher.Side;
  * Handles primary communication from hooked code into the system
  *
  * The FML entry point is {@link #beginServerLoading(MinecraftServer)} called from
- * {@link net.minecraft.shared.DedicatedServer}
+ * {@link net.minecraft.server.dedicated.DedicatedServer}
  *
  * Obfuscated code should focus on this class and other members of the "server"
  * (or "client") code
@@ -82,7 +83,6 @@ public class FMLServerHandler implements IFMLSidedHandler
     public void beginServerLoading(MinecraftServer minecraftServer)
     {
         server = minecraftServer;
-        ObfuscationReflectionHelper.detectObfuscation(World.class);
         Loader.instance().loadMods();
     }
 
@@ -189,5 +189,15 @@ public class FMLServerHandler implements IFMLSidedHandler
     public void disconnectIDMismatch(MapDifference<Integer, ItemData> s, NetHandler handler, INetworkManager mgr)
     {
 
+    }
+    @Override
+    public void addModAsResource(ModContainer container)
+    {
+        // NOOP on server
+    }
+    @Override
+    public void updateResourcePackList()
+    {
+        // NOOP on server
     }
 }

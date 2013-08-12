@@ -1,3 +1,15 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.relauncher;
 
 /**
@@ -22,33 +34,19 @@ final class FMLLogFormatter extends Formatter
         msg.append(this.dateFormat.format(Long.valueOf(record.getMillis())));
         Level lvl = record.getLevel();
 
-        if (lvl == Level.FINEST)
+        String name = lvl.getLocalizedName();
+        if ( name == null )
         {
-            msg.append(" [FINEST] ");
+            name = lvl.getName();        	
         }
-        else if (lvl == Level.FINER)
+
+        if ( ( name != null ) && ( name.length() > 0 ) )
         {
-            msg.append(" [FINER] ");
+            msg.append(" [" + name + "] ");
         }
-        else if (lvl == Level.FINE)
+        else
         {
-            msg.append(" [FINE] ");
-        }
-        else if (lvl == Level.INFO)
-        {
-            msg.append(" [INFO] ");
-        }
-        else if (lvl == Level.WARNING)
-        {
-            msg.append(" [WARNING] ");
-        }
-        else if (lvl == Level.SEVERE)
-        {
-            msg.append(" [SEVERE] ");
-        }
-        else if (lvl == Level.SEVERE)
-        {
-            msg.append(" [" + lvl.getLocalizedName() + "] ");
+            msg.append(" ");
         }
 
         if (record.getLoggerName() != null)

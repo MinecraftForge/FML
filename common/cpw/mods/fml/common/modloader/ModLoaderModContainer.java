@@ -1,16 +1,15 @@
 /*
- * The FML Forge Mod Loader suite.
- * Copyright (C) 2012 cpw
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Contributors:
+ *     cpw - implementation
  */
+
 package cpw.mods.fml.common.modloader;
 
 import java.io.File;
@@ -41,6 +40,7 @@ import com.google.common.eventbus.Subscribe;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.ILanguageAdapter;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderException;
@@ -338,12 +338,6 @@ public class ModLoaderModContainer implements ModContainer
         return mod != null ? mod.getName() : modId;
     }
 
-    @Deprecated
-    public static ModContainer findContainerFor(BaseModProxy mod)
-    {
-        return FMLCommonHandler.instance().findContainerFor(mod);
-    }
-
     @Override
     public String getSortingRules()
     {
@@ -503,7 +497,7 @@ public class ModLoaderModContainer implements ModContainer
             {
                 dummyHandler.setBaseMod(mod);
             }
-            ProxyInjector.inject(this, event.getASMHarvestedData(), FMLCommonHandler.instance().getSide());
+            ProxyInjector.inject(this, event.getASMHarvestedData(), FMLCommonHandler.instance().getSide(), new ILanguageAdapter.JavaAdapter());
         }
         catch (Exception e)
         {
@@ -525,7 +519,6 @@ public class ModLoaderModContainer implements ModContainer
             GameRegistry.registerFuelHandler(ModLoaderHelper.buildFuelHelper(mod));
             GameRegistry.registerCraftingHandler(ModLoaderHelper.buildCraftingHelper(mod));
             GameRegistry.registerPickupHandler(ModLoaderHelper.buildPickupHelper(mod));
-            GameRegistry.registerDispenserHandler(ModLoaderHelper.buildDispenseHelper(mod));
             NetworkRegistry.instance().registerChatListener(ModLoaderHelper.buildChatListener(mod));
             NetworkRegistry.instance().registerConnectionHandler(ModLoaderHelper.buildConnectionHelper(mod));
         }
@@ -619,6 +612,18 @@ public class ModLoaderModContainer implements ModContainer
     }
     @Override
     public Certificate getSigningCertificate()
+    {
+        return null;
+    }
+
+    @Override
+    public Map<String, String> getCustomModProperties()
+    {
+        return EMPTY_PROPERTIES;
+    }
+
+    @Override
+    public Class<?> getCustomResourcePackClass()
     {
         return null;
     }

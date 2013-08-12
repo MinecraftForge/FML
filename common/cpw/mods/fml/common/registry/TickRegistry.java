@@ -1,3 +1,15 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.registry;
 
 import java.util.List;
@@ -58,8 +70,8 @@ public class TickRegistry
     }
 
     /**
-     * @param side
-     * @return
+     * @param side the side to get the tick queue for
+     * @return the queue for the effective side
      */
     private static PriorityQueue<TickQueueElement> getQueue(Side side)
     {

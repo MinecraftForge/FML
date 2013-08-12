@@ -1,16 +1,15 @@
 /*
- * The FML Forge Mod Loader suite.
- * Copyright (C) 2012 cpw
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Contributors:
+ *     cpw - implementation
  */
+
 package cpw.mods.fml.common.toposort;
 
 import java.util.ArrayList;
@@ -25,6 +24,11 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import com.google.common.collect.Sets;
+import com.google.common.collect.Sets.SetView;
+
+import cpw.mods.fml.common.FMLLog;
 
 /**
  * Topological sort for mod loading
@@ -175,8 +179,14 @@ public class TopologicalSort
                 return;
             }
 
-            System.out.printf("%s: %s\n%s\n%s\n", node, sortedResult, visitedNodes, expandedNodes);
-            throw new ModSortingException("There was a cycle detected in the input graph, sorting is not possible", node, visitedNodes);
+            FMLLog.severe("Mod Sorting failed.");
+            FMLLog.severe("Visting node %s", node);
+            FMLLog.severe("Current sorted list : %s", sortedResult);
+            FMLLog.severe("Visited set for this node : %s", visitedNodes);
+            FMLLog.severe("Explored node set : %s", expandedNodes);
+            SetView<T> cycleList = Sets.difference(visitedNodes, expandedNodes);
+            FMLLog.severe("Likely cycle is in : %s", cycleList);
+            throw new ModSortingException("There was a cycle detected in the input graph, sorting is not possible", node, cycleList);
         }
 
         // Visit this node

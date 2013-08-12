@@ -1,3 +1,15 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.network;
 
 import java.util.Arrays;
@@ -110,7 +122,7 @@ public abstract class FMLPacket
         for (int i = 0; i < packetData.length / 32000 + 1; i++)
         {
             int len = Math.min(32000, packetData.length - i* 32000);
-            chunks[i] = Bytes.concat(new byte[] { UnsignedBytes.checkedCast(type.ordinal()), UnsignedBytes.checkedCast(i), UnsignedBytes.checkedCast(chunks.length)}, Ints.toByteArray(len), Arrays.copyOfRange(packetData, i * 32000, len));
+            chunks[i] = Bytes.concat(new byte[] { UnsignedBytes.checkedCast(type.ordinal()), UnsignedBytes.checkedCast(i), UnsignedBytes.checkedCast(chunks.length)}, Ints.toByteArray(len), Arrays.copyOfRange(packetData, i * 32000, len + i * 32000));
         }
         return chunks;
     }

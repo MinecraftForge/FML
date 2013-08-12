@@ -1,3 +1,15 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.network;
 
 import java.lang.reflect.Method;
@@ -84,6 +96,10 @@ public class NetworkModHandler
             }
         }
 
+        configureNetworkMod(container);
+    }
+    protected void configureNetworkMod(ModContainer container)
+    {
         if (this.checkHandler == null)
         {
             String versionBounds = mod.versionBounds();
@@ -193,7 +209,7 @@ public class NetworkModHandler
         }
     }
     /**
-     * @return
+     * @return the default {@link NetworkMod#connectionHandler()} annotation value
      */
     private Object getConnectionHandlerDefaultValue()
     {
@@ -211,7 +227,7 @@ public class NetworkModHandler
     }
 
     /**
-     * @return
+     * @return the default {@link NetworkMod#packetHandler()} annotation value
      */
     private Object getPacketHandlerDefaultValue()
     {
@@ -228,6 +244,9 @@ public class NetworkModHandler
         }
     }
 
+    /**
+     * @return the default {@link NetworkMod#tinyPacketHandler()} annotation value
+     */
     private Object getTinyPacketHandlerDefaultValue()
     {
         try {
@@ -243,7 +262,7 @@ public class NetworkModHandler
         }
     }
     /**
-     * @return
+     * @return the {@link NetworkMod#clientPacketHandlerSpec()} default annotation value
      */
     private Object getClientHandlerSpecDefaultValue()
     {
@@ -260,7 +279,7 @@ public class NetworkModHandler
         }
     }
     /**
-     * @return
+     * @return the default {@link NetworkMod#serverPacketHandlerSpec()} annotation value
      */
     private Object getServerHandlerSpecDefaultValue()
     {

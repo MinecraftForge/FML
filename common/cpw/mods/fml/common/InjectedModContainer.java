@@ -1,8 +1,21 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common;
 
 import java.io.File;
 import java.security.cert.Certificate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.eventbus.EventBus;
@@ -13,7 +26,7 @@ import cpw.mods.fml.common.versioning.VersionRange;
 public class InjectedModContainer implements ModContainer
 {
     private File source;
-    private ModContainer wrappedContainer;
+    public final ModContainer wrappedContainer;
 
     public InjectedModContainer(ModContainer mc, File source)
     {
@@ -135,5 +148,23 @@ public class InjectedModContainer implements ModContainer
     public Certificate getSigningCertificate()
     {
         return wrappedContainer.getSigningCertificate();
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Wrapped{"+wrappedContainer.toString()+"}";
+    }
+
+    @Override
+    public Map<String, String> getCustomModProperties()
+    {
+        return wrappedContainer.getCustomModProperties();
+    }
+
+    @Override
+    public Class<?> getCustomResourcePackClass()
+    {
+        return wrappedContainer.getCustomResourcePackClass();
     }
 }

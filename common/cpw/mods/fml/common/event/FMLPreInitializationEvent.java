@@ -1,3 +1,15 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.event;
 
 import java.io.File;
@@ -81,6 +93,8 @@ public class FMLPreInitializationEvent extends FMLStateEvent
 
     /**
      * Get a logger instance configured to write to the FML Log as a parent, identified by modid. Handy for mod logging!
+     * Configurations can be applied through the <code>config/logging.properties</code> file, specifying logging levels
+     * for your ModID. Use this!
      *
      * @return A logger
      */

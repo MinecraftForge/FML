@@ -12,6 +12,8 @@
  */
 package cpw.mods.fml.client;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +30,11 @@ import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.resources.FileResourcePack;
+import net.minecraft.client.resources.FolderResourcePack;
+import net.minecraft.client.resources.ReloadableResourceManager;
+import net.minecraft.client.resources.ResourcePack;
+import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -44,6 +51,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.MapDifference.ValueDifference;
+import com.google.common.collect.Maps;
 
 import cpw.mods.fml.client.modloader.ModLoaderClientHelper;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
@@ -71,13 +79,14 @@ import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.common.registry.IThrowableEntity;
 import cpw.mods.fml.common.registry.ItemData;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.common.toposort.ModSortingException;
 import cpw.mods.fml.relauncher.Side;
 
 
 /**
  * Handles primary communication from hooked code into the system
  *
- * The FML entry point is {@link #beginMinecraftLoading(Minecraft)} called from
+ * The FML entry point is {@link #beginMinecraftLoading(Minecraft, List)} called from
  * {@link Minecraft}
  *
  * Obfuscated code should focus on this class and other members of the "server"
@@ -113,7 +122,9 @@ public class FMLClientHandler implements IFMLSidedHandler
 
     private MissingModsException modsMissing;
 
-    private boolean loading;
+    private ModSortingException modSorting;
+
+    private boolean loading = true;
 
     private WrongMinecraftVersionException wrongMC;
 
@@ -123,13 +134,25 @@ public class FMLClientHandler implements IFMLSidedHandler
 
     private boolean serverShouldBeKilledQuietly;
 
+    private List<ResourcePack> resourcePackList;
+
+    private ReloadableResourceManager resourceManager;
+
+    private Map<String, ResourcePack> resourcePackMap;
+
     /**
      * Called to start the whole game off
      *
      * @param minecraft The minecraft instance being launched
+     * @param resourcePackList The resource pack list we will populate with mods
+     * @param resourceManager The resource manager
      */
-    public void beginMinecraftLoading(Minecraft minecraft)
+    public void beginMinecraftLoading(Minecraft minecraft, List resourcePackList, ReloadableResourceManager resourceManager)
     {
+        client = minecraft;
+        this.resourcePackList = resourcePackList;
+        this.resourceManager = resourceManager;
+        this.resourcePackMap = Maps.newHashMap();
         if (minecraft.func_71355_q())
         {
             FMLLog.severe("DEMO MODE DETECTED, FML will not work. Finishing now.");
@@ -137,10 +160,7 @@ public class FMLClientHandler implements IFMLSidedHandler
             return;
         }
 
-        loading = true;
-        client = minecraft;
-        ObfuscationReflectionHelper.detectObfuscation(World.class);
-        TextureFXManager.instance().setClient(client);
+//        TextureFXManager.instance().setClient(client);
         FMLCommonHandler.instance().beginLoading(this);
         new ModLoaderClientHelper(client);
         try
@@ -172,6 +192,10 @@ public class FMLClientHandler implements IFMLSidedHandler
         {
             modsMissing = missing;
         }
+        catch (ModSortingException sorting)
+        {
+            modSorting = sorting;
+        }
         catch (CustomModLoadingErrorDisplayException custom)
         {
             FMLLog.log(Level.SEVERE, custom, "A custom exception was thrown by a mod, the game will now halt");
@@ -198,7 +222,7 @@ public class FMLClientHandler implements IFMLSidedHandler
     @SuppressWarnings("deprecation")
     public void finishMinecraftLoading()
     {
-        if (modsMissing != null || wrongMC != null || customError!=null || dupesFound!=null)
+        if (modsMissing != null || wrongMC != null || customError!=null || dupesFound!=null || modSorting!=null)
         {
             return;
         }
@@ -217,7 +241,8 @@ public class FMLClientHandler implements IFMLSidedHandler
             haltGame("There was a severe problem during mod loading that has caused the game to fail", le);
             return;
         }
-        LanguageRegistry.reloadLanguageTable();
+        // Reload resources
+        client.func_110436_a();
         RenderingRegistry.instance().loadEntityRenderers((Map<Class<? extends Entity>, Render>)RenderManager.field_78727_a.field_78729_o);
 
         loading = false;
@@ -238,13 +263,19 @@ public class FMLClientHandler implements IFMLSidedHandler
         {
         	client.func_71373_a(new GuiDupesFound(dupesFound));
         }
-        else if (customError != null)
+        else if (modSorting != null)
+        {
+            client.func_71373_a(new GuiSortingProblem(modSorting));
+        }
+		else if (customError != null)
         {
             client.func_71373_a(new GuiCustomModLoadingErrorScreen(customError));
         }
         else
         {
-            TextureFXManager.instance().loadTextures(client.field_71418_C.func_77292_e());
+            // Force renderengine to reload and re-initialize all textures
+//            client.field_71446_o.func_78352_b();
+//            TextureFXManager.instance().loadTextures(client.field_71418_C.func_77292_e());
         }
     }
     /**
@@ -339,6 +370,7 @@ public class FMLClientHandler implements IFMLSidedHandler
             else
             {
                 entity = (Entity)(cls.getConstructor(World.class).newInstance(wc));
+                int offset = packet.entityId - entity.field_70157_k;
                 entity.field_70157_k = packet.entityId;
                 entity.func_70012_b(packet.scaledX, packet.scaledY, packet.scaledZ, packet.scaledYaw, packet.scaledPitch);
                 if (entity instanceof EntityLiving)
@@ -346,6 +378,14 @@ public class FMLClientHandler implements IFMLSidedHandler
                     ((EntityLiving)entity).field_70759_as = packet.scaledHeadYaw;
                 }
 
+                Entity parts[] = entity.func_70021_al();
+                if (parts != null)
+                {
+                    for (int j = 0; j < parts.length; j++)
+                    {
+                        parts[j].field_70157_k += offset;
+                    }
+                }
             }
 
             entity.field_70118_ct = packet.rawX;
@@ -357,18 +397,6 @@ public class FMLClientHandler implements IFMLSidedHandler
                 Entity thrower = client.field_71439_g.field_70157_k == packet.throwerId ? client.field_71439_g : wc.func_73045_a(packet.throwerId);
                 ((IThrowableEntity)entity).setThrower(thrower);
             }
-
-
-            Entity parts[] = entity.func_70021_al();
-            if (parts != null)
-            {
-                int i = packet.entityId - entity.field_70157_k;
-                for (int j = 0; j < parts.length; j++)
-                {
-                    parts[j].field_70157_k += i;
-                }
-            }
-
 
             if (packet.metadata != null)
             {
@@ -529,5 +557,53 @@ public class FMLClientHandler implements IFMLSidedHandler
         client.func_71403_a((WorldClient)null);
         // Show error screen
         warnIDMismatch(s, false);
+    }
+
+    /**
+     * Is this GUI type open?
+     *
+     * @param gui The type of GUI to test for
+     * @return if a GUI of this type is open
+     */
+    public boolean isGUIOpen(Class<? extends GuiScreen> gui)
+    {
+        return client.field_71462_r != null && client.field_71462_r.getClass().equals(gui);
+    }
+
+
+    @Override
+    public void addModAsResource(ModContainer container)
+    {
+        Class<?> resourcePackType = container.getCustomResourcePackClass();
+        if (resourcePackType != null)
+        {
+            try
+            {
+                ResourcePack pack = (ResourcePack) resourcePackType.getConstructor(ModContainer.class).newInstance(container);
+                resourcePackList.add(pack);
+                resourcePackMap.put(container.getModId(), pack);
+            }
+            catch (NoSuchMethodException e)
+            {
+                FMLLog.log(Level.SEVERE, "The container %s (type %s) returned an invalid class for it's resource pack.", container.getName(), container.getClass().getName());
+                return;
+            }
+            catch (Exception e)
+            {
+                FMLLog.log(Level.SEVERE, e, "An unexpected exception occurred constructing the custom resource pack for %s", container.getName());
+                throw Throwables.propagate(e);
+            }
+        }
+    }
+
+    @Override
+    public void updateResourcePackList()
+    {
+        client.func_110436_a();
+    }
+
+    public ResourcePack getResourcePackFor(String modId)
+    {
+        return resourcePackMap.get(modId);
     }
 }

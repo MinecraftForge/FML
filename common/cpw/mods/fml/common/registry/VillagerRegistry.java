@@ -1,12 +1,27 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.registry;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.gen.structure.ComponentVillageStartPiece;
@@ -18,6 +33,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * Registry for villager trading control
@@ -31,11 +48,12 @@ public class VillagerRegistry
 
     private Multimap<Integer, IVillageTradeHandler> tradeHandlers = ArrayListMultimap.create();
     private Map<Class<?>, IVillageCreationHandler> villageCreationHandlers = Maps.newHashMap();
-    private Map<Integer, String> newVillagers = Maps.newHashMap();
     private List<Integer> newVillagerIds = Lists.newArrayList();
+    @SideOnly(Side.CLIENT)
+    private Map<Integer, ResourceLocation> newVillagers;
 
     /**
-     * Allow access to the {@link StructureVillagePieces} array controlling new village
+     * Allow access to the {@link net.minecraft.world.gen.structure.StructureVillagePieces} array controlling new village
      * creation so you can insert your own new village pieces
      *
      * @author cpw
@@ -44,7 +62,7 @@ public class VillagerRegistry
     public interface IVillageCreationHandler
     {
         /**
-         * Called when {@link MapGenVillage} is creating a new village
+         * Called when {@link net.minecraft.world.gen.structure.MapGenVillage} is creating a new village
          *
          * @param random
          * @param i
@@ -58,7 +76,7 @@ public class VillagerRegistry
 
 
         /**
-         * Build an instance of the village component {@link StructureVillagePieces}
+         * Build an instance of the village component {@link net.minecraft.world.gen.structure.StructureVillagePieces}
          * @param villagePiece
          * @param startPiece
          * @param pieces
@@ -97,20 +115,32 @@ public class VillagerRegistry
     }
 
     /**
+     * Register your villager id
+     * @param id
+     */
+    public void registerVillagerId(int id)
+    {
+        if (newVillagerIds.contains(id))
+        {
+            FMLLog.severe("Attempt to register duplicate villager id %d", id);
+            throw new RuntimeException();
+        }
+        newVillagerIds.add(id);
+    }
+    /**
      * Register a new skin for a villager type
      *
      * @param villagerId
      * @param villagerSkin
      */
-    public void registerVillagerType(int villagerId, String villagerSkin)
+    @SideOnly(Side.CLIENT)
+    public void registerVillagerSkin(int villagerId, ResourceLocation villagerSkin)
     {
-        if (newVillagers.containsKey(villagerId))
+        if (newVillagers == null)
         {
-            FMLLog.severe("Attempt to register duplicate villager id %d", villagerId);
-            throw new RuntimeException();
+            newVillagers = Maps.newHashMap();
         }
         newVillagers.put(villagerId, villagerSkin);
-        newVillagerIds.add(villagerId);
     }
 
     /**
@@ -140,15 +170,25 @@ public class VillagerRegistry
      * @param villagerType
      * @param defaultSkin
      */
-    public static String getVillagerSkin(int villagerType, String defaultSkin)
+    @SideOnly(Side.CLIENT)
+    public static ResourceLocation getVillagerSkin(int villagerType, ResourceLocation defaultSkin)
     {
-        if (instance().newVillagers.containsKey(villagerType))
+        if (instance().newVillagers != null && instance().newVillagers.containsKey(villagerType))
         {
             return instance().newVillagers.get(villagerType);
         }
         return defaultSkin;
     }
 
+    /**
+     * Returns a list of all added villager types
+     *
+     * @return newVillagerIds
+     */
+    public static Collection<Integer> getRegisteredVillagers()
+    {
+        return Collections.unmodifiableCollection(instance().newVillagerIds);
+    }
     /**
      * Callback to handle trade setup for villagers
      *

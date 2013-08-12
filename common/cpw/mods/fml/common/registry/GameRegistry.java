@@ -1,5 +1,18 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.registry;
 
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -36,8 +49,6 @@ import com.google.common.collect.Sets.SetView;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ICraftingHandler;
-import cpw.mods.fml.common.IDispenseHandler;
-import cpw.mods.fml.common.IDispenserHandler;
 import cpw.mods.fml.common.IFuelHandler;
 import cpw.mods.fml.common.IPickupNotifier;
 import cpw.mods.fml.common.IPlayerTracker;
@@ -45,6 +56,7 @@ import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.LoaderState;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.Mod.Block;
 import cpw.mods.fml.common.ModContainer;
 
@@ -92,43 +104,6 @@ public class GameRegistry
     }
 
     /**
-     * Deprecated without replacement. Use vanilla DispenserRegistry code
-     *
-     * @param handler
-     */
-    @Deprecated
-    public static void registerDispenserHandler(IDispenserHandler handler)
-    {
-    }
-    /**
-     * Deprecated without replacement. Use vanilla DispenserRegistry code
-     *
-     * @param handler
-     */
-    @Deprecated
-    public static void registerDispenserHandler(final IDispenseHandler handler)
-    {
-    }
-
-
-    /**
-     *
-     * Deprecated without replacement, use vanilla DispenserRegistry code
-     *
-     * @param world
-     * @param x
-     * @param y
-     * @param z
-     * @param xVelocity
-     * @param zVelocity
-     * @param item
-     */
-    @Deprecated
-    public static int tryDispense(World world, int x, int y, int z, int xVelocity, int zVelocity, ItemStack item, Random random, double entX, double entY, double entZ)
-    {
-        return -1;
-    }
-    /**
      * Internal method for creating an @Block instance
      * @param container
      * @param type
@@ -145,7 +120,7 @@ public class GameRegistry
     /**
      * Private and not yet working properly
      *
-     * @return
+     * @return a block id
      */
     private static int findSpareBlockId()
     {
@@ -237,7 +212,18 @@ public class GameRegistry
             assert block != null : "registerBlock: block cannot be null";
             assert itemclass != null : "registerBlock: itemclass cannot be null";
             int blockItemId = block.field_71990_ca - 256;
-            Item i = itemclass.getConstructor(int.class).newInstance(blockItemId);
+            Constructor<? extends ItemBlock> itemCtor;
+            Item i;
+            try
+            {
+                itemCtor = itemclass.getConstructor(int.class);
+                i = itemCtor.newInstance(blockItemId);
+            }
+            catch (NoSuchMethodException e)
+            {
+                itemCtor = itemclass.getConstructor(int.class, net.minecraft.block.Block.class);
+                i = itemCtor.newInstance(blockItemId, block);
+            }
             GameRegistry.registerItem(i,name, modId);
         }
         catch (Exception e)
@@ -250,7 +236,12 @@ public class GameRegistry
 
     public static void addRecipe(ItemStack output, Object... params)
     {
-        CraftingManager.func_77594_a().func_92051_a(output, params);
+        addShapedRecipe(output, params);
+    }
+
+    public static IRecipe addShapedRecipe(ItemStack output, Object... params)
+    {
+        return CraftingManager.func_77594_a().func_92103_a(output, params);
     }
 
     public static void addShapelessRecipe(ItemStack output, Object... params)
@@ -271,6 +262,27 @@ public class GameRegistry
     public static void registerTileEntity(Class<? extends TileEntity> tileEntityClass, String id)
     {
         TileEntity.func_70306_a(tileEntityClass, id);
+    }
+
+    /**
+     * Register a tile entity, with alternative TileEntity identifiers. Use with caution!
+     * This method allows for you to "rename" the 'id' of the tile entity.
+     *
+     * @param tileEntityClass The tileEntity class to register
+     * @param id The primary ID, this will be the ID that the tileentity saves as
+     * @param alternatives A list of alternative IDs that will also map to this class. These will never save, but they will load
+     */
+    public static void registerTileEntityWithAlternatives(Class<? extends TileEntity> tileEntityClass, String id, String... alternatives)
+    {
+        TileEntity.func_70306_a(tileEntityClass, id);
+        Map<String,Class> teMappings = ObfuscationReflectionHelper.getPrivateValue(TileEntity.class, null, "field_" + "70326_a", "field_70326_a", "a");
+        for (String s: alternatives)
+        {
+            if (!teMappings.containsKey(s))
+            {
+                teMappings.put(s, tileEntityClass);
+            }
+        }
     }
 
     public static void addBiome(BiomeGenBase biome)
@@ -360,4 +372,104 @@ public class GameRegistry
 			tracker.onPlayerRespawn(player);
 	}
 
+
+	/**
+	 * Look up a mod block in the global "named item list"
+	 * @param modId The modid owning the block
+	 * @param name The name of the block itself
+	 * @return The block or null if not found
+	 */
+	public static net.minecraft.block.Block findBlock(String modId, String name)
+	{
+	    return GameData.findBlock(modId, name);
+	}
+
+	/**
+	 * Look up a mod item in the global "named item list"
+	 * @param modId The modid owning the item
+	 * @param name The name of the item itself
+	 * @return The item or null if not found
+	 */
+	public static net.minecraft.item.Item findItem(String modId, String name)
+    {
+        return GameData.findItem(modId, name);
+    }
+
+	/**
+	 * Manually register a custom item stack with FML for later tracking. It is automatically scoped with the active modid
+	 *
+	 * @param name The name to register it under
+	 * @param itemStack The itemstack to register
+	 */
+	public static void registerCustomItemStack(String name, ItemStack itemStack)
+	{
+	    GameData.registerCustomItemStack(name, itemStack);
+	}
+	/**
+	 * Lookup an itemstack based on mod and name. It will create "default" itemstacks from blocks and items if no
+	 * explicit itemstack is found.
+	 *
+	 * If it is built from a block, the metadata is by default the "wildcard" value.
+	 *
+	 * Custom itemstacks can be dumped from minecraft by setting the system property fml.dumpRegistry to true
+	 * (-Dfml.dumpRegistry=true on the command line will work)
+	 *
+	 * @param modId The modid of the stack owner
+	 * @param name The name of the stack
+	 * @param stackSize The size of the stack returned
+	 * @return The custom itemstack or null if no such itemstack was found
+	 */
+	public static ItemStack findItemStack(String modId, String name, int stackSize)
+	{
+	    ItemStack foundStack = GameData.findItemStack(modId, name);
+	    if (foundStack != null)
+	    {
+            ItemStack is = foundStack.func_77946_l();
+    	    is.field_77994_a = Math.min(stackSize, is.func_77976_d());
+    	    return is;
+	    }
+	    return null;
+	}
+
+	public static class UniqueIdentifier
+	{
+	    public final String modId;
+	    public final String name;
+        UniqueIdentifier(String modId, String name)
+        {
+            this.modId = modId;
+            this.name = name;
+        }
+	}
+
+	/**
+	 * Look up the mod identifier data for a block.
+	 * Returns null if there is no mod specified mod identifier data, or it is part of a
+	 * custom itemstack definition {@link #registerCustomItemStack}
+	 *
+	 * Note: uniqueness and persistence is only guaranteed by mods using the game registry
+	 * correctly.
+	 *
+	 * @param block to lookup
+     * @return a {@link UniqueIdentifier} for the block or null
+	 */
+	public static UniqueIdentifier findUniqueIdentifierFor(net.minecraft.block.Block block)
+	{
+	    return GameData.getUniqueName(block);
+	}
+    /**
+     * Look up the mod identifier data for an item.
+     * Returns null if there is no mod specified mod identifier data, or it is part of a
+     * custom itemstack definition {@link #registerCustomItemStack}
+     *
+     * Note: uniqueness and persistence is only guaranteed by mods using the game registry
+     * correctly.
+     *
+     * @param item to lookup
+     * @return a {@link UniqueIdentifier} for the item or null
+     */
+    public static UniqueIdentifier findUniqueIdentifierFor(net.minecraft.item.Item item)
+    {
+        return GameData.getUniqueName(item);
+    }
 }

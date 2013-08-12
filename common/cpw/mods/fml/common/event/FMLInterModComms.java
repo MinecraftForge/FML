@@ -1,3 +1,15 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.event;
 
 import java.util.List;
@@ -44,17 +56,24 @@ public class FMLInterModComms {
      *
      */
     public static class IMCEvent extends FMLEvent {
+        private ModContainer activeContainer;
+
         @Override
         public void applyModContainer(ModContainer activeContainer)
         {
-            currentList = ImmutableList.copyOf(modMessages.removeAll(activeContainer.getModId()));
-            FMLLog.finest("Attempting to deliver %d IMC messages to mod %s", currentList.size(), activeContainer.getModId());
+            this.activeContainer = activeContainer;
+            this.currentList = null;
+            FMLLog.finest("Attempting to deliver %d IMC messages to mod %s", modMessages.get(activeContainer.getModId()).size(), activeContainer.getModId());
         }
 
         private ImmutableList<IMCMessage> currentList;
 
         public ImmutableList<IMCMessage> getMessages()
         {
+            if (currentList == null)
+            {
+                currentList = ImmutableList.copyOf(modMessages.removeAll(activeContainer.getModId()));
+            }
             return currentList;
         }
     }
@@ -202,7 +221,7 @@ public class FMLInterModComms {
         ModContainer mc = FMLCommonHandler.instance().findContainerFor(forMod);
         if (mc != null)
         {
-            return ImmutableList.copyOf(modMessages.removeAll(mc));
+            return ImmutableList.copyOf(modMessages.removeAll(mc.getModId()));
         }
         else
         {

@@ -1,3 +1,15 @@
+/*
+ * Forge Mod Loader
+ * Copyright (c) 2012-2013 cpw.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser Public License v2.1
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * Contributors:
+ *     cpw - implementation
+ */
+
 package cpw.mods.fml.common.asm.transformers;
 
 import java.io.BufferedOutputStream;
@@ -46,6 +58,7 @@ public class MCPMerger
     private static HashSet<String> copyToServer = new HashSet<String>();
     private static HashSet<String> copyToClient = new HashSet<String>();
     private static HashSet<String> dontAnnotate = new HashSet<String>();
+    private static HashSet<String> dontProcess  = new HashSet<String>();
     private static final boolean DEBUG = false;
 
     public static void main(String[] args)
@@ -59,9 +72,8 @@ public class MCPMerger
         File map_file = new File(args[0]);
         File client_jar = new File(args[1]);
         File server_jar = new File(args[2]);
-        File client_jar_tmp = new File(args[1] + ".MergeBack");
-        File server_jar_tmp = new File(args[2] + ".MergeBack");
-
+        File client_jar_tmp = new File(args[1] + ".backup_merge");
+        File server_jar_tmp = new File(args[2] + ".backup_merge");
 
         if (client_jar_tmp.exists() && !client_jar_tmp.delete())
         {
@@ -138,12 +150,13 @@ public class MCPMerger
                 line = line.split("#")[0];
                 char cmd = line.charAt(0);
                 line = line.substring(1).trim();
-                
+
                 switch (cmd)
                 {
                     case '!': dontAnnotate.add(line); break;
                     case '<': copyToClient.add(line); break;
-                    case '>': copyToServer.add(line); break; 
+                    case '>': copyToServer.add(line); break;
+                    case '^': dontProcess.add(line);  break;
                 }
             }
 
@@ -321,19 +334,30 @@ public class MCPMerger
         return ann;
     }
 
-    @SuppressWarnings("unchecked")
     private static Hashtable<String, ZipEntry> getClassEntries(ZipFile inFile, ZipOutputStream outFile) throws IOException
     {
         Hashtable<String, ZipEntry> ret = new Hashtable<String, ZipEntry>();
-        for (ZipEntry entry : Collections.list((Enumeration<ZipEntry>)inFile.entries()))
+        for (ZipEntry entry : Collections.list(inFile.entries()))
         {
             if (entry.isDirectory())
             {
                 outFile.putNextEntry(entry);
                 continue;
             }
+
             String entryName = entry.getName();
-            if (!entryName.endsWith(".class") || entryName.startsWith("."))
+
+            boolean filtered = false;
+            for (String filter : dontProcess)
+            {
+                if (entryName.startsWith(filter))
+                {
+                    filtered = true;
+                    break;
+                }
+            }
+
+            if (filtered || !entryName.endsWith(".class") || entryName.startsWith("."))
             {
                 ZipEntry newEntry = new ZipEntry(entry.getName());
                 outFile.putNextEntry(newEntry);
@@ -398,7 +422,6 @@ public class MCPMerger
         return classNode;
     }
 
-    @SuppressWarnings("unchecked")
     private static void processFields(ClassNode cClass, ClassNode sClass, ClassInfo info)
     {
         List<FieldNode> cFields = cClass.fields;
@@ -512,7 +535,6 @@ public class MCPMerger
             return Objects.toStringHelper(this).add("name", node.name).add("desc",node.desc).add("server",server).add("client",client).toString();
         }
     }
-    @SuppressWarnings("unchecked")
     private static void processMethods(ClassNode cClass, ClassNode sClass, ClassInfo info)
     {
         List<MethodNode> cMethods = (List<MethodNode>)cClass.methods;

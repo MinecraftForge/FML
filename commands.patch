@@ -1,93 +1,101 @@
 --- commands.py
 +++ commands.py
-@@ -58,6 +58,8 @@
+@@ -126,8 +126,8 @@
  
  
- def reallyrmtree(path):
-+    if os.path.isfile(os.path.join(path, 'asm-all-4.0.jar')): #Check if asm exists, indicating the libs folder, if so, don't delete it
-+        return
-     if not sys.platform.startswith('win'):
-         if os.path.exists(path):
-             shutil.rmtree(path)
-@@ -788,6 +790,8 @@
+ def truncate(text, length):
+-    if len(text) > length:
+-        return text[:length] + '...'
++    #if len(text) > length:
++    #    return text[:length] + '...'
+     return text
+ 
+ 
+@@ -139,6 +139,8 @@
+             fieldnames = csvreader.fieldnames
+     return set(fieldnames)
+ 
++def commands_sanity_check():
++    print '    Commands patch applied successfully'
+ 
+ class Commands(object):
+     """Contains the commands and initialisation for a full mcp run"""
+@@ -950,6 +952,8 @@
          binlk = {CLIENT: self.binclient, SERVER: self.binserver}
          testlk = {CLIENT: self.testclient, SERVER: self.testserver}
  
-+        if side == SERVER:
++        if side == SERVER and not os.path.exists(os.path.join(binlk[side], os.path.normpath(testlk[side] + '.class'))):
 +            return self.checkbins(CLIENT)
          if not os.path.exists(os.path.join(binlk[side], os.path.normpath(testlk[side] + '.class'))):
              return False
          return True
-@@ -1029,6 +1033,10 @@
+@@ -1281,23 +1285,34 @@
+         pathbinlk = {CLIENT: self.binclient, SERVER: self.binserver}
          pathsrclk = {CLIENT: self.srcclient, SERVER: self.srcserver}
          pathlog = {CLIENT: self.clientrecomplog, SERVER: self.serverrecomplog}
- 
-+        if side == SERVER: #Disable server because FML recombines it into client
-+            self.logger.info('Server side recompiling skipped, this is normal')
-+            return
 +        
++        if side == SERVER: #Warn about server because FML recombines it into client
++            self.logger.info('Server side recompiling might be skipped, this is normal, do not complain to FML/Forge team about server side.')
+ 
          if not os.path.exists(pathbinlk[side]):
              os.makedirs(pathbinlk[side])
  
-@@ -1062,7 +1070,7 @@
+         # HINT: We create the list of source directories based on the list of packages
+         # on windows we just pass wildcards, otherwise we pass the full file list
+-        if self.osname == 'win':
++        if self.osname == 'win' and False == True: #FML: Disable for windows we write to file now
+             all_files = False
+             append_pattern = True
+         else:
+             all_files = True
+             append_pattern = False
+         pkglist = filterdirs(pathsrclk[side], '*.java', append_pattern=append_pattern, all_files=all_files)
++        from tempfile import NamedTemporaryFile
+         if self.cmdrecompscala: # Compile scala before java as scala scans java files, but not vice-versa
+             pkglistscala = pkglist[:]
+             pkglistscala.extend(filterdirs(pathsrclk[side], '*.scala', append_pattern=append_pattern, all_files=all_files))
+-            dirs = ' '.join(pkglistscala)
++            f = NamedTemporaryFile(mode='wb', suffix='.txt', prefix ='scala_src_path_', delete=False) #FML: We write to a temporary file just in case the command is to long
++            for line in pkglistscala:
++                if os.sep == '\\':
++                    f.write('"%s"\n' % os.path.abspath(line).replace(os.sep, os.sep + os.sep))
++                else:
++                    f.write('"%s"\n' % os.path.abspath(line))
++            f.close()
++            dirs = '@"%s"' % f.name
+             classpath = os.pathsep.join(cplk[side])
+             forkcmd = self.cmdrecompscala.format(classpath=classpath, sourcepath=pathsrclk[side], outpath=pathbinlk[side], pkgs=dirs)
+             try:
+@@ -1317,7 +1332,15 @@
+                 self.logger.error('================================')
+                 self.logger.error('')
+                 raise
+-        dirs = ' '.join(pkglist)
++            os.unlink(f.name)
++        f = NamedTemporaryFile(mode='wb', suffix='.txt', prefix ='java_src_path_', delete=False) #FML: We write to a temporary file just in case the command is to long
++        for line in pkglist:
++            if os.sep == '\\':
++                f.write('"%s"\n' % os.path.abspath(line).replace('\\', '\\\\'))
++            else:
++                f.write('"%s"\n' % os.path.abspath(line))
++        f.close()
++        dirs = '@"%s"' % f.name
+         classpath = os.pathsep.join(cplk[side])
+         forkcmd = self.cmdrecomp.format(classpath=classpath, sourcepath=pathsrclk[side], outpath=pathbinlk[side],
+                                         pkgs=dirs)
+@@ -1336,9 +1359,10 @@
+             self.logger.error('==================')
+             self.logger.error('')
              raise
++        os.unlink(f.name)
  
-     def startserver(self):
+     def startserver(self, mainclass, extraargs):
 -        classpath = [self.binserver] + self.cpathserver
-+        classpath = [self.binclient, self.srcclient] + self.cpathserver
++        classpath = [self.binclient, self.srcclient] + self.cpathserver + self.cpathclient
          classpath = [os.path.join('..', p) for p in classpath]
          classpath = os.pathsep.join(classpath)
          os.chdir(self.dirjars)
-@@ -1070,7 +1078,7 @@
-         self.runmc(forkcmd)
- 
-     def startclient(self):
--        classpath = [self.binclient] + self.cpathclient
-+        classpath = [self.binclient, self.srcclient] + self.cpathclient
-         classpath = [os.path.join('..', p) for p in classpath]
-         classpath = os.pathsep.join(classpath)
-         natives = os.path.join('..', self.dirnatives)
-@@ -1197,20 +1205,20 @@
-         with open(self.csvmethods, 'rb') as fh:
-             methodsreader = csv.DictReader(fh)
-             for row in methodsreader:
--                if int(row['side']) == side:
-+                if int(row['side']) == side or int(row['side']) == 2:
-                     if row['name'] != row['searge']:
-                         names['methods'][row['searge']] = row['name']
-         with open(self.csvfields, 'rb') as fh:
-             fieldsreader = csv.DictReader(fh)
-             for row in fieldsreader:
--                if int(row['side']) == side:
-+                if int(row['side']) == side or int(row['side']) == 2:
-                     if row['name'] != row['searge']:
-                         names['fields'][row['searge']] = row['name']
-         if self.has_param_csv:
-             with open(self.csvparams, 'rb') as fh:
-                 paramsreader = csv.DictReader(fh)
-                 for row in paramsreader:
--                    if int(row['side']) == side:
-+                    if int(row['side']) == side or int(row['side']) == 2:
-                         names['params'][row['param']] = row['name']
- 
-         regexps = {
-@@ -1344,13 +1352,13 @@
-         methods = {}
-         for row in methodsreader:
-             #HINT: Only include methods that have a non-empty description
--            if int(row['side']) == side and row['desc']:
-+            if (int(row['side']) == side or int(row['side']) == 2) and row['desc']:
-                 methods[row['searge']] = row['desc'].replace('*/', '* /')
- 
-         fields = {}
-         for row in fieldsreader:
-             #HINT: Only include fields that have a non-empty description
--            if int(row['side']) == side and row['desc']:
-+            if (int(row['side']) == side or int(row['side']) == 2) and row['desc']:
-                 fields[row['searge']] = row['desc'].replace('*/', '* /')
- 
-         regexps = {
-@@ -1427,7 +1435,7 @@
+@@ -1703,7 +1727,7 @@
          self.runcmd(forkcmd)
          return True
  
@@ -96,7 +104,7 @@
          if not reobf:
              md5lk = {CLIENT: self.md5client, SERVER: self.md5server}
          else:
-@@ -1442,6 +1450,9 @@
+@@ -1718,6 +1742,9 @@
                      class_path = ''
                  else:
                      class_path += '/'
@@ -106,40 +114,7 @@
                  for class_file in fnmatch.filter(filelist, '*.class'):
                      class_name = class_path + os.path.splitext(class_file)[0]
                      bin_file = os.path.normpath(os.path.join(path, class_file))
-@@ -1535,6 +1546,8 @@
-         if not os.path.exists(outpathlk[side]):
-             os.makedirs(outpathlk[side])
- 
-+        reserved = ['CON', 'PRN', 'AUX', 'NUL', 'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9', 'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9']
-+
-         # HINT: We extract the modified class files
-         with closing(zipfile.ZipFile(jarlk[side])) as zipjar:
-             for in_class in trgclasses:
-@@ -1548,6 +1561,23 @@
-                     out_class = out_class.replace(self.nullpkg, '')
-                     if out_class[0] == '/':
-                         out_class = out_class[1:]
-+                        
-+                rename = False
-+                for res in reserved:
-+                    if out_class.upper().startswith(res):
-+                        rename = True
-+                        break
-+                        
-+                if rename:
-+                    try:
-+                        f = open(os.path.join(outpathlk[side], '_' + out_class), 'wb')
-+                        f.write(zipjar.read(out_class))
-+                        f.close()
-+                        self.logger.info('> Outputted %s to %s as %s', in_class.ljust(35), outpathlk[side], '_' + out_class)
-+                    except IOError:
-+                        self.logger.error('* File %s failed extracting for %s', out_class, in_class)
-+                    continue
-+                
-                 try:
-                     zipjar.extract(out_class, outpathlk[side])
-                     self.logger.info('> Outputted %s to %s as %s', in_class.ljust(35), outpathlk[side], out_class)
-@@ -1594,6 +1624,9 @@
+@@ -1890,6 +1917,9 @@
                  sys.exit(1)
  
          for entry in newfiles:
@@ -149,7 +124,7 @@
              if entry[3] == 'U':
                  self.logger.info('Retrieving file from server : %s', entry[0])
                  cur_file = os.path.normpath(entry[0])
-@@ -1614,6 +1647,9 @@
+@@ -1910,6 +1940,9 @@
          md5reoblk = {CLIENT: self.md5reobfclient, SERVER: self.md5reobfserver}
          outpathlk = {CLIENT: self.srcmodclient, SERVER: self.srcmodserver}
          src = {CLIENT: self.srcclient, SERVER: self.srcserver}
@@ -159,10 +134,3 @@
  
          # HINT: We need a table for the old md5 and the new ones
          md5table = {}
-@@ -1656,3 +1692,6 @@
-                 except IOError:
-                     self.logger.error('* File %s copy failed', in_class)
- 
-+def commands_sanity_check():
-+    print 'Commands patch applied successfully'
-+    
