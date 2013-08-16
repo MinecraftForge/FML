@@ -46,7 +46,7 @@ public class ModLoaderBlockRendererHandler implements ISimpleBlockRenderingHandl
     }
 
     @Override
-    public boolean shouldRender3DInInventory()
+    public boolean shouldRender3DInInventory(int modelID)
     {
         return render3dInInventory;
     }
