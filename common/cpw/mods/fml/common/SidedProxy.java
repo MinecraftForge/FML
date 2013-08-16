@@ -68,7 +68,7 @@ public @interface SidedProxy
 
     /**
      * The (optional) name of a mod to load this proxy for. This will help ensure correct behaviour when loading a combined
-     * scala/java mod package. It is almost never going to be required, unless you ship both Scala and Java {@link Mod} content
+     * scala/groovy/java mod package. It is almost never going to be required, unless you ship multiple language {@link Mod} content
      * in a single jar.
      */
     String modId() default "";

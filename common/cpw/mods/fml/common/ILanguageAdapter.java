@@ -194,4 +194,39 @@ public interface ILanguageAdapter {
             // Nothing to do here.
         }
     }
+    
+    public static class GroovyAdapter implements ILanguageAdapter {
+        @Override
+        public Object getNewInstance(FMLModContainer container, Class<?> objectClass, ClassLoader classLoader, Method factoryMarkedMethod) throws Exception
+        {
+            if (factoryMarkedMethod != null)
+            {
+                return factoryMarkedMethod.invoke(null);
+            }
+            else
+            {
+                return objectClass.newInstance();
+            }
+        }
+
+        @Override
+        public boolean supportsStatics()
+        {
+            return true;
+        }
+
+        @Override
+        public void setProxy(Field target, Class<?> proxyTarget, Object proxy) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException
+        {
+            // could potentially go wrong if someone does some serious hackery, but extremely unlikely.
+            target.set(null, proxy);
+        }
+
+        @Override
+        public void setInternalProxies(ModContainer mod, Side side, ClassLoader loader)
+        {
+            // Nothing to do here.
+            // groovy annotation handling is just like java.
+        }
+    }
 }

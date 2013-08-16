@@ -119,8 +119,20 @@ public class FMLModContainer implements ModContainer
         this.source = modSource;
         this.descriptor = modDescriptor;
         this.modLanguage = (String) modDescriptor.get("modLanguage");
-        this.languageAdapter = "scala".equals(modLanguage) ? new ILanguageAdapter.ScalaAdapter() : new ILanguageAdapter.JavaAdapter();
         this.eventMethods = ArrayListMultimap.create();
+        
+        if (modLanguage.equals("scala"))
+        {
+            this.languageAdapter = new ILanguageAdapter.ScalaAdapter();
+        }
+        else if (modLanguage.equals("groovy"))
+        {
+            this.languageAdapter = new ILanguageAdapter.GroovyAdapter();
+        }
+        else
+        {
+            this.languageAdapter = new ILanguageAdapter.JavaAdapter();
+        }
     }
 
     private ILanguageAdapter getLanguageAdapter()
