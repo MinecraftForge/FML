@@ -165,7 +165,7 @@ public @interface Mod
 
     /**
      * The language the mod is authored in. This will be used to control certain compatibility behaviours for this mod.
-     * Valid values are currently "java", "scala"
+     * Valid values are currently "java", "scala", "groovy"
      *
      * @return The language the mod is authored in
      */
