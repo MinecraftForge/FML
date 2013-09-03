@@ -47,6 +47,7 @@ public class VillagerRegistry
     private static final VillagerRegistry INSTANCE = new VillagerRegistry();
 
     private Multimap<Integer, IVillageTradeHandler> tradeHandlers = ArrayListMultimap.create();
+    private Map<Integer, IVillageSpawnCondition> spawnConditionHandlers = Maps.newHashMap();
     private Map<Class<?>, IVillageCreationHandler> villageCreationHandlers = Maps.newHashMap();
     private List<Integer> newVillagerIds = Lists.newArrayList();
     @SideOnly(Side.CLIENT)
@@ -109,6 +110,20 @@ public class VillagerRegistry
         void manipulateTradesForVillager(EntityVillager villager, MerchantRecipeList recipeList, Random random);
     }
 
+    /**
+     * Allow access to the random profession selection for new villagers. 
+     *
+     */
+    public interface IVillageSpawnCondition
+    {
+        /**
+         * Called to allow profession to be excluded from the random selection when a new villager is created.
+         *
+         * @param villager
+         */
+        boolean typeIsValidForVillager( EntityVillager villager, Random random );
+    }
+
     public static VillagerRegistry instance()
     {
         return INSTANCE;
@@ -162,6 +177,17 @@ public class VillagerRegistry
     public void registerVillageTradeHandler(int villagerId, IVillageTradeHandler handler)
     {
         tradeHandlers.put(villagerId, handler);
+    }
+
+    /**
+     * Register a new villager spawn condition for the specified villager type
+     *
+     * @param villagerId
+     * @param handler
+     */
+    public void registerVillageSpawnCondition(int villagerId, IVillageSpawnCondition handler)
+    {
+        spawnConditionHandlers.put(villagerId, handler);
     }
 
     /**
@@ -241,8 +267,20 @@ public class VillagerRegistry
 
     public static void applyRandomTrade(EntityVillager villager, Random rand)
     {
-        int extra = instance().newVillagerIds.size();
+        // Select only the villager id's that fulfills their validation for spawning at this time.
+        // If no spawn condition is set for an id we assume it is valid.
+        List<Integer> validVillagerIds = Lists.newArrayList();
+        for ( int i = 0; i < instance().newVillagerIds.size(); i++ ) {
+            if ( instance().spawnConditionHandlers.get( instance().newVillagerIds.get( i ) ) == null )
+                validVillagerIds.add( instance().newVillagerIds.get( i ) );
+            else if ( instance().spawnConditionHandlers.get( instance().newVillagerIds.get( i ) ).typeIsValidForVillager( villager, rand ) )
+                validVillagerIds.add( instance().newVillagerIds.get( i ) );
+        }
+
+        // Randomize from the list of validated types instead of the entire list.
+        int extra = validVillagerIds.size();
         int trade = rand.nextInt(5 + extra);
-        villager.func_70938_b(trade < 5 ? trade : instance().newVillagerIds.get(trade - 5));
+
+        villager.func_70938_b(trade < 5 ? trade : validVillagerIds.get(trade - 5));
     }
 }
