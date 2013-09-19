@@ -57,7 +57,13 @@ final class FMLLogFormatter extends Formatter
         {
             msg.append("[] ");
         }
-        msg.append(record.getMessage());
+		Object[] args = record.getParameters();
+		String m = record.getMessage();
+		for (int i = 0; i < args.length; i++) {
+            if (args[i] == null) continue;
+            m = m.replace("{" + i + "}", args[i].toString());
+        }
+        msg.append(m);
         msg.append(LINE_SEPARATOR);
         Throwable thr = record.getThrown();
 
