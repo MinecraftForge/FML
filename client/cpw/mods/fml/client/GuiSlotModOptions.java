@@ -26,10 +26,10 @@ public class GuiSlotModOptions extends GuiScrollingList{
         optionsList = new ArrayList<String>();
         optionsMap = new HashMap<String, GuiModOption>();
 
-        for(String key : ClientRegistry.modOptions.keySet())
+        for(String key : ClientRegistry.getModGuis().keySet())
         {
             optionsList.add(key);
-            optionsMap.put(key, ClientRegistry.modOptions.get(key));
+            optionsMap.put(key, ClientRegistry.getModGuis().get(key));
         }
     }
 
