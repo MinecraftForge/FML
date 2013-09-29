@@ -1,0 +1,23 @@
+--- ../src-base/minecraft/net/minecraft/client/gui/GuiOptions.java
++++ ../src-work/minecraft/net/minecraft/client/gui/GuiOptions.java
+@@ -1,8 +1,9 @@
+ package net.minecraft.client.gui;
+
+ import cpw.mods.fml.relauncher.Side;
+ import cpw.mods.fml.relauncher.SideOnly;
++import cpw.mods.fml.client.GuiModOptionList;
+ import net.minecraft.client.resources.GuiScreenTemporaryResourcePackSelect;
+ import net.minecraft.client.resources.I18n;
+ import net.minecraft.client.settings.EnumOptions;
+ import net.minecraft.client.settings.GameSettings;
+@@ -59,1 +59,3 @@
++
++        this.field_73887_h.add(new GuiButton(201, field_73880_f / 2 + 5, field_73881_g / 6 + 60, 150, 20, "Mod Options"));
+     }
+@@ -114,1 +114,6 @@
+             }
++            if (par1GuiButton.field_73741_f == 201)
++            {
++                field_73882_e.field_71474_y.func_74303_b();
++                field_73882_e.func_71373_a(new GuiModOptionList(this));
++            }

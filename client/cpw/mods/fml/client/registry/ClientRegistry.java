@@ -16,9 +16,18 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+import java.util.HashMap;
+
+import cpw.mods.fml.client.GuiModOption;
 
 public class ClientRegistry
 {
+
+    /**
+     * Used for handling the modOptionsList
+     */
+    private static HashMap<String, GuiModOption> modOptions = new HashMap<String, GuiModOption>();
+    
     /**
      * 
      * Utility method for registering a tile entity and it's renderer at once - generally you should register them separately
@@ -37,5 +46,24 @@ public class ClientRegistry
     {
         TileEntityRenderer.field_76963_a.field_76966_m.put(tileEntityClass, specialRenderer);
         specialRenderer.func_76893_a(TileEntityRenderer.field_76963_a);
+    }
+    
+    /**
+     * Call this method on client side.
+     * Used for creating a new Mod Options GUI that is tacked onto the list.
+     * Recommended to keep options in here mostly client, though common can be done.
+     * @author Syllabus
+     */
+    public static void registerModOptions(String modName, GuiModOption gui)
+    {
+        if(!modOptions.containsKey(modName) && gui != null)
+        {
+            modOptions.put(modName, gui);
+        }
+    }
+    
+    public static HashMap<String, GuiModOption> getModGuis()
+    {
+        return modOptions;
     }
 }
