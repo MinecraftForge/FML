@@ -85,6 +85,11 @@
 +                this.func_73731_b(this.field_73886_k, brd, 2, this.field_73881_g - ( 10 + i * (this.field_73886_k.field_78288_b + 1)), 16777215);
 +            }
 +        }
+
++       if(!Main.extraBrandingFromArgs.isEmpty())
++       {
++           this.drawString(this.fontRenderer, Main.extraBrandingFromArgs, 2, 2, 16777215);
++       }
 +
          String s1 = "Copyright Mojang AB. Do not distribute!";
          this.func_73731_b(this.field_73886_k, s1, this.field_73880_f - this.field_73886_k.func_78256_a(s1) - 2, this.field_73881_g - 10, 16777215);
