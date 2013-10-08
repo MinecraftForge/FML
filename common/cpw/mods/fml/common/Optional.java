@@ -18,7 +18,7 @@ public final class Optional {
      */
     private Optional() {}
     /**
-     * Used to remove optional interfaces
+     * Used to remove an optional interface
      * @author cpw
      *
      */
@@ -36,6 +36,15 @@ public final class Optional {
          * @return the modid
          */
         public String modid();
+    }
+    /**
+     * Used to remove multiple optional interfaces
+     *
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    public @interface Interfaces {
+        public Optional.Interface[] value();        
     }
     /**
      * Used to remove optional methods
