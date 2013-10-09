@@ -1,28 +1,21 @@
 package cpw.mods.fml.common.asm.transformers;
 
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.relauncher.FMLRelaunchLog;
-
 import net.minecraft.launchwrapper.IClassTransformer;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
+
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 public class ModAPITransformer implements IClassTransformer {
 
@@ -41,24 +34,47 @@ public class ModAPITransformer implements IClassTransformer {
         classReader.accept(classNode, 0);
 
         if (logDebugInfo) FMLRelaunchLog.finest("Optional removal - found optionals for class %s - processing", name);
+        final String removalSkipped = "Optional removal skipped on %s %s - mod present %s";
+        final String removalTriggered = "Optional on %s triggered - mod missing %s";
         for (ASMData optional : optionals.get(name))
         {
-            String modId = (String) optional.getAnnotationInfo().get("modid");
-
-            if (Loader.isModLoaded(modId))
-            {
-                if (logDebugInfo) FMLRelaunchLog.finest("Optional removal skipped - mod present %s", modId);
-                continue;
-            }
-            if (logDebugInfo) FMLRelaunchLog.finest("Optional on %s triggered - mod missing %s", name, modId);
-
             if ("cpw.mods.fml.common.Optional$Interface".equals(optional.getAnnotationName()))
             {
-                stripInterface(classNode,(String)optional.getAnnotationInfo().get("iface"));
+                final String modId = (String) optional.getAnnotationInfo().get("modid");
+                final String iFace = (String) optional.getAnnotationInfo().get("iface");
+
+                if (Loader.isModLoaded(modId))
+                {
+                    if (logDebugInfo) FMLRelaunchLog.finest(removalSkipped, "interface", iFace, modId);
+                    continue;
+                }
+                if (logDebugInfo) FMLRelaunchLog.finest(removalTriggered, name, modId);
+                stripInterface(classNode, iFace);
+            }
+            else if ("cpw.mods.fml.common.Optional$Interfaces".equals(optional.getAnnotationName()))
+            {
+                List<Optional.Interface> interfaces = (List<Optional.Interface>) optional.getAnnotationInfo().get("value");
+                for (Optional.Interface optionalInterface : interfaces)
+                {
+                    final String modId = optionalInterface.modid();
+                    final String iFace = optionalInterface.iface();
+
+                    if (Loader.isModLoaded(modId))
+                    {
+                        if (logDebugInfo) FMLRelaunchLog.finest(removalSkipped, "interface", iFace, modId);
+                        continue;
+                    }
+                    if (logDebugInfo) FMLRelaunchLog.finest(removalTriggered, name, modId);
+                    stripInterface(classNode, iFace);
+                }
             }
             else
             {
-                stripMethod(classNode, (String)optional.getObjectName());
+                final String modId = (String) optional.getAnnotationInfo().get("modid");
+                if (Loader.isModLoaded(modId))
+                    if (logDebugInfo) FMLRelaunchLog.finest(removalSkipped, "method", optional.getObjectName(), modId);
+                else
+                    stripMethod(classNode, optional.getObjectName());
             }
 
         }
@@ -96,6 +112,8 @@ public class ModAPITransformer implements IClassTransformer {
     {
         optionals = ArrayListMultimap.create();
         Set<ASMData> interfaces = dataTable.getAll("cpw.mods.fml.common.Optional$Interface");
+        addData(interfaces);
+        interfaces = dataTable.getAll("cpw.mods.fml.common.Optional$Interfaces");
         addData(interfaces);
         Set<ASMData> methods = dataTable.getAll("cpw.mods.fml.common.Optional$Method");
         addData(methods);
