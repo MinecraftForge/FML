@@ -31,7 +31,7 @@
     </condition>
     <property name="fml.python.dir" location="${basedir}/python" />
     <property name="fml.lzma.dir" location="${basedir}/lzmabin" />
-    <condition property="python.exe" value="${fml.python.dir}/python_fml" else="python">
+    <condition property="python.exe" value="${fml.python.dir}/python_fml" else="python2">
       <os family="Windows" />
     </condition>
     <condition property="lzma.exe" value="${fml.lzma.dir}/xz.exe" else="xz">
