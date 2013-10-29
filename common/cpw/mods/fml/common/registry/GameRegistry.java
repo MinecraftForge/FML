@@ -196,6 +196,16 @@ public class GameRegistry
         registerBlock(block, itemclass, name, null);
     }
     /**
+     * Register a block with the world, with the specified item class and block name
+     * @param block The block to register
+     * @param itemblock The itemblock to register with it
+     * @param name The mod-unique name to register it with
+     */
+    public static void registerBlock(net.minecraft.block.Block block, ItemBlock itemblock, String name)
+    {
+        registerBlock(block, itemblock, name, null);
+    }
+    /**
      * Register a block with the world, with the specified item class, block name and owning modId
      * @param block The block to register
      * @param itemclass The iterm type to register with it
@@ -204,17 +214,12 @@ public class GameRegistry
      */
     public static void registerBlock(net.minecraft.block.Block block, Class<? extends ItemBlock> itemclass, String name, String modId)
     {
-        if (Loader.instance().isInState(LoaderState.CONSTRUCTING))
-        {
-            FMLLog.warning("The mod %s is attempting to register a block whilst it it being constructed. This is bad modding practice - please use a proper mod lifecycle event.", Loader.instance().activeModContainer());
-        }
+        ItemBlock i;
         try
         {
-            assert block != null : "registerBlock: block cannot be null";
             assert itemclass != null : "registerBlock: itemclass cannot be null";
-            int blockItemId = block.field_71990_ca - 256;
+            int blockItemId = block.blockID - 256;
             Constructor<? extends ItemBlock> itemCtor;
-            Item i;
             try
             {
                 itemCtor = itemclass.getConstructor(int.class);
@@ -225,10 +230,32 @@ public class GameRegistry
                 itemCtor = itemclass.getConstructor(int.class, net.minecraft.block.Block.class);
                 i = itemCtor.newInstance(blockItemId, block);
             }
-            GameRegistry.registerItem(i,name, modId);
         }
         catch (Exception e)
         {
+            FMLLog.log(Level.SEVERE, e, "Caught an exception during itemblock instantiation");
+            throw new LoaderException(e);
+        }
+        registerBlock(block, i, name, modId);
+    }
+    /**
+     * Register a block with the world, with the specified itemblock, block name and owning modId
+     * @param block The block to register
+     * @param itemblock The itemblock type to register with it
+     * @param name The mod-unique name to register it with
+     * @param modId The modId that will own the block name. null defaults to the active modId
+     */
+    public static void registerBlock(net.minecraft.block.Block block, ItemBlock itemblock, String name, String modId)
+    {
+        if (Loader.instance().isInState(LoaderState.CONSTRUCTING))
+        {
+            FMLLog.warning("The mod %s is attempting to register a block whilst it it being constructed. This is bad modding practice - please use a proper mod lifecycle event.", Loader.instance().activeModContainer());
+        }
+        try {
+            assert block != null : "registerBlock: block cannot be null";
+            GameRegistry.registerItem(itemblock, name, modId);
+        }
+        catch (Exception e) {
             FMLLog.log(Level.SEVERE, e, "Caught an exception during block registration");
             throw new LoaderException(e);
         }
