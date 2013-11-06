@@ -93,6 +93,16 @@ public class ModAPITransformer implements IClassTransformer {
         String ifaceName = interfaceName.replace('.', '/');
         boolean found = classNode.interfaces.remove(ifaceName);
         if (found && logDebugInfo) FMLRelaunchLog.finest("Optional removal - interface %s removed", interfaceName);
+        for (ListIterator<MethodNode> iterator = classNode.methods.listIterator(); iterator.hasNext();)
+        {
+            MethodNode method = iterator.next();
+            if (method.desc.contains("L" + ifaceName + ";"))
+            {
+                iterator.remove();
+                found = true;
+                if (logDebugInfo) FMLRelaunchLog.finest("Optional removal - method %s removed because its signature contained %s", method.name+method.desc, interfaceName);
+            }
+        }
         if (!found && logDebugInfo) FMLRelaunchLog.finest("Optional removal - interface %s NOT removed - not found", interfaceName);
     }
 
