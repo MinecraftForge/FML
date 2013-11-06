@@ -88,7 +88,14 @@ public class ModDiscoverer
     {
         File[] modList = modsDir.listFiles();
         // Sort the files into alphabetical order first
-        Arrays.sort(modList);
+        Arrays.sort(modList, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                String p1 = o1.getAbsolutePath();
+                String p2 = o2.getAbsolutePath()
+                return p1.compareToIgnoreCase(p2);
+            }
+        });
 
         for (File modFile : modList)
         {
