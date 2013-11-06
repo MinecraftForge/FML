@@ -91,9 +91,9 @@ public class ModDiscoverer
         Arrays.sort(modList, new Comparator<File>() {
             @Override
             public int compare(File o1, File o2) {
-                String p1 = o1.getAbsolutePath().toLowerCase();
-                String p2 = o2.getAbsolutePath().toLowerCase();
-                return p1.compareTo(p2);
+                String p1 = o1.getAbsolutePath();
+                String p2 = o2.getAbsolutePath()
+                return p1.compareToIgnoreCase(p2);
             }
         });
 
