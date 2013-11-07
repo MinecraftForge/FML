@@ -129,6 +129,28 @@ public class NetworkRegistry
             serverPacketHandlers.put(channelName, handler);
         }
     }
+
+    public void unregisterChannel(IPacketHandler handler, String channelName, Side side)
+    {
+    	if (Strings.isNullOrEmpty(channelName) || (channelName!=null && channelName.length()>16))
+        {
+            FMLLog.severe("Invalid channel name '%s' : %s", channelName, Strings.isNullOrEmpty(channelName) ? "Channel name is empty" : "Channel name is too long (16 chars is maximum)");
+            throw new RuntimeException("Channel name is invalid");
+
+        }
+    	if (side == null)
+    	{
+    		universalPacketHandlers.remove(channelName, handler);
+    		return;
+    	}
+    	else if (side.isClient()){
+    		clientPacketHandlers.remove(channelName, handler);
+    	}
+    	else
+    	{
+    		serverPacketHandlers.remove(channelName, handler);
+    	}
+    }
     /**
      * Activate the channel for the player
      * @param player
@@ -154,6 +176,11 @@ public class NetworkRegistry
     public void registerConnectionHandler(IConnectionHandler handler)
     {
         connectionHandlers.add(handler);
+    }
+
+    public void unregisterConnectionHandler(IConnectionHandler handler)
+    {
+    	connectionHandlers.remove(handler);
     }
 
     /**
