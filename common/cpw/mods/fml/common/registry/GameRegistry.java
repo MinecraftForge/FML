@@ -349,6 +349,11 @@ public class GameRegistry
 		playerTrackers.add(tracker);
 	}
 
+    public static void unregisterPlayerTracker(IPlayerTracker tracker)
+    {
+    	playerTrackers.remove(tracker);
+    }
+
 	public static void onPlayerLogin(EntityPlayer player)
 	{
         for (IPlayerTracker tracker : playerTrackers)
