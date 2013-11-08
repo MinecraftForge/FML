@@ -51,6 +51,15 @@ public final class Optional {
          * @return the modid
          */
         public String modid();
+
+        /**
+         * Also strip any methods in the class that use the specified interface
+         * in their signature. This does <em>not</em> strip methods defined in
+         * the specified interface, but methods defined in the class that use
+         * the interface in their signature, meaning either as a parameter or
+         * as return type.
+         */
+        public boolean methods() default false;
     }
     /**
      * Used to remove optional methods
