@@ -17,109 +17,37 @@
  import net.minecraft.network.packet.Packet13PlayerLookMove;
  import net.minecraft.network.packet.Packet14BlockDig;
  import net.minecraft.network.packet.Packet15Place;
-@@ -618,53 +621,61 @@
+@@ -618,6 +621,10 @@
  
      public void func_72481_a(Packet3Chat p_72481_1_)
      {
--        if (this.field_72574_e.func_71126_v() == 2)
--        {
--            this.func_72567_b(new Packet3Chat(ChatMessageComponent.func_111077_e("chat.cannotSend").func_111059_a(EnumChatFormatting.RED)));
--        }
--        else
--        {
--            this.field_72574_e.func_143004_u();
--            String s = p_72481_1_.field_73476_b;
--
--            if (s.length() > 100)
--            {
--                this.func_72565_c("Chat message too long");
 +        p_72481_1_ = FMLNetworkHandler.handleChatMessage(this, p_72481_1_);
 +        
 +        if (p_72481_1_ != null)
 +        {
-+            if (this.field_72574_e.func_71126_v() == 2)
-+            {
-+                this.func_72567_b(new Packet3Chat(ChatMessageComponent.func_111077_e("chat.cannotSend").func_111059_a(EnumChatFormatting.RED)));
-             }
-             else
+         if (this.field_72574_e.func_71126_v() == 2)
+         {
+             this.func_72567_b(new Packet3Chat(ChatMessageComponent.func_111077_e("chat.cannotSend").func_111059_a(EnumChatFormatting.RED)));
+@@ -635,6 +642,8 @@
              {
--                s = StringUtils.normalizeSpace(s);
--
--                for (int i = 0; i < s.length(); ++i)
--                {
--                    if (!ChatAllowedCharacters.func_71566_a(s.charAt(i)))
--                    {
--                        this.func_72565_c("Illegal characters in chat");
--                        return;
--                    }
--                }
--
--                if (s.startsWith("/"))
--                {
--                    this.func_72566_d(s);
-+                this.field_72574_e.func_143004_u();
-+                String s = p_72481_1_.field_73476_b;
-+    
-+                if (s.length() > 100)
+                 s = StringUtils.normalizeSpace(s);
+ 
++                if (s != null)
 +                {
-+                    this.func_72565_c("Chat message too long");
-                 }
-                 else
+                 for (int i = 0; i < s.length(); ++i)
                  {
--                    if (this.field_72574_e.func_71126_v() == 1)
--                    {
--                        this.func_72567_b(new Packet3Chat(ChatMessageComponent.func_111077_e("chat.cannotSend").func_111059_a(EnumChatFormatting.RED)));
--                        return;
--                    }
--
--                    ChatMessageComponent chatmessagecomponent = ChatMessageComponent.func_111082_b("chat.type.text", new Object[] {this.field_72574_e.func_96090_ax(), s});
--                    this.field_72573_d.func_71203_ab().func_110459_a(chatmessagecomponent, false);
--                }
--
--                this.field_72581_m += 20;
--
--                if (this.field_72581_m > 200 && !this.field_72573_d.func_71203_ab().func_72353_e(this.field_72574_e.func_70005_c_()))
--                {
--                    this.func_72565_c("disconnect.spam");
-+                    s = StringUtils.normalizeSpace(s);
-+    
-+                    if (s != null)
-+                    {
-+                        for (int i = 0; i < s.length(); ++i)
-+                        {
-+                            if (!ChatAllowedCharacters.func_71566_a(s.charAt(i)))
-+                            {
-+                                this.func_72565_c("Illegal characters in chat");
-+                                return;
-+                            }
-+                        }
-+        
-+                        if (s.startsWith("/"))
-+                        {
-+                            this.func_72566_d(s);
-+                        }
-+                        else
-+                        {
-+                            if (this.field_72574_e.func_71126_v() == 1)
-+                            {
-+                                this.func_72567_b(new Packet3Chat(ChatMessageComponent.func_111077_e("chat.cannotSend").func_111059_a(EnumChatFormatting.RED)));
-+                                return;
-+                            }
-+        
-+                            ChatMessageComponent chatmessagecomponent = ChatMessageComponent.func_111082_b("chat.type.text", new Object[] {this.field_72574_e.func_96090_ax(), s});
-+                            this.field_72573_d.func_71203_ab().func_110459_a(chatmessagecomponent, false);
-+                        }
-+        
-+                        this.field_72581_m += 20;
-+        
-+                        if (this.field_72581_m > 200 && !this.field_72573_d.func_71203_ab().func_72353_e(this.field_72574_e.func_70005_c_()))
-+                        {
-+                            this.func_72565_c("disconnect.spam");
-+                        }
-+                    }
+                     if (!ChatAllowedCharacters.func_71566_a(s.charAt(i)))
+@@ -666,7 +675,9 @@
+                 {
+                     this.func_72565_c("disconnect.spam");
                  }
-             }
+-            }
++                }
++            }
++        }
          }
+     }
+ 
 @@ -1013,6 +1024,11 @@
      }
  
