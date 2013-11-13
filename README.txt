@@ -3,8 +3,7 @@ This is Forge Mod Loader, or FML for short, by cpw.
 More information can be found at https://github.com/MinecraftForge/FML/wiki
 
 It is a clean reimplementation of a mod loading system for client, server and
-bukkit use, incorporating API implementations of client side ModLoader by
-Risugami.
+bukkit use.
 
 It can be installed on its own, or as part of Minecraft Forge.
 
@@ -16,18 +15,9 @@ Environments and compatibility
 ==============================
 FML covers the three main environments: client, server and bukkit. All
 environments share the main mod loading code base, with additional varying hooks
-based on the specific environment. Compatibility is almost 100% with all 
-ModLoader based mods- any mod with any difficulty (unless noted below) should
-be reported as a ticket to the github, please.
+based on the specific environment.
 
-Client side mods should be 100% compatible with ModLoader. The only exception is
-Optifine, however new versions of optifine are compatible. There are some very
-visible changes to the client when FML is installed.
-
-Server side mods are mostly compatible with previous MLMP based incarnations,
-however, this compatibility is not guaranteed. Most mods have adapted to FML 
-and MLMP is not assured and will cause errors. Ask your mod author to update
-to FML.
+The support for ModLoader mods was dropped with the release of Minecraft 1.7.
 
 Bukkit side modding is an adaptation of the server side mod code to the bukkit
 environment. Mods need to be recompiled against the bukkit decompilation to work
