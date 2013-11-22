@@ -114,7 +114,7 @@ public class CoreModManager {
             {
                 try
                 {
-                    IFMLCallHook call = (IFMLCallHook) Class.forName(setupClass, true, classLoader).newInstance();
+                    IFMLCallHook call = (IFMLCallHook) Class.forName(setupClass).newInstance();
                     Map<String, Object> callData = new HashMap<String, Object>();
                     callData.put("mcLocation", mcDir);
                     callData.put("classLoader", classLoader);
@@ -378,7 +378,7 @@ public class CoreModManager {
         {
             FMLRelaunchLog.fine("Instantiating coremod class %s", coreModName);
             classLoader.addTransformerExclusion(coreModClass);
-            Class<?> coreModClazz = Class.forName(coreModClass, true, classLoader);
+            Class<?> coreModClazz = Class.forName(coreModClass);
             Name coreModNameAnn = coreModClazz.getAnnotation(IFMLLoadingPlugin.Name.class);
             if (coreModNameAnn != null && !Strings.isNullOrEmpty(coreModNameAnn.value()))
             {
