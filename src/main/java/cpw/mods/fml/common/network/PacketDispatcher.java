@@ -40,7 +40,7 @@ public class PacketDispatcher
 
     public static void sendPacketToPlayer(Packet packet, Player player)
     {
-        if (player instanceof EntityPlayerMP)
+        if (player instanceof EntityPlayerMP && (EntityPlayerMP)player).field_71135_a != null)
         {
             ((EntityPlayerMP)player).field_71135_a.func_72567_b(packet);
         }
