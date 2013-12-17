@@ -1146,7 +1146,7 @@ def download_libraries(mcp_dir, libraries, natives_dir):
     # This list should be in the format of the new launcher's version.json file
     # Under the entry 'libraries'
     lib_dir = os.path.join(mcp_dir, 'jars', 'libraries')
-    default_url = 'http://s3.amazonaws.com/Minecraft.Download/libraries'
+    default_url = 'https://libraries.minecraft.net'
     
     downloads = []
     failed = False
@@ -1239,7 +1239,7 @@ def download_list(list, natives_dir):
 def download_assets(mcp_dir):
     from xml.dom.minidom import parse
     asset_dir = os.path.join(mcp_dir, 'jars', 'assets')
-    base_url = 'http://s3.amazonaws.com/Minecraft.Resources'
+    base_url = 'http://resources.download.minecraft.net'
     
     print('Gathering assets list from %s' % base_url)
     
