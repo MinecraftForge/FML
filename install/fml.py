@@ -150,9 +150,7 @@ def download_file(url, target, md5=None, root=None, prefix=''):
             urllib.urlretrieve(url, target)
             if not md5 == None:
                 if not get_md5(target) == md5:
-                    print '%sDownload of %s failed md5 check, deleting' % (prefix, name)
-                    os.remove(target)
-                    return False
+                    print '%sDownload of %s failed md5 check' % (prefix, name)
             if prefix == '':
                 print 'Downloaded %s' % name
             else:
