@@ -4,6 +4,7 @@ import shutil, glob, fnmatch
 import subprocess, logging, re, shlex
 import csv, ConfigParser
 from hashlib import md5  # pylint: disable-msg=E0611
+from hashlib import sha1  # pylint: disable-msg=E0611
 from pprint import pprint
 from zipfile import ZipFile
 from pprint import pprint
@@ -129,7 +130,7 @@ def read_mc_versions(fml_dir, version=None, work_dir=None):
         
     return mc_info
 
-def download_file(url, target, md5=None, root=None, prefix=''):
+def download_file(url, target, hash=None, root=None, prefix=''):
     name = os.path.basename(target)
     
     if not root is None:
@@ -140,17 +141,25 @@ def download_file(url, target, md5=None, root=None, prefix=''):
     if not os.path.isdir(dir):
         os.makedirs(dir)
     
-    if os.path.isfile(target) and not md5 == None:
-        if not get_md5(target) == md5:
+    if os.path.isfile(target) and not hash == None:
+        t_hash = get_md5(target)
+        if len(hash) == 40:
+            t_hash = get_sha1(target)
+        if not t_hash == hash:
             print '%s%s Modified, removing' % (prefix, name)
             os.remove(target)
     
     if not os.path.isfile(target):
         try:
             urllib.urlretrieve(url, target)
-            if not md5 == None:
-                if not get_md5(target) == md5:
-                    print '%sDownload of %s failed md5 check' % (prefix, name)
+            if not hash == None:
+                t_hash = get_md5(target)
+                if len(hash) == 40:
+                    t_hash = get_sha1(target)
+                if not t_hash == hash:
+                    print '%sDownload of %s failed hash check, deleting %s %s' % (prefix, name, t_hash, hash)
+                    os.remove(target)
+                    return False
             if prefix == '':
                 print 'Downloaded %s' % name
             else:
@@ -186,7 +195,14 @@ def get_md5(file):
     if not os.path.isfile(file):
         return None
     with closing(open(file, 'rb')) as fh:
-        return md5(fh.read()).hexdigest()   
+        return md5(fh.read()).hexdigest() 
+        
+def get_sha1(file):
+    #Returns the MD5 digest of the specified file, or None if the file doesnt exist
+    if not os.path.isfile(file):
+        return None
+    with closing(open(file, 'rb')) as fh:
+        return sha1(fh.read()).hexdigest()   
 
 def fix_patch(in_file, out_file, find=None, rep=None):
     #Fixes the following issues in the patch file if they exist:
@@ -1181,14 +1197,22 @@ def download_libraries(mcp_dir, libraries, natives_dir):
                 print('Could not retreive headers for library: %s ( %s )' % (lib['name'], url))
                 failed = True
             else:
-                md5 = None
-                if 'ETag' in headers.keys(): # Amazon headers, Mojang's server
-                    md5 = headers['ETag']
-                else: # Could be a normal maven repo, check for .md5 file
+                hash = None
+                if hash is None: # Could be a mojang repo, try sha
                     try:
-                        md5 = urllib2.urlopen(url + '.md5').read().split(' ')[0].replace('\r', '').replace('\n', '')
-                        if not len(md5) == 32:
-                            md5 = None
+                        hash = urllib2.urlopen(url + '.sha1').read().split(' ')[0].replace('\r', '').replace('\n', '')
+                        if not len(hash) == 40:
+                            hash = None
+                            print('Could not retrieve sha1 for library %s ( %s.sha1 )' % (file_name, url))
+                            failed = True
+                    except (HTTPError):
+                        failed = True
+                        pass
+                if hash is None: # Could be a normal maven repo, check for .md5 file
+                    try:
+                        hash = urllib2.urlopen(url + '.md5').read().split(' ')[0].replace('\r', '').replace('\n', '')
+                        if not len(hash) == 32:
+                            hash = None
                             print('Could not retrieve md5 for library %s ( %s.md5 )' % (file_name, url))
                             failed = True
                     except (HTTPError):
@@ -1197,7 +1221,7 @@ def download_libraries(mcp_dir, libraries, natives_dir):
                 downloads.append({
                     'url' : url,
                     'file' : file_path,
-                    'md5'  : md5,
+                    'md5'  : hash,
                     'size' : headers['Content-Length'],
                     'extract' : extract
                 })
@@ -1235,7 +1259,7 @@ def download_list(list, natives_dir):
     return failed
 
 def download_assets(mcp_dir):
-    from xml.dom.minidom import parse
+    from json import loads
     asset_dir = os.path.join(mcp_dir, 'jars', 'assets')
     base_url = 'http://resources.download.minecraft.net'
     
@@ -1245,29 +1269,22 @@ def download_assets(mcp_dir):
     failed = False
     
     try:
-        url = urllib.urlopen(base_url)
-        xml = parse(url)
+        url = urllib.urlopen('https://s3.amazonaws.com/Minecraft.Download/indexes/legacy.json').read()
+        json = loads(url)
         
-        def get(xml, key):
-            return xml.getElementsByTagName(key)[0].firstChild.nodeValue
-        
-        for asset in xml.getElementsByTagName('Contents'):
-            path = get(asset, 'Key')
-            if path.endswith('/'):
-                continue
-                
-            file = os.path.join(asset_dir, os.sep.join(path.split('/')))
-            md5 = get(asset, 'ETag').replace('"', '')
+        for name, info in json['objects'].items():
+            file = os.path.join(asset_dir, os.sep.join(name.split('/')))
+            sha1 = info['hash']
             
             if os.path.isfile(file):
-                if get_md5(file) == md5:
+                if get_sha1(file) == sha1:
                     continue
                 
             files.append({
                 'file' : file,
-                'url'  : '%s/%s' % (base_url, path),
-                'size' : get(asset, 'Size'),
-                'md5'  : md5
+                'url'  : '%s/%s/%s' % (base_url, sha1[0:2], sha1),
+                'size' : info['size'],
+                'md5'  : sha1
             })
     except Exception as e:
         print 'Error gathering asset list:'
