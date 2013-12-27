@@ -157,7 +157,7 @@
       }
     },
     {
-      "name": "org.lwjgl.lwjgl:lwjgl:2.9.1-nightly-20131017",
+      "name": "org.lwjgl.lwjgl:lwjgl:2.9.1-nightly-20131120",
       "rules": [
         {
           "action": "allow",
@@ -168,7 +168,7 @@
       ]
     },
     {
-      "name": "org.lwjgl.lwjgl:lwjgl_util:2.9.1-nightly-20131017",
+      "name": "org.lwjgl.lwjgl:lwjgl_util:2.9.1-nightly-20131120",
       "rules": [
         {
           "action": "allow",
@@ -179,7 +179,7 @@
       ]
     },
     {
-      "name": "org.lwjgl.lwjgl:lwjgl-platform:2.9.1-nightly-20131017",
+      "name": "org.lwjgl.lwjgl:lwjgl-platform:2.9.1-nightly-20131120",
       "rules": [
         {
           "action": "allow",
