@@ -38,7 +38,7 @@ public abstract class FMLIndexedMessageToMessageCodec<A> extends MessageToMessag
         out.add(proxy);
     }
 
-    public abstract void decodeInto(ChannelHandlerContext ctx, ByteBuf source, A msg);
+    public abstract void decodeInto(ChannelHandlerContext ctx, ByteBuf source, A msg, INetHandler handler);
 
     @Override
     protected final void decode(ChannelHandlerContext ctx, FMLProxyPacket msg, List<Object> out) throws Exception
@@ -47,7 +47,7 @@ public abstract class FMLIndexedMessageToMessageCodec<A> extends MessageToMessag
         byte discriminator = payload.readByte();
         Class<? extends A> clazz = discriminators.get(discriminator);
         A newMsg = clazz.newInstance();
-        decodeInto(ctx, payload.slice(), newMsg);
+        decodeInto(ctx, payload.slice(), newMsg, msg.handler());
         out.add(newMsg);
     }
 }
