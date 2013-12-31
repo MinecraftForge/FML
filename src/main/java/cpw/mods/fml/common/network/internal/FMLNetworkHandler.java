@@ -502,8 +502,8 @@ public class FMLNetworkHandler
     @SideOnly(Side.CLIENT)
     private static void addClientHandlers()
     {
-        channelPair.get(Side.CLIENT).pipeline().addAfter("FMLRuntimeCodec#0", "GuiHandler", new OpenGuiHandler());
-        channelPair.get(Side.CLIENT).pipeline().addAfter("FMLRuntimeCodec#0", "EntitySpawnHandler", new EntitySpawnHandler());
+        channelPair.get(Side.CLIENT).pipeline().addAfter("cpw.mods.fml.common.network.internal.FMLRuntimeCodec#0", "GuiHandler", new OpenGuiHandler());
+        channelPair.get(Side.CLIENT).pipeline().addAfter("cpw.mods.fml.common.network.internal.FMLRuntimeCodec#0", "EntitySpawnHandler", new EntitySpawnHandler());
     }
     public static void registerChannel(FMLContainer container, Side side)
     {
