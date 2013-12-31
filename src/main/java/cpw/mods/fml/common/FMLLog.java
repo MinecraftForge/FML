@@ -15,6 +15,9 @@ package cpw.mods.fml.common;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * A utility class for FML's logging needs
+ */
 @SuppressWarnings("static-access")
 public class FMLLog
 {

@@ -21,15 +21,18 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.tileentity.TileEntity;
 
+/**
+ * Static utlity class for registering various client related things
+ */
 public class ClientRegistry
 {
     /**
      *
      * Utility method for registering a tile entity and it's renderer at once - generally you should register them separately
      *
-     * @param tileEntityClass
-     * @param id
-     * @param specialRenderer
+     * @param tileEntityClass The class of the tile entity being registered
+     * @param id The id to register the tile entity under
+     * @param specialRenderer The {@link TileEntitySpecialRenderer} for this tile entity
      */
     public static void registerTileEntity(Class <? extends TileEntity > tileEntityClass, String id, TileEntitySpecialRenderer specialRenderer)
     {
@@ -37,6 +40,11 @@ public class ClientRegistry
         bindTileEntitySpecialRenderer(tileEntityClass, specialRenderer);
     }
 
+    /**
+     * Bind a special renderer to a given tile entity
+     * @param tileEntityClass The tile entity to bind the renderer to
+     * @param specialRenderer The special renderer that will be bound to the entity
+     */
     @SuppressWarnings("unchecked")
     public static void bindTileEntitySpecialRenderer(Class <? extends TileEntity> tileEntityClass, TileEntitySpecialRenderer specialRenderer)
     {
@@ -44,6 +52,10 @@ public class ClientRegistry
         specialRenderer.func_147497_a(TileEntityRendererDispatcher.field_147556_a);
     }
 
+    /**
+     * Register a keybinding
+     * @param key The keybinding to register
+     */
     public static void registerKeyBinding(KeyBinding key)
     {
         Minecraft.func_71410_x().field_71474_y.field_151456_ac = ArrayUtils.add(Minecraft.func_71410_x().field_71474_y.field_151456_ac, key);

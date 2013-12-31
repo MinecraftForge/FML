@@ -88,6 +88,9 @@ public class FMLClientHandler implements IFMLSidedHandler
      */
     private Minecraft client;
 
+    /**
+     * A dummy mod container that should contain optifine if it is installed
+     */
     private DummyModContainer optifineContainer;
 
     @SuppressWarnings("unused")
@@ -141,6 +144,7 @@ public class FMLClientHandler implements IFMLSidedHandler
         FMLCommonHandler.instance().beginLoading(this);
         try
         {
+        	// Attempt to load optifine into a dummy container if it is installed
             Class<?> optifineConfig = Class.forName("Config", false, Loader.instance().getModClassLoader());
             String optifineVersion = (String) optifineConfig.getField("VERSION").get(null);
             Map<String,Object> dummyOptifineMeta = ImmutableMap.<String,Object>builder().put("name", "Optifine").put("version", optifineVersion).build();
@@ -200,6 +204,9 @@ public class FMLClientHandler implements IFMLSidedHandler
         }
     }
 
+    /**
+     * Stop the game in a abrupt manner with a exception
+     */
     @Override
     public void haltGame(String message, Throwable t)
     {
@@ -240,6 +247,8 @@ public class FMLClientHandler implements IFMLSidedHandler
         loading = false;
     }
 
+    // This does nothing. Why does it exist?
+    @Deprecated
     @SuppressWarnings("unused")
     public void extendModList()
     {
@@ -267,6 +276,10 @@ public class FMLClientHandler implements IFMLSidedHandler
         }
 
     }
+    
+    /**
+     * Called before the main GUI screen is displayed, to display errors
+     */
     public void onInitializationComplete()
     {
         if (wrongMC != null)
@@ -294,7 +307,7 @@ public class FMLClientHandler implements IFMLSidedHandler
         }
     }
     /**
-     * Get the server instance
+     * Get the client instance
      */
     public Minecraft getClient()
     {
@@ -310,7 +323,7 @@ public class FMLClientHandler implements IFMLSidedHandler
         return null;
     }
 
-    /**
+    /** Get the instance of this singleton
      * @return the instance
      */
     public static FMLClientHandler instance()
@@ -319,8 +332,9 @@ public class FMLClientHandler implements IFMLSidedHandler
     }
 
     /**
-     * @param player
-     * @param gui
+     * Display a GUI screen
+     * @param player The player to show the GUI to
+     * @param gui The GUI to show the player
      */
     public void displayGuiScreen(EntityPlayer player, GuiScreen gui)
     {
@@ -330,7 +344,8 @@ public class FMLClientHandler implements IFMLSidedHandler
     }
 
     /**
-     * @param mods
+     * Add mods that require special treatment to mods
+     * @param mods The list of mods to add special mods to
      */
     public void addSpecialModEntries(ArrayList<ModContainer> mods)
     {
@@ -356,6 +371,10 @@ public class FMLClientHandler implements IFMLSidedHandler
         return Side.CLIENT;
     }
 
+    /**
+     * Test if the client has optifine
+     * @return True if the client has optifine
+     */
     public boolean hasOptifine()
     {
         return optifineContainer!=null;
@@ -368,11 +387,19 @@ public class FMLClientHandler implements IFMLSidedHandler
         client.func_147108_a(gui);
     }
 
+    /**
+     * Get the world client
+     * @return Get the world client
+     */
     public WorldClient getWorldClient()
     {
         return client.field_71441_e;
     }
 
+    /**
+     * Get the client player entity
+     * @return The client player entity
+     */
     public EntityClientPlayerMP getClientPlayerEntity()
     {
         return client.field_71439_g;
@@ -397,6 +424,10 @@ public class FMLClientHandler implements IFMLSidedHandler
         return client.func_71401_C();
     }
 
+    /**
+     * Display things that are missing
+     * @param modMissingPacket The packet of missing mods
+     */
     public void displayMissingMods(Object modMissingPacket)
     {
 //        showGuiScreen(new GuiModsMissingForServer(modMissingPacket));
@@ -459,6 +490,11 @@ public class FMLClientHandler implements IFMLSidedHandler
         client.func_110436_a();
     }
 
+    /**
+     * Get the resource pack associated with the id given
+     * @param modId The id to lookup
+     * @return
+     */
     public IResourcePack getResourcePackFor(String modId)
     {
         return resourcePackMap.get(modId);
@@ -488,6 +524,10 @@ public class FMLClientHandler implements IFMLSidedHandler
         return this.client.func_147114_u()!=null ? this.client.func_147114_u().func_147298_b() : null;
     }
 
+    /**
+     * Handle the client closing a world
+     * @param world The world being closed
+     */
     public void handleClientWorldClosing(WorldClient world)
     {
         NetworkManager client = getClientToServerNetworkManager();
@@ -498,6 +538,11 @@ public class FMLClientHandler implements IFMLSidedHandler
         }
     }
 
+    /**
+     * Try and load a world
+     * @param selectWorldGUI The GUI for selecting a world
+     * @param selectedIndex The index of the selected world
+     */
     public void tryLoadWorld(GuiSelectWorld selectWorldGUI, int selectedIndex)
     {
         selectWorldGUI.func_146615_e(selectedIndex);

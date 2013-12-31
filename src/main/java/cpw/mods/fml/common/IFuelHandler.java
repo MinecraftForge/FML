@@ -14,7 +14,15 @@ package cpw.mods.fml.common;
 
 import net.minecraft.item.ItemStack;
 
+/**
+ * Interface for adding custom fuels to the furnace
+ */
 public interface IFuelHandler
 {
+	/**
+	 * Get the number of ticks a fuel burns
+	 * @param fuel The fuel to consider
+	 * @return The # of ticks the fuel will burn
+	 */
     int getBurnTime(ItemStack fuel);
 }

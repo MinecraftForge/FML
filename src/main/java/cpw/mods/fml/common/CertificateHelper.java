@@ -16,10 +16,18 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.cert.Certificate;
 
+/**
+ * Helper for extracting fingerprints from certificates and bytebuffers
+ */
 public class CertificateHelper {
 
     private static final String HEXES = "0123456789abcdef";
 
+    /**
+     * Get the fingerprint from a certificate
+     * @param certificate The certificate to retrieve a fingerprint from
+     * @return The fingerprint of the certificate
+     */
     public static String getFingerprint(Certificate certificate)
     {
         if (certificate == null)
@@ -40,6 +48,11 @@ public class CertificateHelper {
         }
     }
 
+    /**
+     * Get the fingerprint from a buffer of bytes
+     * @param buffer The buffer to retrieve the fingerprint from
+     * @return The fingerprint of the buffer
+     */
     public static String getFingerprint(ByteBuffer buffer)
     {
         try
@@ -55,6 +68,11 @@ public class CertificateHelper {
         }
     }
 
+    /**
+     * Convert a byte array to a hex string
+     * @param chksum The byte array to convert
+     * @return A hex string from the byte array
+     */
     private static String hexify(byte[] chksum)
     {
         final StringBuilder hex = new StringBuilder( 2 * chksum.length );

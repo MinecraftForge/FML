@@ -68,6 +68,10 @@ import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionParser;
 import cpw.mods.fml.common.versioning.VersionRange;
 
+/**
+ * The mod container for all FML loaded mods
+ *
+ */
 public class FMLModContainer implements ModContainer
 {
     private Object modInstance;
@@ -216,6 +220,10 @@ public class FMLModContainer implements ModContainer
         }
     }
 
+    /**
+     * Search for version properties
+     * @return Version properties for this mod
+     */
     public Properties searchForVersionProperties()
     {
         try
@@ -313,6 +321,12 @@ public class FMLModContainer implements ModContainer
         }
     }
 
+    /**
+     * Gather all of the mod lifecycle methods
+     * @param clazz The class to gather lifecycle events from
+     * @return A method to create instances of this class, if one exists
+     * @throws Exception If something goes wrong when retrieving when gathering annotations
+     */
     @SuppressWarnings("unchecked")
     private Method gatherAnnotations(Class<?> clazz) throws Exception
     {
