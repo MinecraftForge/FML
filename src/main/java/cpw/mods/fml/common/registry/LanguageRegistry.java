@@ -62,6 +62,73 @@ public class LanguageRegistry
         return localizedString;
     }
 
+    public String getStringLocalization(String localizationFile, String key, boolean isXML)
+    {
+        return getStringLocalization(localizationFile, key, FMLCommonHandler.instance().getCurrentLanguage(), isXML);
+    }
+
+    public String getStringLocalization(URL localizationFile, String key, boolean isXML)
+    {
+        return getStringLocalization(localizationFile, key, FMLCommonHandler.instance().getCurrentLanguage(), isXML);
+    }
+
+    public String getStringLocalization(String localizationFile, String key, String lang, boolean isXML)
+    {
+        URL urlResource = this.getClass().getResource(localizationFile);
+        String localizedString = "";
+        if (urlResource != null)
+        {
+            localizedString = getStringLocalization(urlResource, key, lang, isXML);
+        }
+        else
+        {
+            ModContainer activeModContainer = Loader.instance().activeModContainer();
+            if (activeModContainer!=null)
+            {
+                FMLLog.log(activeModContainer.getModId(), Level.ERROR, "The language resource %s cannot be located on the classpath. This is a programming error.", localizationFile);
+            }
+            else
+            {
+                FMLLog.log(Level.ERROR, "The language resource %s cannot be located on the classpath. This is a programming error.", localizationFile);
+            }
+        }
+        return localizedString;
+    }
+
+    public String getStringLocalization(URL localizationFile, String key, String lang, boolean isXML)
+    {
+        String localizedString = "";
+        InputStream langStream = null;
+        Properties langPack = new Properties();
+
+        try    {
+            langStream = localizationFile.openStream();
+
+            if (isXML) {
+                langPack.loadFromXML(langStream);
+            }
+            else {
+                langPack.load(new InputStreamReader(langStream,Charsets.UTF_8));
+            }
+
+            localizedString = langPack.getProperty(key);
+        }
+        catch (IOException e) {
+            FMLLog.log(Level.ERROR, e, "Unable to load localization from file %s", localizationFile);
+        }
+        finally    {
+            try    {
+                if (langStream != null)    {
+                    langStream.close();
+                }
+            }
+            catch (IOException ex) {
+                // HUSH
+            }
+        }
+        return localizedString;
+    }
+
     public void addStringLocalization(String key, String value)
     {
         addStringLocalization(key, "en_US", value);
