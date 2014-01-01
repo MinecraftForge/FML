@@ -19,7 +19,7 @@ public class FMLRuntimeCodec extends FMLIndexedMessageToMessageCodec<FMLMessage>
     }
 
     @Override
-    public void decodeInto(ChannelHandlerContext ctx, ByteBuf source, FMLMessage msg)
+    public void decodeInto(ChannelHandlerContext ctx, ByteBuf source, FMLMessage msg, INetHandler handler)
     {
         msg.fromBytes(source);
     }
