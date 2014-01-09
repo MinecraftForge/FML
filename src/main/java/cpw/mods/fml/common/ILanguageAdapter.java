@@ -7,9 +7,26 @@ import org.apache.logging.log4j.Level;
 
 import cpw.mods.fml.relauncher.Side;
 
+/**
+ * Adaptor to allow the use of other JVM languages for modding
+ *
+ */
 public interface ILanguageAdapter {
-    public Object getNewInstance(FMLModContainer container, Class<?> objectClass, ClassLoader classLoader, Method factoryMarkedAnnotation) throws Exception;
-    public boolean supportsStatics();
+    /** 
+     * Get a new instance of the object class, using a factory method if possible
+     * @param container The mod container that is requesting the instantiation
+     * @param objectClass The class of the object to instantiate
+     * @param classLoader The class loader objectClass is loaded in
+     * @param factoryMarkedAnnotation Preferred method to instantiate object
+     * @return A instance of objectClass
+     * @throws Exception If object class can't be instantiated
+     */
+	public Object getNewInstance(FMLModContainer container, Class<?> objectClass, ClassLoader classLoader, Method factoryMarkedAnnotation) throws Exception;
+    /**
+     * Does the language support static fields
+     * @return True if the language supports statics, false otherwise
+     */
+	public boolean supportsStatics();
     public void setProxy(Field target, Class<?> proxyTarget, Object proxy) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException;
     public void setInternalProxies(ModContainer mod, Side side, ClassLoader loader);
 

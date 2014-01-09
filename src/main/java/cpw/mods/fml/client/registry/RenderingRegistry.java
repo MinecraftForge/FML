@@ -28,6 +28,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
 
 /**
+ * A registry for various rendering things
  * @author cpw
  *
  */
@@ -44,7 +45,7 @@ public class RenderingRegistry
     /**
      * Add a new armour prefix to the RenderPlayer
      *
-     * @param armor
+     * @param armor The armour prefix to add
      */
     public static int addNewArmourRendererPrefix(String armor)
     {
@@ -56,8 +57,8 @@ public class RenderingRegistry
      * Register an entity rendering handler. This will, after mod initialization, be inserted into the main
      * render map for entities
      *
-     * @param entityClass
-     * @param renderer
+     * @param entityClass The class of the entity to render
+     * @param renderer The renderer to use for the entity
      */
     public static void registerEntityRenderingHandler(Class<? extends Entity> entityClass, Render renderer)
     {
@@ -67,7 +68,7 @@ public class RenderingRegistry
     /**
      * Register a simple block rendering handler
      *
-     * @param handler
+     * @param handler The handler to register
      */
     public static void registerBlockHandler(ISimpleBlockRenderingHandler handler)
     {
@@ -79,8 +80,8 @@ public class RenderingRegistry
      * This version will not call getRenderId on the passed in handler, instead using the supplied ID, so you
      * can easily re-use the same rendering handler for multiple IDs
      *
-     * @param renderId
-     * @param handler
+     * @param renderId The render ID to use
+     * @param handler The handler to register
      */
     public static void registerBlockHandler(int renderId, ISimpleBlockRenderingHandler handler)
     {
@@ -95,6 +96,10 @@ public class RenderingRegistry
     }
 
 
+    /**
+     * Get the instance of the rendering registry
+     * @return The instance of the rendering registry
+     */
     @Deprecated public static RenderingRegistry instance()
     {
         return INSTANCE;

@@ -25,6 +25,9 @@ import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionRange;
 
+/**
+ * A mod container for things that should be treated as mods, but are not actual mods
+ */
 public class DummyModContainer implements ModContainer
 {
     private ModMetadata md;

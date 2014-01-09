@@ -12,6 +12,9 @@
 
 package cpw.mods.fml.common;
 
+/**
+ * Marker interface for exceptions handled by FML
+ */
 public interface IFMLHandledException
 {
 

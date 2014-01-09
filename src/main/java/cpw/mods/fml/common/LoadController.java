@@ -43,6 +43,9 @@ import cpw.mods.fml.common.event.FMLStateEvent;
 import cpw.mods.fml.common.functions.ArtifactVersionNameFunction;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 
+/**
+ * Conrols state and status of loader
+ */
 public class LoadController
 {
     private Loader loader;

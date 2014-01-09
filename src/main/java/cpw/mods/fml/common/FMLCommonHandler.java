@@ -94,6 +94,10 @@ public class FMLCommonHandler
         return eventBus;
     }
 
+    /**
+     * Attempt to load minecraft early, as well as register which side we are on.
+     * @param handler The side we are on
+     */
     public void beginLoading(IFMLSidedHandler handler)
     {
         sidedDelegate = handler;
@@ -104,6 +108,7 @@ public class FMLCommonHandler
     }
 
     /**
+     * Get the instance of this singleton
      * @return the instance
      */
     public static FMLCommonHandler instance()
@@ -134,6 +139,10 @@ public class FMLCommonHandler
         return FMLLog.getLogger();
     }
 
+    /**
+     * Get the side we are on
+     * @return The side we are on
+     */
     public Side getSide()
     {
         return sidedDelegate.getSide();
@@ -167,6 +176,10 @@ public class FMLCommonHandler
     }
 
 
+    /**
+     * Attempt to load Minecraft Forge
+     * @return The main Minecraft Forge class, or null if it cannot be found
+     */
     private Class<?> findMinecraftForge()
     {
         if (forge==null && !noForge)
@@ -180,6 +193,11 @@ public class FMLCommonHandler
         return forge;
     }
 
+    /** 
+     * Attempt to call a no-args method on the main Minecraft forge class
+     * @param method The name of the method to call
+     * @return The object returned by the called method or null if forge was not found
+     */
     private Object callForgeMethod(String method)
     {
         if (noForge)
@@ -195,6 +213,9 @@ public class FMLCommonHandler
         }
     }
 
+    /**
+     * Attempt to calculate the list of brandings for this version of minecraft.
+     */
     public void computeBranding()
     {
         if (brandings == null)
@@ -223,6 +244,11 @@ public class FMLCommonHandler
             brandingsNoMC = brandings.subList(1, brandings.size());
         }
     }
+    /**
+     * Get the brandings for this minecraft instance
+     * @param includeMC Whether to include minecraft in the brandings
+     * @return The list of brandings
+     */
     public List<String> getBrandings(boolean includeMC)
     {
         if (brandings == null)
@@ -232,11 +258,18 @@ public class FMLCommonHandler
         return includeMC ? ImmutableList.copyOf(brandings) : ImmutableList.copyOf(brandingsNoMC);
     }
 
+    /**
+     * Get the sided delegate
+     * @return The sided delegate
+     */
     public IFMLSidedHandler getSidedDelegate()
     {
         return sidedDelegate;
     }
 
+    /**
+     * Called just after a server tick has happened
+     */
     public void onPostServerTick()
     {
         bus().post(new TickEvent.ServerTickEvent(Phase.END));
@@ -249,7 +282,10 @@ public class FMLCommonHandler
     {
         bus().post(new TickEvent.WorldTickEvent(Side.SERVER, Phase.END, world));
     }
-
+    
+    /**
+     * Called just before a server tick has happened
+     */
     public void onPreServerTick()
     {
         bus().post(new TickEvent.ServerTickEvent(Phase.START));
@@ -263,83 +299,144 @@ public class FMLCommonHandler
         bus().post(new TickEvent.WorldTickEvent(Side.SERVER, Phase.START, world));
     }
 
+    /**
+     * Tell the loader a server is about to start
+     * @param server The server that is about to start
+     * @return If an exception occured when telling the loader a server was about to start
+     */
     public boolean handleServerAboutToStart(MinecraftServer server)
     {
         return Loader.instance().serverAboutToStart(server);
     }
 
+    /**
+     * Tell the loader a server is starting
+     * @param server The server that is starting
+     * @return If an exception occured when telling the loader a server was starting
+     */
     public boolean handleServerStarting(MinecraftServer server)
     {
         return Loader.instance().serverStarting(server);
     }
 
+    /**
+     * Tell the loader a server has started
+     */
     public void handleServerStarted()
     {
         Loader.instance().serverStarted();
     }
 
+    /**
+     * Tell the loader a server is stopping
+     */
     public void handleServerStopping()
     {
         Loader.instance().serverStopping();
     }
 
+    /**
+     * Get the current server
+     * @return The current server
+     */
     public MinecraftServer getMinecraftServerInstance()
     {
         return sidedDelegate.getServer();
     }
 
+    /**
+     * Show a GUI element
+     * @param clientGuiElement The GUI element to show
+     */
     public void showGuiScreen(Object clientGuiElement)
     {
         sidedDelegate.showGuiScreen(clientGuiElement);
     }
 
+    /**
+     * Start a dedicated server
+     * @param dedicatedServer The dedicated server that is started
+     */
     public void onServerStart(MinecraftServer dedicatedServer)
     {
         FMLServerHandler.instance();
         sidedDelegate.beginServerLoading(dedicatedServer);
     }
 
+    /**
+     * Called when a dedicated server has been started
+     */
     public void onServerStarted()
     {
         sidedDelegate.finishServerLoading();
     }
 
-
+    /**
+     * Called just before a client tick happens.
+     */
     public void onPreClientTick()
     {
         bus().post(new TickEvent.ClientTickEvent(Phase.START));
     }
 
+    /**
+     * Called just after a client tick happens 
+     */
     public void onPostClientTick()
     {
         bus().post(new TickEvent.ClientTickEvent(Phase.END));
     }
 
+    /**
+     * Called when a render tick starts
+     * @param timer Time since the last render tick
+     */
     public void onRenderTickStart(float timer)
     {
         bus().post(new TickEvent.RenderTickEvent(Phase.START, timer));
     }
 
+    /**
+     * Called when a render tick ends
+     * @param timer How long this render tick took
+     */
     public void onRenderTickEnd(float timer)
     {
         bus().post(new TickEvent.RenderTickEvent(Phase.END, timer));
     }
 
+    /**
+     * Called just before a player is ticked
+     * @param player The player about to be ticked
+     */
     public void onPlayerPreTick(EntityPlayer player)
     {
         bus().post(new TickEvent.PlayerTickEvent(Phase.START, player));
     }
 
+    /**
+     * Called just after a player has been ticked
+     * @param player The player that has just been ticked
+     */
     public void onPlayerPostTick(EntityPlayer player)
     {
         bus().post(new TickEvent.PlayerTickEvent(Phase.END, player));
     }
-
+    
+    /** 
+     * Register something to be called when we crash
+     * @param callable The thing to call when we crash
+     */
     public void registerCrashCallable(ICrashCallable callable)
     {
         crashCallables.add(callable);
     }
 
+    /**
+     * Enhance a crash report in the given category with the register  crashCallables
+     * @param crashReport The crash report that will be issued
+     * @param category The category of a crash report
+     */
     public void enhanceCrashReport(CrashReport crashReport, CrashReportCategory category)
     {
         for (ICrashCallable call: crashCallables)
@@ -348,6 +445,12 @@ public class FMLCommonHandler
         }
     }
 
+    /**
+     * Save mod data from a world into a NBTTag
+     * @param handler The save handler for this save
+     * @param worldInfo The info for the world being saved
+     * @param tagCompound The NBTTag for the world save
+     */
     public void handleWorldDataSave(SaveHandler handler, WorldInfo worldInfo, NBTTagCompound tagCompound)
     {
         for (ModContainer mc : Loader.instance().getModList())
@@ -364,6 +467,12 @@ public class FMLCommonHandler
         }
     }
 
+    /**
+     * Load mod data from a world into a NBTTag
+     * @param handler The save handler for the world
+     * @param worldInfo The info of the world being saved
+     * @param tagCompound The NBTTag for the world being saved
+     */
     public void handleWorldDataLoad(SaveHandler handler, WorldInfo worldInfo, NBTTagCompound tagCompound)
     {
         if (getEffectiveSide()!=Side.SERVER)
@@ -390,6 +499,10 @@ public class FMLCommonHandler
         }
     }
 
+    /**
+     * Should the server die quietly
+     * @return Whether the server died quietly
+     */
     public boolean shouldServerBeKilledQuietly()
     {
         if (sidedDelegate == null)
@@ -399,6 +512,9 @@ public class FMLCommonHandler
         return sidedDelegate.shouldServerShouldBeKilledQuietly();
     }
 
+    /**
+     * Stop the server and tell everyone that it has stopped
+     */
     public void handleServerStopped()
     {
         sidedDelegate.serverStopped();
@@ -408,6 +524,10 @@ public class FMLCommonHandler
         if (server!=null) ObfuscationReflectionHelper.setPrivateValue(MinecraftServer.class, server, false, "field_71316"+"_v", "u", "serverStopped");
     }
 
+    /**
+     * Get the list of builtin mods
+     * @return The list of builtin mods
+     */
     public String getModName()
     {
         List<String> modNames = Lists.newArrayListWithExpectedSize(3);
@@ -424,71 +544,128 @@ public class FMLCommonHandler
         return Joiner.on(',').join(modNames);
     }
 
+    /**
+     * Add a mod to a resource pack
+     * @param container The mod to add
+     */
     public void addModToResourcePack(ModContainer container)
     {
         sidedDelegate.addModAsResource(container);
     }
 
+    /**
+     * Refresh the resource pack list
+     */
     public void updateResourcePackList()
     {
         sidedDelegate.updateResourcePackList();
     }
 
+    /**
+     * Get the current language for the game
+     * @return
+     */
     public String getCurrentLanguage()
     {
 
         return sidedDelegate.getCurrentLanguage();
     }
 
+    // Why is this here? It seems to serve no purpose
+    @Deprecated
     public void bootstrap()
     {
     }
 
+    /**
+     * Get the network manager for the client-to-server connection
+     * @return The network manager for the client-to-server connection
+     */
     public NetworkManager getClientToServerNetworkManager()
     {
         return sidedDelegate.getClientToServerNetworkManager();
     }
 
+    /**
+     * Fire a mouse input event over the event bus
+     */
     public void fireMouseInput()
     {
         bus().post(new InputEvent.MouseInputEvent());
     }
 
+    /**
+     * Fire a key input event over the event bus
+     */
     public void fireKeyInput()
     {
         bus().post(new InputEvent.KeyInputEvent());
     }
 
+    /** 
+     * Fire a event that the player changed dimensions
+     * @param player The player that is changing dimensions
+     * @param fromDim The dimension the player was in
+     * @param toDim The dimension the player is going to
+     */
     public void firePlayerChangedDimensionEvent(EntityPlayer player, int fromDim, int toDim)
     {
         bus().post(new PlayerEvent.PlayerChangedDimensionEvent(player, fromDim, toDim));
     }
 
+    /**
+     * Fire an event that a player logged in
+     * @param player The player that has logged in
+     */
     public void firePlayerLoggedIn(EntityPlayer player)
     {
         bus().post(new PlayerEvent.PlayerLoggedInEvent(player));
     }
-
+    
+    /**
+     * Fire an event that a player logged out
+     * @param player The player that is logging out
+     */
     public void firePlayerLoggedOut(EntityPlayer player)
     {
         bus().post(new PlayerEvent.PlayerLoggedOutEvent(player));
     }
 
+    /**
+     * Fire an event that a player has respawned
+     * @param player The player that is respawning
+     */
     public void firePlayerRespawnEvent(EntityPlayer player)
     {
         bus().post(new PlayerEvent.PlayerRespawnEvent(player));
     }
 
+    /**
+     * Fire an event that a player has picked up a item that currently exists as a entity
+     * @param player The player that is picking up the item
+     * @param item The entity for the item that is being picked up
+     */
     public void firePlayerItemPickupEvent(EntityPlayer player, EntityItem item)
     {
         bus().post(new PlayerEvent.ItemPickupEvent(player, item));
     }
 
+    /**
+     * Fire an event that a player has crafted an item
+     * @param player The player that is crafting the item
+     * @param crafted the item that has been crafted
+     * @param craftMatrix The inventory the item was crafted from
+     */
     public void firePlayerCraftingEvent(EntityPlayer player, ItemStack crafted, IInventory craftMatrix)
     {
         bus().post(new PlayerEvent.ItemCraftedEvent(player, crafted, craftMatrix));
     }
 
+    /**
+     * Fire an event that a player has smelted an item
+     * @param player The player smelting the item
+     * @param smelted The item that was the result of smelting
+     */
     public void firePlayerSmeltedEvent(EntityPlayer player, ItemStack smelted)
     {
         bus().post(new PlayerEvent.ItemSmeltedEvent(player, smelted));

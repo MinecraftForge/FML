@@ -16,8 +16,15 @@ import java.io.File;
 
 import com.google.common.collect.SetMultimap;
 
+/**
+ * Indicates FML has found multiple files that load the same mod
+ *
+ */
 public class DuplicateModsFoundException extends LoaderException {
     private static final long serialVersionUID = 1L;
+    /**
+     * A map of duplicate mods to the set of files that represent them
+     */
     public SetMultimap<ModContainer,File> dupes;
 
 	public DuplicateModsFoundException(SetMultimap<ModContainer, File> dupes) {

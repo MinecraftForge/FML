@@ -41,6 +41,7 @@ import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.Side;
 
 /**
+ * A mod container for FML
  * @author cpw
  *
  */
