@@ -67,6 +67,7 @@ public class ProxyInjector
                     FMLLog.severe("Attempted to load a proxy type %s into %s.%s, but the types don't match", targetType, targ.getClassName(), targ.getObjectName());
                     throw new LoaderException();
                 }
+                target.setAccessible(true);
                 languageAdapter.setProxy(target, proxyTarget, proxy);
             }
             catch (Exception e)
