@@ -27,3 +27,6 @@ installation process, no further action is required on your part.
 
 For reference this is version @MAJOR@.@MINOR@.@REV@.@BUILD@ of FML
 for Minecraft version @MCVERSION@.
+
+LexManos' Install Video
+=======================
