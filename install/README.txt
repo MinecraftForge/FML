@@ -30,3 +30,4 @@ for Minecraft version @MCVERSION@.
 
 LexManos' Install Video
 =======================
+https://www.youtube.com/watch?v=8VEdtQLuLO0&feature=youtu.be
