@@ -338,7 +338,7 @@ public class GameRegistry
 	    return null;
 	}
 
-	public static class UniqueIdentifier
+	public static final class UniqueIdentifier
 	{
 	    public final String modId;
 	    public final String name;
