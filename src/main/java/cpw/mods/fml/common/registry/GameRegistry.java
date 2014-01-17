@@ -338,7 +338,7 @@ public class GameRegistry
 	    return null;
 	}
 
-	public static class UniqueIdentifier
+	public static final class UniqueIdentifier
 	{
 	    public final String modId;
 	    public final String name;
@@ -356,14 +356,20 @@ public class GameRegistry
         }
 
         @Override
-        public boolean equals(Object obj)
-        {
-            if (obj == null) return false;
-            if (obj.getClass() != this.getClass()) return false;
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof UniqueIdentifier)) return false;
             final UniqueIdentifier other = (UniqueIdentifier) obj;
             return Objects.equal(modId, other.modId) && Objects.equal(name, other.name);
         }
-        
+
+        @Override
+        public int hashCode() {
+            int result = modId != null ? modId.hashCode() : 0;
+            result = 31 * result + (name != null ? name.hashCode() : 0);
+            return result;
+        }
+
         @Override
         public String toString()
         {
