@@ -163,6 +163,22 @@ public class FMLOutboundHandler extends ChannelOutboundHandlerAdapter {
                 NetworkManager clientConnection = FMLCommonHandler.instance().getClientToServerNetworkManager();
                 return clientConnection == null ? ImmutableList.<NetworkDispatcher>of() : ImmutableList.of(clientConnection.channel().attr(NetworkDispatcher.FML_DISPATCHER).get());
             }
+        },
+        DISPATCHER
+        {
+            @Override
+            public void validateArgs(Object args)
+            {
+                if (!(args instanceof NetworkDispatcher))
+                {
+                    throw new RuntimeException("DISPATCHER target expects a NetworkDispatcher arg");
+                }
+            }
+            @Override
+            public List<NetworkDispatcher> selectNetworks(Object args, ChannelHandlerContext context, FMLProxyPacket packet)
+            {
+                return ImmutableList.<NetworkDispatcher>of((NetworkDispatcher) args);
+            }
         };
 
         public abstract void validateArgs(Object args);
