@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.collect.MapMaker;
 import com.google.common.reflect.TypeToken;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 
@@ -26,15 +27,25 @@ public class EventBus
     {
         ListenerList.resize(busID + 1);
     }
-
-    public void register(Object target)
+    
+    public void register(Object target, Object mod)
     {
         if (listeners.containsKey(target))
         {
             return;
         }
+        
+        ModContainer targetContainer;
+        if (mod instanceof ModContainer)
+        {
+            targetContainer = (ModContainer) mod;
+        }
+        else
+        {
+            targetContainer = FMLCommonHandler.instance().findContainerFor(mod);
+        }
 
-        listenerOwners.put(target, Loader.instance().activeModContainer());
+        listenerOwners.put(target, targetContainer);
         Set<? extends Class<?>> supers = TypeToken.of(target.getClass()).getTypes().rawTypes();
         for (Method method : target.getClass().getMethods())
         {
@@ -71,6 +82,11 @@ public class EventBus
                 }
             }
         }
+    }
+    
+    public void register(Object target)
+    {
+        this.register(target, Loader.instance().activeModContainer());
     }
 
     private void register(Class<?> eventType, Object target, Method method, ModContainer owner)
