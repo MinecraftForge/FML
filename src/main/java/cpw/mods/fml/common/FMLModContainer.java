@@ -360,6 +360,7 @@ public class FMLModContainer implements ModContainer
 
         parseSimpleFieldAnnotation(annotations, Instance.class.getName(), new Function<ModContainer, Object>()
         {
+            @Override
             public Object apply(ModContainer mc)
             {
                 return mc.getMod();
@@ -367,6 +368,7 @@ public class FMLModContainer implements ModContainer
         });
         parseSimpleFieldAnnotation(annotations, Metadata.class.getName(), new Function<ModContainer, Object>()
         {
+            @Override
             public Object apply(ModContainer mc)
             {
                 return mc.getMetadata();
@@ -621,5 +623,11 @@ public class FMLModContainer implements ModContainer
     public String getGuiClassName()
     {
         return (String) descriptor.get("guiFactory");
+    }
+
+    @Override
+    public List<String> getOwnedPackages()
+    {
+        return candidate.getContainedPackages();
     }
 }

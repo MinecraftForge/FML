@@ -28,7 +28,7 @@
          this.field_71446_o = new TextureManager(this.field_110451_am);
          this.field_110451_am.func_110542_a(this.field_71446_o);
          this.field_147127_av = new SoundHandler(this.field_110451_am, this.field_71474_y);
-@@ -508,6 +513,7 @@
+@@ -508,12 +513,13 @@
          this.field_71446_o.func_130088_a(TextureMap.field_110576_c, new TextureMap(1, "textures/items"));
          GL11.glViewport(0, 0, this.field_71443_c, this.field_71440_d);
          this.field_71452_i = new EffectRenderer(this.field_71441_e, this.field_71446_o);
@@ -36,6 +36,13 @@
          this.func_71361_d("Post startup");
          this.field_71456_v = new GuiIngame(this);
  
+         if (this.field_71475_ae != null)
+         {
+-            this.func_147108_a(new GuiConnecting(new GuiMainMenu(), this, this.field_71475_ae, this.field_71477_af));
++            FMLClientHandler.instance().connectToServerAtStartup(this.field_71475_ae, this.field_71477_af);
+         }
+         else
+         {
 @@ -527,6 +533,7 @@
              this.func_71352_k();
          }
@@ -44,7 +51,7 @@
          Display.setVSyncEnabled(this.field_71474_y.field_74352_v);
      }
  
-@@ -915,9 +922,11 @@
+@@ -916,9 +923,11 @@
  
          if (!this.field_71454_w)
          {
@@ -56,7 +63,7 @@
          }
  
          GL11.glFlush();
-@@ -1495,6 +1504,8 @@
+@@ -1496,6 +1505,8 @@
              --this.field_71467_ac;
          }
  
@@ -65,7 +72,7 @@
          this.field_71424_I.func_76320_a("gui");
  
          if (!this.field_71445_n)
-@@ -1645,6 +1656,7 @@
+@@ -1646,6 +1657,7 @@
                          this.field_71462_r.func_146274_d();
                      }
                  }
@@ -73,7 +80,7 @@
              }
  
              if (this.field_71429_W > 0)
-@@ -1786,6 +1798,7 @@
+@@ -1787,6 +1799,7 @@
                              }
                          }
                      }
@@ -81,7 +88,7 @@
                  }
              }
  
-@@ -1977,6 +1990,8 @@
+@@ -1978,12 +1991,15 @@
              this.field_71453_ak.func_74428_b();
          }
  
@@ -90,7 +97,14 @@
          this.field_71424_I.func_76319_b();
          this.field_71423_H = func_71386_F();
      }
-@@ -2093,6 +2108,7 @@
+ 
+     public void func_71371_a(String p_71371_1_, String p_71371_2_, WorldSettings p_71371_3_)
+     {
++        FMLClientHandler.instance().startIntegratedServer(p_71371_1_, p_71371_2_, p_71371_3_);
+         this.func_71403_a((WorldClient)null);
+         System.gc();
+         ISaveHandler isavehandler = this.field_71469_aa.func_75804_a(p_71371_1_, false);
+@@ -2094,6 +2110,7 @@
              this.field_110448_aq.func_148529_f();
              this.func_71351_a((ServerData)null);
              this.field_71455_al = false;

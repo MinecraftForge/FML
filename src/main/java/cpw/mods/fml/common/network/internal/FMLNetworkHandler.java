@@ -29,9 +29,12 @@ import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.core.helpers.Integers;
 import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLContainer;
 import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.FMLOutboundHandler;
@@ -75,10 +78,11 @@ public class FMLNetworkHandler
                 entityPlayerMP.func_71117_bO();
                 entityPlayerMP.func_71128_l();
                 int windowId = entityPlayerMP.field_71139_cq;
-                new FMLMessage.OpenGui(windowId, mc.getModId(), modGuiId, x, y, z);
+                FMLMessage.OpenGui openGui = new FMLMessage.OpenGui(windowId, mc.getModId(), modGuiId, x, y, z);
                 EmbeddedChannel embeddedChannel = channelPair.get(Side.SERVER);
                 embeddedChannel.attr(FMLOutboundHandler.FML_MESSAGETARGET).set(OutboundTarget.PLAYER);
                 embeddedChannel.attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(entityPlayerMP);
+                embeddedChannel.writeOutbound(openGui);
                 entityPlayerMP.field_71070_bA = remoteGuiContainer;
                 entityPlayerMP.field_71070_bA.field_75152_c = windowId;
                 entityPlayerMP.field_71070_bA.func_75132_a(entityPlayerMP);
@@ -176,4 +180,20 @@ public class FMLNetworkHandler
         return list;
     }
 
+
+    public static void enhanceStatusQuery(JsonObject jsonobject)
+    {
+        JsonObject fmlData = new JsonObject();
+        fmlData.addProperty("type", "FML");
+        JsonArray modList = new JsonArray();
+        for (ModContainer mc : Loader.instance().getActiveModList())
+        {
+            JsonObject modData = new JsonObject();
+            modData.addProperty("modid", mc.getModId());
+            modData.addProperty("version", mc.getVersion());
+            modList.add(modData);
+        }
+        fmlData.add("modList", modList);
+        jsonobject.add("modinfo", fmlData);
+    }
 }

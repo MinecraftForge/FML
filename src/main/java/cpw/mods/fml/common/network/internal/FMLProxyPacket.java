@@ -3,15 +3,18 @@ package cpw.mods.fml.common.network.internal;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
-
 import java.io.IOException;
-
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
+import org.apache.logging.log4j.Level;
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.network.FMLNetworkException;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.handshake.NetworkDispatcher;
 import cpw.mods.fml.relauncher.Side;
 
 public class FMLProxyPacket extends Packet {
@@ -19,6 +22,7 @@ public class FMLProxyPacket extends Packet {
     private Side target;
     private final ByteBuf payload;
     private INetHandler netHandler;
+    private NetworkDispatcher dispatcher;
 
     private FMLProxyPacket(byte[] payload, String channel)
     {
@@ -59,10 +63,23 @@ public class FMLProxyPacket extends Packet {
     {
         this.netHandler = inethandler;
         EmbeddedChannel internalChannel = NetworkRegistry.INSTANCE.getChannel(this.channel, this.target);
-        internalChannel.attr(NetworkRegistry.NET_HANDLER).set(this.netHandler);
         if (internalChannel != null)
         {
-            internalChannel.writeInbound(this);
+            internalChannel.attr(NetworkRegistry.NET_HANDLER).set(this.netHandler);
+            try
+            {
+                internalChannel.writeInbound(this);
+            }
+            catch (FMLNetworkException ne)
+            {
+                FMLLog.log(Level.ERROR, ne, "There was a network exception handling a packet on channel %s", channel);
+                dispatcher.rejectHandshake(ne.getMessage());
+            }
+            catch (Throwable t)
+            {
+                FMLLog.log(Level.ERROR, t, "There was a critical exception handling a packet on channel %s", channel);
+                dispatcher.rejectHandshake("A fatal error has occured, this connection is terminated");
+            }
         }
     }
 
@@ -91,5 +108,25 @@ public class FMLProxyPacket extends Packet {
     public void setTarget(Side target)
     {
         this.target = target;
+    }
+
+    public void setDispatcher(NetworkDispatcher networkDispatcher)
+    {
+        this.dispatcher = networkDispatcher;
+    }
+
+    public NetworkManager getOrigin()
+    {
+        return this.dispatcher != null ? this.dispatcher.manager : null;
+    }
+
+    public NetworkDispatcher getDispatcher()
+    {
+        return this.dispatcher;
+    }
+
+    public Side getTarget()
+    {
+        return target;
     }
 }

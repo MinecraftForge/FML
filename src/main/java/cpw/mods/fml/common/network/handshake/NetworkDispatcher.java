@@ -11,9 +11,12 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.ScheduledFuture;
 import java.net.SocketAddress;
+import java.nio.channels.ClosedChannelException;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.Level;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.INetHandler;
@@ -21,6 +24,7 @@ import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
+import net.minecraft.network.play.server.S01PacketJoinGame;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import net.minecraft.network.play.server.S40PacketDisconnect;
 import net.minecraft.server.management.ServerConfigurationManager;
@@ -65,11 +69,10 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
 
     public static final AttributeKey<NetworkDispatcher> FML_DISPATCHER = new AttributeKey<NetworkDispatcher>("fml:dispatcher");
     public static final AttributeKey<Boolean> IS_LOCAL = new AttributeKey<Boolean>("fml:isLocal");
-    private final NetworkManager manager;
+    public final NetworkManager manager;
     private final ServerConfigurationManager scm;
     private EntityPlayerMP player;
     private ConnectionState state;
-    @SuppressWarnings("unused")
     private ConnectionType connectionType;
     private final Side side;
     private final EmbeddedChannel handshakeChannel;
@@ -147,23 +150,24 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
     void clientListenForServerHandshake()
     {
         manager.func_150723_a(EnumConnectionState.PLAY);
+        FMLCommonHandler.instance().waitForPlayClient();
         this.netHandler = FMLCommonHandler.instance().getClientPlayHandler();
         this.state = ConnectionState.AWAITING_HANDSHAKE;
     }
 
-    private void completeClientSideConnection()
+    private void completeClientSideConnection(ConnectionType type)
     {
-        FMLLog.info("[%s] Client side modded connection established", Thread.currentThread().getName());
+        this.connectionType = type;
+        FMLLog.info("[%s] Client side %s connection established", Thread.currentThread().getName(), this.connectionType.name().toLowerCase(Locale.ENGLISH));
         this.state = ConnectionState.CONNECTED;
-        this.connectionType = ConnectionType.MODDED;
-        FMLCommonHandler.instance().bus().post(new FMLNetworkEvent.ClientConnectedToServerEvent(manager));
+        FMLCommonHandler.instance().bus().post(new FMLNetworkEvent.ClientConnectedToServerEvent(manager, this.connectionType.name()));
     }
 
-    private void completeServerSideConnection()
+    private void completeServerSideConnection(ConnectionType type)
     {
-        FMLLog.info("[%s] Server side modded connection established", Thread.currentThread().getName());
+        this.connectionType = type;
+        FMLLog.info("[%s] Server side %s connection established", Thread.currentThread().getName(), this.connectionType.name().toLowerCase(Locale.ENGLISH));
         this.state = ConnectionState.CONNECTED;
-        this.connectionType = ConnectionType.MODDED;
         FMLCommonHandler.instance().bus().post(new FMLNetworkEvent.ServerConnectionFromClientEvent(manager));
         scm.func_72355_a(manager, player, serverHandler);
     }
@@ -181,12 +185,25 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         }
         else if (state != ConnectionState.CONNECTED && state != ConnectionState.HANDSHAKECOMPLETE)
         {
-            FMLLog.info("Unexpected packet during modded negotiation - assuming vanilla or keepalives : %s", msg.getClass().getName());
+            handled = handleVanilla(msg);
         }
         if (!handled)
         {
             ctx.fireChannelRead(msg);
         }
+    }
+
+    private boolean handleVanilla(Packet msg)
+    {
+        if (state == ConnectionState.AWAITING_HANDSHAKE && msg instanceof S01PacketJoinGame)
+        {
+            handshakeChannel.pipeline().fireUserEventTriggered(msg);
+        }
+        else
+        {
+            FMLLog.info("Unexpected packet during modded negotiation - assuming vanilla or keepalives : %s", msg.getClass().getName());
+        }
+        return false;
     }
 
     public INetHandler getNetHandler()
@@ -213,6 +230,7 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         final ChatComponentText chatcomponenttext = new ChatComponentText(message);
         manager.func_150725_a(new S40PacketDisconnect(chatcomponenttext), new GenericFutureListener<Future<?>>()
         {
+            @Override
             public void operationComplete(Future<?> result)
             {
                 manager.func_150718_a(chatcomponenttext);
@@ -227,6 +245,7 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         if ("FML|HS".equals(channelName) || "REGISTER".equals(channelName) || "UNREGISTER".equals(channelName))
         {
             FMLProxyPacket proxy = new FMLProxyPacket(msg);
+            proxy.setDispatcher(this);
             handshakeChannel.writeInbound(proxy);
             // forward any messages into the regular channel
             for (Object push : handshakeChannel.inboundMessages())
@@ -245,6 +264,7 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         else if (NetworkRegistry.INSTANCE.hasChannel(channelName, Side.CLIENT))
         {
             FMLProxyPacket proxy = new FMLProxyPacket(msg);
+            proxy.setDispatcher(this);
             context.fireChannelRead(proxy);
             return true;
         }
@@ -262,6 +282,7 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         if ("FML|HS".equals(channelName) || "REGISTER".equals(channelName) || "UNREGISTER".equals(channelName))
         {
             FMLProxyPacket proxy = new FMLProxyPacket(msg);
+            proxy.setDispatcher(this);
             handshakeChannel.writeInbound(proxy);
             for (Object push : handshakeChannel.inboundMessages())
             {
@@ -279,6 +300,7 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         else if (NetworkRegistry.INSTANCE.hasChannel(channelName, Side.SERVER))
         {
             FMLProxyPacket proxy = new FMLProxyPacket(msg);
+            proxy.setDispatcher(this);
             context.fireChannelRead(proxy);
             return true;
         }
@@ -399,11 +421,11 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         }
         if (side == Side.CLIENT)
         {
-            completeClientSideConnection();
+            completeClientSideConnection(ConnectionType.MODDED);
         }
         else
         {
-            completeServerSideConnection();
+            completeServerSideConnection(ConnectionType.MODDED);
         }
     }
 
@@ -411,4 +433,21 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
     {
         state = ConnectionState.HANDSHAKECOMPLETE;
     }
+
+    public void abortClientHandshake(String type)
+    {
+        completeClientSideConnection(ConnectionType.valueOf(type));
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
+    {
+        // Stop the epic channel closed spam at close
+        if (!(cause instanceof ClosedChannelException))
+        {
+            FMLLog.log(Level.ERROR, cause, "NetworkDispatcher exception");
+        }
+        super.exceptionCaught(ctx, cause);
+    }
+
 }

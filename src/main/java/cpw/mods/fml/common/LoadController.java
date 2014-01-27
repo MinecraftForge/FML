@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.ThreadContext;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
@@ -28,6 +29,7 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -54,6 +56,7 @@ public class LoadController
     private List<ModContainer> activeModList = Lists.newArrayList();
     private ModContainer activeContainer;
     private BiMap<ModContainer, Object> modObjectList;
+    private ListMultimap<String, ModContainer> packageOwners;
 
     public LoadController(Loader loader)
     {
@@ -62,7 +65,7 @@ public class LoadController
         this.masterChannel.register(this);
 
         state = LoaderState.NOINIT;
-
+        packageOwners = ArrayListMultimap.create();
 
     }
 
@@ -170,7 +173,7 @@ public class LoadController
 
     public ModContainer activeContainer()
     {
-        return activeContainer;
+        return activeContainer != null ? activeContainer : findActiveContainerFromStack();
     }
 
     @Subscribe
@@ -201,9 +204,11 @@ public class LoadController
         }
         activeContainer = mc;
         stateEvent.applyModContainer(activeContainer());
+        ThreadContext.put("mod", modId);
         FMLLog.log(modId, Level.TRACE, "Sending event %s to mod %s", stateEvent.getEventType(), modId);
         eventChannels.get(modId).post(stateEvent);
         FMLLog.log(modId, Level.TRACE, "Sent event %s to mod %s", stateEvent.getEventType(), modId);
+        ThreadContext.remove("mod");
         activeContainer = null;
         if (stateEvent instanceof FMLStateEvent)
         {
@@ -226,6 +231,11 @@ public class LoadController
             if (!mc.isImmutable() && mc.getMod()!=null)
             {
                 builder.put(mc, mc.getMod());
+                List<String> packages = mc.getOwnedPackages();
+                for (String pkg : packages)
+                {
+                    packageOwners.put(pkg, mc);
+                }
             }
             if (mc.getMod()==null && !mc.isImmutable() && state!=LoaderState.CONSTRUCTING)
             {
@@ -305,5 +315,38 @@ public class LoadController
     void forceState(LoaderState newState)
     {
         this.state = newState;
+    }
+
+    private ModContainer findActiveContainerFromStack()
+    {
+        for (Class<?> c : getCallingStack())
+        {
+            int idx = c.getName().lastIndexOf('.');
+            if (idx == -1)
+            {
+                continue;
+            }
+            String pkg = c.getName().substring(0,idx);
+            if (packageOwners.containsKey(pkg))
+            {
+                return packageOwners.get(pkg).get(0);
+            }
+        }
+
+        return null;
+    }
+    private FMLSecurityManager accessibleManager = new FMLSecurityManager();
+
+    class FMLSecurityManager extends SecurityManager
+    {
+        Class<?>[] getStackClasses()
+        {
+            return getClassContext();
+        }
+    }
+
+    Class<?>[] getCallingStack()
+    {
+        return accessibleManager.getStackClasses();
     }
 }

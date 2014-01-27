@@ -1,5 +1,6 @@
 package cpw.mods.fml.common.network.handshake;
 
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
@@ -37,10 +38,19 @@ enum FMLHandshakeClientState implements IHandshakeState<FMLHandshakeClientState>
         @Override
         public FMLHandshakeClientState accept(ChannelHandlerContext ctx, FMLHandshakeMessage msg)
         {
-            FMLLog.info("Server protocol version %x", ((FMLHandshakeMessage.ServerHello)msg).protocolVersion());
+            // write our custom packet registration, always
             ctx.writeAndFlush(FMLHandshakeMessage.makeCustomChannelRegistration(NetworkRegistry.INSTANCE.channelNamesFor(Side.CLIENT)));
-            ctx.writeAndFlush(new FMLHandshakeMessage.ClientHello());
-            ctx.writeAndFlush(new FMLHandshakeMessage.ModList(Loader.instance().getActiveModList()));
+            if (msg == null)
+            {
+                NetworkDispatcher dispatcher = ctx.channel().attr(NetworkDispatcher.FML_DISPATCHER).get();
+                dispatcher.abortClientHandshake("VANILLA");
+                // VANILLA login
+                return DONE;
+            }
+
+            FMLLog.info("Server protocol version %x", ((FMLHandshakeMessage.ServerHello)msg).protocolVersion());
+            ctx.writeAndFlush(new FMLHandshakeMessage.ClientHello()).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+            ctx.writeAndFlush(new FMLHandshakeMessage.ModList(Loader.instance().getActiveModList())).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             return WAITINGSERVERDATA;
         }
     },
@@ -57,7 +67,7 @@ enum FMLHandshakeClientState implements IHandshakeState<FMLHandshakeClientState>
                 dispatcher.rejectHandshake(result);
                 return ERROR;
             }
-            ctx.writeAndFlush(new FMLHandshakeMessage.HandshakeAck(ordinal()));
+            ctx.writeAndFlush(new FMLHandshakeMessage.HandshakeAck(ordinal())).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             if (!ctx.channel().attr(NetworkDispatcher.IS_LOCAL).get())
             {
                 return WAITINGSERVERCOMPLETE;
@@ -80,7 +90,7 @@ enum FMLHandshakeClientState implements IHandshakeState<FMLHandshakeClientState>
                 dispatcher.rejectHandshake("Fatally missing blocks and items");
                 return ERROR;
             }
-            ctx.writeAndFlush(new FMLHandshakeMessage.HandshakeAck(ordinal()));
+            ctx.writeAndFlush(new FMLHandshakeMessage.HandshakeAck(ordinal())).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             return PENDINGCOMPLETE;
         }
     },
@@ -89,7 +99,7 @@ enum FMLHandshakeClientState implements IHandshakeState<FMLHandshakeClientState>
         @Override
         public FMLHandshakeClientState accept(ChannelHandlerContext ctx, FMLHandshakeMessage msg)
         {
-            ctx.writeAndFlush(new FMLHandshakeMessage.HandshakeAck(ordinal()));
+            ctx.writeAndFlush(new FMLHandshakeMessage.HandshakeAck(ordinal())).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             return COMPLETE;
         }
     },
@@ -102,7 +112,7 @@ enum FMLHandshakeClientState implements IHandshakeState<FMLHandshakeClientState>
             dispatcher.completeClientHandshake();
             FMLMessage.CompleteHandshake complete = new FMLMessage.CompleteHandshake(Side.CLIENT);
             ctx.fireChannelRead(complete);
-            ctx.writeAndFlush(new FMLHandshakeMessage.HandshakeAck(ordinal()));
+            ctx.writeAndFlush(new FMLHandshakeMessage.HandshakeAck(ordinal())).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             return DONE;
         }
     },

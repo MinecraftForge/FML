@@ -12,28 +12,19 @@
  */
 package cpw.mods.fml.server;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
+import java.util.Set;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.StringTranslate;
-
 import com.google.common.collect.ImmutableList;
-
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.IFMLSidedHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
+import cpw.mods.fml.common.eventhandler.EventBus;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 
@@ -78,6 +69,7 @@ public class FMLServerHandler implements IFMLSidedHandler
      *
      * @param minecraftServer
      */
+    @Override
     public void beginServerLoading(MinecraftServer minecraftServer)
     {
         server = minecraftServer;
@@ -87,10 +79,10 @@ public class FMLServerHandler implements IFMLSidedHandler
     /**
      * Called a bit later on during server initialization to finish loading mods
      */
+    @Override
     public void finishServerLoading()
     {
         Loader.instance().initializeMods();
-        LanguageRegistry.reloadLanguageTable();
     }
 
     @Override
@@ -102,6 +94,7 @@ public class FMLServerHandler implements IFMLSidedHandler
     /**
      * Get the server instance
      */
+    @Override
     public MinecraftServer getServer()
     {
         return server;
@@ -146,55 +139,9 @@ public class FMLServerHandler implements IFMLSidedHandler
     @Override
     public void addModAsResource(ModContainer container)
     {
-        File source = container.getSource();
-        try
-        {
-            if (source.isDirectory())
-            {
-                searchDirForENUSLanguage(source,"");
-            }
-            else
-            {
-                searchZipForENUSLanguage(source);
-            }
-        }
-        catch (IOException ioe)
-        {
+        LanguageRegistry.instance().loadLanguagesFor(container, Side.SERVER);
+    }
 
-        }
-    }
-    private static final Pattern assetENUSLang = Pattern.compile("assets/(.*)/lang/en_US.lang");
-    private void searchZipForENUSLanguage(File source) throws IOException
-    {
-        ZipFile zf = new ZipFile(source);
-        for (ZipEntry ze : Collections.list(zf.entries()))
-        {
-            Matcher matcher = assetENUSLang.matcher(ze.getName());
-            if (matcher.matches())
-            {
-                FMLLog.fine("Injecting found translation data in zip file %s at %s into language system", source.getName(), ze.getName());
-                StringTranslate.inject(zf.getInputStream(ze));
-            }
-        }
-        zf.close();
-    }
-    private void searchDirForENUSLanguage(File source, String path) throws IOException
-    {
-        for (File file : source.listFiles())
-        {
-            String currPath = path+file.getName();
-            if (file.isDirectory())
-            {
-                searchDirForENUSLanguage(file, currPath+'/');
-            }
-            Matcher matcher = assetENUSLang.matcher(currPath);
-            if (matcher.matches())
-            {
-                FMLLog.fine("Injecting found translation data at %s into language system", currPath);
-                StringTranslate.inject(new FileInputStream(file));
-            }
-        }
-    }
     @Override
     public void updateResourcePackList()
     {
@@ -220,5 +167,16 @@ public class FMLServerHandler implements IFMLSidedHandler
     public INetHandler getClientPlayHandler()
     {
         return null;
+    }
+    @Override
+    public void waitForPlayClient()
+    {
+        // NOOP
+    }
+
+    @Override
+    public void fireNetRegistrationEvent(EventBus bus, NetworkManager manager, Set<String> channelSet, String channel, Side side)
+    {
+        bus.post(new FMLNetworkEvent.CustomPacketRegistrationEvent<NetHandlerPlayServer>(manager, channelSet, channel, side, NetHandlerPlayServer.class));
     }
 }
