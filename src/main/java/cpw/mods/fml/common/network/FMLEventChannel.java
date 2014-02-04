@@ -14,7 +14,7 @@ public class FMLEventChannel {
     private EnumMap<Side, FMLEmbeddedChannel> channels;
     private EventBus eventBus;
 
-    FMLEventChannel(String name)
+    public FMLEventChannel(String name)
     {
         this.channels = NetworkRegistry.INSTANCE.newChannel(name, new NetworkEventFiringHandler(this));
         this.eventBus = new EventBus();
@@ -33,15 +33,15 @@ public class FMLEventChannel {
     void fireRead(FMLProxyPacket msg, ChannelHandlerContext ctx)
     {
         FMLNetworkEvent.CustomPacketEvent<?> event = null;
-        if (msg.handler() instanceof NetHandlerPlayClient)
-        {
-            NetHandlerPlayClient client = (NetHandlerPlayClient) msg.handler();
-            event = new FMLNetworkEvent.ClientCustomPacketEvent(client.func_147298_b(), msg);
-        }
-        else if (msg.handler() instanceof NetHandlerPlayServer)
+        if (msg.handler() instanceof NetHandlerPlayServer)
         {
             NetHandlerPlayServer server = (NetHandlerPlayServer) msg.handler();
             event = new FMLNetworkEvent.ServerCustomPacketEvent(server.func_147362_b(), msg);
+        }
+        else if (msg.handler() instanceof NetHandlerPlayClient)
+        {
+            NetHandlerPlayClient client = (NetHandlerPlayClient) msg.handler();
+            event = new FMLNetworkEvent.ClientCustomPacketEvent(client.func_147298_b(), msg);
         }
         if (event != null)
         {
