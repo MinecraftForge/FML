@@ -91,9 +91,13 @@ public class GameData {
         return is;
     }
 
-    static void registerCustomItemStack(String name, ItemStack itemStack)
+    static void registerCustomItemStack(String name, ItemStack itemStack, String modId)
     {
-        customItemStacks.put(Loader.instance().activeModContainer().getModId(), name, itemStack);
+        if (modId == null)
+        {
+            modId = Loader.instance().activeModContainer().getModId();
+        }
+        customItemStacks.put(modId, name, itemStack);
     }
 
     public static void dumpRegistry(File minecraftDir)
