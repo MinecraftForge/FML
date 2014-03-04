@@ -1,0 +1,17 @@
+--- ../src-base/minecraft/net/minecraft/client/gui/TaskOnlineConnect.java
++++ ../src-work/minecraft/net/minecraft/client/gui/TaskOnlineConnect.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.client.gui;
+ 
++import cpw.mods.fml.client.FMLClientHandler;
+ import cpw.mods.fml.relauncher.Side;
+ import cpw.mods.fml.relauncher.SideOnly;
+ import io.netty.util.concurrent.GenericFutureListener;
+@@ -129,6 +130,7 @@
+ 
+     private void func_148432_a(final String p_148432_1_, final int p_148432_2_)
+     {
++        FMLClientHandler.instance().connectToRealm();
+         (new Thread("MCO Connector #" + field_148439_a.incrementAndGet())
+         {
+             private static final String __OBFID = "CL_00000791";
