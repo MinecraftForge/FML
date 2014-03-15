@@ -360,6 +360,12 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
     @Override
     public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
     {
+        ctx.disconnect(promise);
+    }
+
+    @Override
+    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
+    {
         if (side == Side.CLIENT)
         {
             FMLCommonHandler.instance().bus().post(new FMLNetworkEvent.ClientDisconnectionFromServerEvent(manager));
@@ -368,12 +374,6 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         {
             FMLCommonHandler.instance().bus().post(new FMLNetworkEvent.ServerDisconnectionFromClientEvent(manager));
         }
-        ctx.disconnect(promise);
-    }
-
-    @Override
-    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
-    {
         ctx.close(promise);
     }
 
