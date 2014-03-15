@@ -15,9 +15,11 @@ package cpw.mods.fml.common.registry;
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.block.Block;
@@ -98,30 +100,108 @@ public class GameData {
 
     public static void dumpRegistry(File minecraftDir)
     {
-        if (customItemStacks == null)
-        {
-            return;
-        }
-        if (Boolean.valueOf(System.getProperty("fml.dumpRegistry", "false")).booleanValue())
-        {
-            ImmutableListMultimap.Builder<String, String> builder = ImmutableListMultimap.builder();
-            for (String modId : customItemStacks.rowKeySet())
-            {
-                builder.putAll(modId, customItemStacks.row(modId).keySet());
-            }
-
-            File f = new File(minecraftDir, "itemStackRegistry.csv");
-            MapJoiner mapJoiner = Joiner.on("\n").withKeyValueSeparator(",");
-            try
-            {
-                Files.write(mapJoiner.join(builder.build().entries()), f, Charsets.UTF_8);
-                FMLLog.log(Level.INFO, "Dumped item registry data to %s", f.getAbsolutePath());
-            }
-            catch (IOException e)
-            {
-                FMLLog.log(Level.ERROR, e, "Failed to write registry data to %s", f.getAbsolutePath());
-            }
-        }
+    	if (Boolean.valueOf(System.getProperty("fml.dumpRegistry", "false")).booleanValue())
+    	{
+	        if (customItemStacks == null)
+	        {
+	            return;
+	        }
+	        else
+	        {
+	            ImmutableListMultimap.Builder<String, String> builder = ImmutableListMultimap.builder();
+	            for (String modId : customItemStacks.rowKeySet())
+	            {
+	                builder.putAll(modId, customItemStacks.row(modId).keySet());
+	            }
+	
+	            File f = new File(minecraftDir, "itemStackRegistry.csv");
+	            MapJoiner mapJoiner = Joiner.on("\n").withKeyValueSeparator(",");
+	            try
+	            {
+	                Files.write(mapJoiner.join(builder.build().entries()), f, Charsets.UTF_8);
+	                FMLLog.log(Level.INFO, "Dumped ItemStack registry data to %s", f.getAbsolutePath());
+	            }
+	            catch (IOException e)
+	            {
+	                FMLLog.log(Level.ERROR, e, "Failed to write ItemStack registry data to %s", f.getAbsolutePath());
+	            }
+	        }
+	        
+	        
+	        
+	        if (blockRegistry == null)
+	        {
+	            return;
+	        }
+	        else
+	        {
+	            ImmutableListMultimap.Builder<String, String> builder = ImmutableListMultimap.builder();
+	            
+	            UniqueIdentifier ui;
+	            Iterator i = blockRegistry.iterator();
+	            while(i.hasNext())
+	            {
+	            	Object obj = i.next();
+	            	if(obj instanceof Block)
+	            	{
+		            	ui = getUniqueName((Block) obj);
+		            	if(ui != null)
+		            		builder.put(ui.modId, ui.name);
+		            	
+	            	}
+	            }
+	
+	            File f = new File(minecraftDir, "blockRegistry.csv");
+	            MapJoiner mapJoiner = Joiner.on("\n").withKeyValueSeparator(",");
+	            try
+	            {
+	                Files.write(mapJoiner.join(builder.build().entries()), f, Charsets.UTF_8);
+	                FMLLog.log(Level.INFO, "Dumped Block registry data to %s", f.getAbsolutePath());
+	            }
+	            catch (IOException e)
+	            {
+	                FMLLog.log(Level.ERROR, e, "Failed to write Block registry data to %s", f.getAbsolutePath());
+	            }
+	            }
+	        
+	        
+	        }
+	        
+	        
+	        if (itemRegistry == null)
+	        {
+	            return;
+	        }
+	        else
+	        {
+	            ImmutableListMultimap.Builder<String, String> builder = ImmutableListMultimap.builder();
+	            
+	            UniqueIdentifier ui;
+	            Iterator i = itemRegistry.iterator();
+	            while(i.hasNext())
+	            {
+	            	Object obj = i.next();
+	            	if(obj instanceof Item)
+	            	{
+	            		ui = getUniqueName((Item) obj);
+		            	if(ui != null)
+		            		builder.put(ui.modId, ui.name);
+	            	}
+	            }
+	
+	            File f = new File(minecraftDir, "itemRegistry.csv");
+	            MapJoiner mapJoiner = Joiner.on("\n").withKeyValueSeparator(",");
+	            try
+	            {
+	                Files.write(mapJoiner.join(builder.build().entries()), f, Charsets.UTF_8);
+	                FMLLog.log(Level.INFO, "Dumped Item registry data to %s", f.getAbsolutePath());
+	            }
+	            catch (IOException e)
+	            {
+	                FMLLog.log(Level.ERROR, e, "Failed to write Item registry data to %s", f.getAbsolutePath());
+	            }
+	        }
+	        
     }
 
     static UniqueIdentifier getUniqueName(Block block)
