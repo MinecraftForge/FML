@@ -122,9 +122,9 @@ public class GameRegistry
      * @param item The item to register
      * @param name The mod-unique name of the item
      */
-    public static void registerItem(net.minecraft.item.Item item, String name)
+    public static Item registerItem(Item item, String name)
     {
-        registerItem(item, name, null);
+        return registerItem(item, name, null);
     }
 
     /**
