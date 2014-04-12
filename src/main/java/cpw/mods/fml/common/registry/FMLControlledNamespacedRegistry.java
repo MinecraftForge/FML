@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.LoadererState;
 import cpw.mods.fml.common.ModContainer;
 
 public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
@@ -295,7 +296,7 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
         }
 
         ModContainer mc = Loader.instance().activeModContainer();
-        if (mc != null)
+        if (mc != null && Loader.instance().isInState(LoaderState.PREINITIALIZATION))
         {
             String prefix = mc.getModId();
             name = prefix + ":"+ name;
