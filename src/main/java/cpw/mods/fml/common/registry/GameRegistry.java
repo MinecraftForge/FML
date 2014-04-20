@@ -12,6 +12,18 @@
 
 package cpw.mods.fml.common.registry;
 
+import static net.minecraft.world.biome.BiomeGenBase.birchForest;
+import static net.minecraft.world.biome.BiomeGenBase.coldTaiga;
+import static net.minecraft.world.biome.BiomeGenBase.desert;
+import static net.minecraft.world.biome.BiomeGenBase.extremeHills;
+import static net.minecraft.world.biome.BiomeGenBase.forest;
+import static net.minecraft.world.biome.BiomeGenBase.icePlains;
+import static net.minecraft.world.biome.BiomeGenBase.plains;
+import static net.minecraft.world.biome.BiomeGenBase.roofedForest;
+import static net.minecraft.world.biome.BiomeGenBase.savanna;
+import static net.minecraft.world.biome.BiomeGenBase.swampland;
+import static net.minecraft.world.biome.BiomeGenBase.taiga;
+
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +42,10 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.layer.GenLayerBiome;
 
 import org.apache.logging.log4j.Level;
 
@@ -145,6 +160,107 @@ public class GameRegistry
     {
 
     }
+    
+    /**
+     * Biome Climates
+     * @author Matthieu Parizeau
+     */
+    public static enum BiomeClimate
+    {
+        HOT, WARM, COLD, MILD
+    }
+    
+    /**
+     * Add a biome to the world generator for the specified climate
+     * @param biome The biome to be added
+     * @param climate The climate of the biome
+     * @param frequency (Optional) How common the biome will be
+     * @author Matthieu Parizeau
+     */
+    public static void addBiome(BiomeGenBase biome, BiomeClimate climate, WorldType worldType, int frequency)
+    {
+        for (int i = 0; i < frequency; i++)
+        {
+            GameRegistry.addBiome(biome, climate, worldType);
+        }
+    }
+    
+    /**
+     * Add a biome to the world generator for the specified climate
+     * @param biome The biome to be added
+     * @param climate The climate of the biome
+     * @author Matthieu Parizeau
+     */
+    public static void addBiome(BiomeGenBase biome, BiomeClimate climate, WorldType worldType)
+    {
+        if (!GenLayerBiome.coldBiomes.containsKey(worldType))
+            GenLayerBiome.coldBiomes.put(worldType, new ArrayList<BiomeGenBase>());
+        
+        if (!GenLayerBiome.hotBiomes.containsKey(worldType))
+            GenLayerBiome.hotBiomes.put(worldType, new ArrayList<BiomeGenBase>());
+        
+        if (!GenLayerBiome.mildBiomes.containsKey(worldType))
+            GenLayerBiome.mildBiomes.put(worldType, new ArrayList<BiomeGenBase>());
+        
+        if (!GenLayerBiome.warmBiomes.containsKey(worldType))
+            GenLayerBiome.warmBiomes.put(worldType, new ArrayList<BiomeGenBase>());
+        
+        switch (climate)
+        {
+        case COLD:
+            GenLayerBiome.coldBiomes.get(worldType).add(biome);
+            break;
+        case HOT:
+            GenLayerBiome.hotBiomes.get(worldType).add(biome);
+            break;
+        case MILD:
+            GenLayerBiome.mildBiomes.get(worldType).add(biome);
+            break;
+        case WARM:
+            GenLayerBiome.warmBiomes.get(worldType).add(biome);
+            break;
+        }
+    }
+    
+    private static void addVanillaBiomes()
+    {
+        GameRegistry.addBiome(desert, BiomeClimate.HOT, WorldType.DEFAULT);
+        GameRegistry.addBiome(desert, BiomeClimate.HOT, WorldType.DEFAULT);
+        GameRegistry.addBiome(desert, BiomeClimate.HOT, WorldType.DEFAULT);
+        GameRegistry.addBiome(savanna, BiomeClimate.HOT, WorldType.DEFAULT);
+        GameRegistry.addBiome(savanna, BiomeClimate.HOT, WorldType.DEFAULT);
+        GameRegistry.addBiome(plains, BiomeClimate.HOT, WorldType.DEFAULT);
+        
+        GameRegistry.addBiome(forest, BiomeClimate.WARM, WorldType.DEFAULT);
+        GameRegistry.addBiome(roofedForest, BiomeClimate.WARM, WorldType.DEFAULT);
+        GameRegistry.addBiome(extremeHills, BiomeClimate.WARM, WorldType.DEFAULT);
+        GameRegistry.addBiome(plains, BiomeClimate.WARM, WorldType.DEFAULT);
+        GameRegistry.addBiome(birchForest, BiomeClimate.WARM, WorldType.DEFAULT);
+        GameRegistry.addBiome(swampland, BiomeClimate.WARM, WorldType.DEFAULT);
+        
+        GameRegistry.addBiome(forest, BiomeClimate.MILD, WorldType.DEFAULT);
+        GameRegistry.addBiome(extremeHills, BiomeClimate.MILD, WorldType.DEFAULT);
+        GameRegistry.addBiome(taiga, BiomeClimate.MILD, WorldType.DEFAULT);
+        GameRegistry.addBiome(plains, BiomeClimate.MILD, WorldType.DEFAULT);
+        
+        GameRegistry.addBiome(icePlains, BiomeClimate.COLD, WorldType.DEFAULT);
+        GameRegistry.addBiome(icePlains, BiomeClimate.COLD, WorldType.DEFAULT);
+        GameRegistry.addBiome(icePlains, BiomeClimate.COLD, WorldType.DEFAULT);
+        GameRegistry.addBiome(coldTaiga, BiomeClimate.COLD, WorldType.DEFAULT);
+        
+        GameRegistry.addBiome(desert, BiomeClimate.HOT, WorldType.DEFAULT_1_1);
+        GameRegistry.addBiome(forest, BiomeClimate.HOT, WorldType.DEFAULT_1_1);
+        GameRegistry.addBiome(extremeHills, BiomeClimate.HOT, WorldType.DEFAULT_1_1);
+        GameRegistry.addBiome(swampland, BiomeClimate.HOT, WorldType.DEFAULT_1_1);
+        GameRegistry.addBiome(plains, BiomeClimate.HOT, WorldType.DEFAULT_1_1);
+        GameRegistry.addBiome(taiga, BiomeClimate.HOT, WorldType.DEFAULT_1_1);
+    }
+    
+    static
+    {
+        addVanillaBiomes();
+    }
+    
     /**
      * Register a block with the specified mod specific name
      * @param block The block to register
