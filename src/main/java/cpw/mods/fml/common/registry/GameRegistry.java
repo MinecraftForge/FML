@@ -174,6 +174,7 @@ public class GameRegistry
      * Add a biome to the world generator for the specified climate
      * @param biome The biome to be added
      * @param climate The climate of the biome
+     * @param worldType The World Type to add the biome to
      * @param frequency (Optional) How common the biome will be
      * @author Matthieu Parizeau
      */
@@ -189,6 +190,7 @@ public class GameRegistry
      * Add a biome to the world generator for the specified climate
      * @param biome The biome to be added
      * @param climate The climate of the biome
+     * @param worldType The World Type to add the biome to
      * @author Matthieu Parizeau
      */
     public static void addBiome(BiomeGenBase biome, BiomeClimate climate, WorldType worldType)
@@ -224,11 +226,8 @@ public class GameRegistry
     
     private static void addVanillaBiomes()
     {
-        GameRegistry.addBiome(desert, BiomeClimate.HOT, WorldType.DEFAULT);
-        GameRegistry.addBiome(desert, BiomeClimate.HOT, WorldType.DEFAULT);
-        GameRegistry.addBiome(desert, BiomeClimate.HOT, WorldType.DEFAULT);
-        GameRegistry.addBiome(savanna, BiomeClimate.HOT, WorldType.DEFAULT);
-        GameRegistry.addBiome(savanna, BiomeClimate.HOT, WorldType.DEFAULT);
+        GameRegistry.addBiome(desert, BiomeClimate.HOT, WorldType.DEFAULT, 3);
+        GameRegistry.addBiome(savanna, BiomeClimate.HOT, WorldType.DEFAULT, 2);
         GameRegistry.addBiome(plains, BiomeClimate.HOT, WorldType.DEFAULT);
         
         GameRegistry.addBiome(forest, BiomeClimate.WARM, WorldType.DEFAULT);
@@ -243,9 +242,7 @@ public class GameRegistry
         GameRegistry.addBiome(taiga, BiomeClimate.MILD, WorldType.DEFAULT);
         GameRegistry.addBiome(plains, BiomeClimate.MILD, WorldType.DEFAULT);
         
-        GameRegistry.addBiome(icePlains, BiomeClimate.COLD, WorldType.DEFAULT);
-        GameRegistry.addBiome(icePlains, BiomeClimate.COLD, WorldType.DEFAULT);
-        GameRegistry.addBiome(icePlains, BiomeClimate.COLD, WorldType.DEFAULT);
+        GameRegistry.addBiome(icePlains, BiomeClimate.COLD, WorldType.DEFAULT, 3);
         GameRegistry.addBiome(coldTaiga, BiomeClimate.COLD, WorldType.DEFAULT);
         
         GameRegistry.addBiome(desert, BiomeClimate.HOT, WorldType.DEFAULT_1_1);
