@@ -60,29 +60,29 @@ public class SimpleNetworkWrapper {
         String type = channel.findChannelHandlerNameForType(SimpleIndexedCodec.class);
         if (side == Side.SERVER)
         {
-            addServerHandlerAfter(channel, type, messageHandler);
+            addServerHandlerAfter(channel, type, messageHandler, message);
         }
         else
         {
-            addClientHandlerAfter(channel, type, messageHandler);
+            addClientHandlerAfter(channel, type, messageHandler, message);
         }
     }
 
-    private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addServerHandlerAfter(FMLEmbeddedChannel channel, String type, Class<? extends IMessageHandler<REQ, REPLY>> messageHandler)
+    private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addServerHandlerAfter(FMLEmbeddedChannel channel, String type, Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> message)
     {
-        SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.SERVER);
+        SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, message, Side.SERVER);
         channel.pipeline().addAfter(type, messageHandler.getName(), handler);
     }
 
-    private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addClientHandlerAfter(FMLEmbeddedChannel channel, String type, Class<? extends IMessageHandler<REQ, REPLY>> messageHandler)
+    private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addClientHandlerAfter(FMLEmbeddedChannel channel, String type, Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> message)
     {
-        SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.CLIENT);
+        SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, message, Side.CLIENT);
         channel.pipeline().addAfter(type, messageHandler.getName(), handler);
     }
 
-    private <REPLY extends IMessage, REQ extends IMessage> SimpleChannelHandlerWrapper<REQ, REPLY> getHandlerWrapper(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Side side)
+    private <REPLY extends IMessage, REQ extends IMessage> SimpleChannelHandlerWrapper<REQ, REPLY> getHandlerWrapper(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> message, Side side)
     {
-        return new SimpleChannelHandlerWrapper<REQ, REPLY>(messageHandler, side);
+        return new SimpleChannelHandlerWrapper<REQ, REPLY>(messageHandler, message, side);
     }
 
     /**

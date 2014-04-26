@@ -24,6 +24,21 @@ public class SimpleChannelHandlerWrapper<REQ extends IMessage, REPLY extends IMe
         }
         this.side = side;
     }
+    
+    public SimpleChannelHandlerWrapper(Class<? extends IMessageHandler<REQ, REPLY>> handler, Class<REQ> message, Side side)
+    {
+        super(message);
+        
+        try
+        {
+            messageHandler = handler.newInstance();
+        } catch (Exception e)
+        {
+            Throwables.propagate(e);
+        }
+        this.side = side;
+    }
+    
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, REQ msg) throws Exception
     {
