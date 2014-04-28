@@ -1,0 +1,87 @@
+--- ../src-base/minecraft/net/minecraft/world/gen/layer/GenLayerBiome.java
++++ ../src-work/minecraft/net/minecraft/world/gen/layer/GenLayerBiome.java
+@@ -1,29 +1,38 @@
+ package net.minecraft.world.gen.layer;
+ 
++import java.util.ArrayList;
++import java.util.HashMap;
++
+ import net.minecraft.world.WorldType;
+ import net.minecraft.world.biome.BiomeGenBase;
+ 
+ public class GenLayerBiome extends GenLayer
+ {
+-    private BiomeGenBase[] field_151623_c;
+-    private BiomeGenBase[] field_151621_d;
+-    private BiomeGenBase[] field_151622_e;
+-    private BiomeGenBase[] field_151620_f;
++    public static HashMap<WorldType, ArrayList<BiomeGenBase>> hotBiomes = new HashMap<WorldType, ArrayList<BiomeGenBase>>();
++    public static HashMap<WorldType, ArrayList<BiomeGenBase>> warmBiomes = new HashMap<WorldType, ArrayList<BiomeGenBase>>();
++    public static HashMap<WorldType, ArrayList<BiomeGenBase>> mildBiomes = new HashMap<WorldType, ArrayList<BiomeGenBase>>();
++    public static HashMap<WorldType, ArrayList<BiomeGenBase>> coldBiomes = new HashMap<WorldType, ArrayList<BiomeGenBase>>();
+     private static final String __OBFID = "CL_00000555";
++    private WorldType worldType;
+ 
+     public GenLayerBiome(long p_i2122_1_, GenLayer p_i2122_3_, WorldType p_i2122_4_)
+     {
+         super(p_i2122_1_);
+-        this.field_151623_c = new BiomeGenBase[] {BiomeGenBase.field_76769_d, BiomeGenBase.field_76769_d, BiomeGenBase.field_76769_d, BiomeGenBase.field_150588_X, BiomeGenBase.field_150588_X, BiomeGenBase.field_76772_c};
+-        this.field_151621_d = new BiomeGenBase[] {BiomeGenBase.field_76767_f, BiomeGenBase.field_150585_R, BiomeGenBase.field_76770_e, BiomeGenBase.field_76772_c, BiomeGenBase.field_150583_P, BiomeGenBase.field_76780_h};
+-        this.field_151622_e = new BiomeGenBase[] {BiomeGenBase.field_76767_f, BiomeGenBase.field_76770_e, BiomeGenBase.field_76768_g, BiomeGenBase.field_76772_c};
+-        this.field_151620_f = new BiomeGenBase[] {BiomeGenBase.field_76774_n, BiomeGenBase.field_76774_n, BiomeGenBase.field_76774_n, BiomeGenBase.field_150584_S};
++        this.worldType = p_i2122_4_;
++        
++        if (!hotBiomes.containsKey(this.worldType))
++            hotBiomes.put(this.worldType, hotBiomes.get(WorldType.field_77137_b));
++        
++        if (!warmBiomes.containsKey(this.worldType))
++            warmBiomes.put(this.worldType, warmBiomes.get(WorldType.field_77137_b));
++        
++        if (!mildBiomes.containsKey(this.worldType))
++            mildBiomes.put(this.worldType, mildBiomes.get(WorldType.field_77137_b));
++        
++        if (!coldBiomes.containsKey(this.worldType))
++            coldBiomes.put(this.worldType, coldBiomes.get(WorldType.field_77137_b));
++        
+         this.field_75909_a = p_i2122_3_;
+-
+-        if (p_i2122_4_ == WorldType.field_77136_e)
+-        {
+-            this.field_151623_c = new BiomeGenBase[] {BiomeGenBase.field_76769_d, BiomeGenBase.field_76767_f, BiomeGenBase.field_76770_e, BiomeGenBase.field_76780_h, BiomeGenBase.field_76772_c, BiomeGenBase.field_76768_g};
+-        }
+     }
+ 
+     public int[] func_75904_a(int p_75904_1_, int p_75904_2_, int p_75904_3_, int p_75904_4_)
+@@ -63,7 +72,7 @@
+                     }
+                     else
+                     {
+-                        aint1[j1 + i1 * p_75904_3_] = this.field_151623_c[this.func_75902_a(this.field_151623_c.length)].field_76756_M;
++                        aint1[j1 + i1 * p_75904_3_] = this.hotBiomes.get(this.worldType).get(this.func_75902_a(this.hotBiomes.get(this.worldType).size())).field_76756_M;
+                     }
+                 }
+                 else if (k1 == 2)
+@@ -74,7 +83,7 @@
+                     }
+                     else
+                     {
+-                        aint1[j1 + i1 * p_75904_3_] = this.field_151621_d[this.func_75902_a(this.field_151621_d.length)].field_76756_M;
++                        aint1[j1 + i1 * p_75904_3_] = this.warmBiomes.get(this.worldType).get(this.func_75902_a(this.warmBiomes.get(this.worldType).size())).field_76756_M;
+                     }
+                 }
+                 else if (k1 == 3)
+@@ -85,12 +94,12 @@
+                     }
+                     else
+                     {
+-                        aint1[j1 + i1 * p_75904_3_] = this.field_151622_e[this.func_75902_a(this.field_151622_e.length)].field_76756_M;
++                        aint1[j1 + i1 * p_75904_3_] = this.mildBiomes.get(this.worldType).get(this.func_75902_a(this.mildBiomes.get(this.worldType).size())).field_76756_M;
+                     }
+                 }
+                 else if (k1 == 4)
+                 {
+-                    aint1[j1 + i1 * p_75904_3_] = this.field_151620_f[this.func_75902_a(this.field_151620_f.length)].field_76756_M;
++                    aint1[j1 + i1 * p_75904_3_] = this.coldBiomes.get(this.worldType).get(this.func_75902_a(this.coldBiomes.get(this.worldType).size())).field_76756_M;
+                 }
+                 else
+                 {
