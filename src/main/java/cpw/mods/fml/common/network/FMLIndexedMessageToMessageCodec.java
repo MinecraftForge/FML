@@ -71,7 +71,10 @@ public abstract class FMLIndexedMessageToMessageCodec<A> extends MessageToMessag
             throw new NullPointerException("Undefined message for discriminator " + discriminator + " in channel " + msg.channel());
         }
         A newMsg = clazz.newInstance();
-        ctx.attr(INBOUNDPACKETTRACKER).get().set(msg);
+        if(!ctx.executor().inEventLoop())
+        {
+            ctx.attr(INBOUNDPACKETTRACKER).get().set(msg);
+        }
         decodeInto(ctx, payload.slice(), newMsg);
         out.add(newMsg);
     }
