@@ -9,7 +9,16 @@
  import net.minecraft.crash.CrashReport;
  import net.minecraft.crash.CrashReportCategory;
  import net.minecraft.entity.EnumCreatureType;
-@@ -209,6 +211,7 @@
+@@ -120,6 +122,8 @@
+             this.field_73245_g.add(chunk);
+             chunk.func_76631_c();
+             chunk.func_76624_a(this, this, p_73158_1_, p_73158_2_);
++            //Fix of vanilla bug where the server sends no more than 7 chunk radius. (actual only on 1.7.2)
++            chunk.func_150804_b(false);
+         }
+ 
+         return chunk;
+@@ -209,6 +213,7 @@
              if (this.field_73246_d != null)
              {
                  this.field_73246_d.func_73153_a(p_73153_1_, p_73153_2_, p_73153_3_);
