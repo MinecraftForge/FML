@@ -33,7 +33,7 @@ public class FMLFolderResourcePack extends FolderResourcePack {
     @Override
     public String getPackName()
     {
-        return "FMLFileResourcePack:"+container.getName();
+        return "FMLFolderResourcePack:"+container.getName();
     }
     @Override
     protected InputStream getInputStreamByName(String resourceName) throws IOException
