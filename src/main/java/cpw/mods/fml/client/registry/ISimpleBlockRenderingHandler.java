@@ -18,6 +18,8 @@ import net.minecraft.world.IBlockAccess;
 
 public interface ISimpleBlockRenderingHandler
 {
+    public static final RenderItem itemRenderer = new RenderItem();
+    
     public abstract void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer);
 
     public abstract boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer);
