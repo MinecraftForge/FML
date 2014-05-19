@@ -574,6 +574,11 @@ public class Loader
     {
         return canonicalConfigDir;
     }
+    
+    public File getModDir()
+    {
+        return canonicalModsDir;
+    }
 
     public String getCrashInformation()
     {
