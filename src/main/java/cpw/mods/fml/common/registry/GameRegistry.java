@@ -115,6 +115,17 @@ public class GameRegistry
         });
         sortedGeneratorList = ImmutableList.copyOf(list);
     }
+    
+    /**
+     * Register an item with the item registry with a custom name : this allows for easier server->client resolution
+     *
+     * @param item The item to register
+     */
+    public static void registerItem(net.minecraft.item.Item item)
+    {
+        registerItem(item, item.getUnlocalizedName(), null);
+    }
+
 
     /**
      * Register an item with the item registry with a custom name : this allows for easier server->client resolution
@@ -134,6 +145,7 @@ public class GameRegistry
      * @param modId deprecated, unused
      * where one mod should "own" all the blocks of all the mods, null defaults to the active mod
      */
+    @Deprecated
     public static Item registerItem(Item item, String name, String modId)
     {
         GameData.getMain().registerItem(item, name);
@@ -144,6 +156,15 @@ public class GameRegistry
     public static void addAlias(String alias, String forName, GameRegistry.Type type)
     {
 
+    }
+    
+    /**
+     * Register a block with the specified mod specific name
+     * @param block The block to register
+     */
+    public static Block registerBlock(Block block)
+    {
+        return registerBlock(block, ItemBlock.class, block.getUnlocalizedName());
     }
 
     /**
