@@ -84,7 +84,7 @@ public class FMLInterModComms {
         /**
          * This field, and {@link #key} are both at the mod's discretion
          */
-        private Object value;
+        public final Object value;
 
         private IMCMessage(String key, Object value)
         {
@@ -108,6 +108,14 @@ public class FMLInterModComms {
             this.sender = activeModContainer.getModId();
         }
 
+        public Class<?> getMessageType()
+        {
+            return value.getClass();
+        }
+
+        /*
+         * Convenience methods for common message types
+         */
         public String getStringValue()
         {
             return (String) value;
@@ -121,11 +129,6 @@ public class FMLInterModComms {
         public ItemStack getItemStackValue()
         {
             return (ItemStack) value;
-        }
-
-        public Class<?> getMessageType()
-        {
-            return value.getClass();
         }
 
         public boolean isStringMessage()
@@ -144,30 +147,12 @@ public class FMLInterModComms {
         }
     }
 
-    public static boolean sendMessage(String modId, String key, NBTTagCompound value)
-    {
-        return enqueueStartupMessage(modId, new IMCMessage(key, value));
-    }
-    public static boolean sendMessage(String modId, String key, ItemStack value)
-    {
-        return enqueueStartupMessage(modId, new IMCMessage(key, value));
-    }
-    public static boolean sendMessage(String modId, String key, String value)
+    public static boolean sendMessage(String modId, String key, Object value)
     {
         return enqueueStartupMessage(modId, new IMCMessage(key, value));
     }
 
-    public static void sendRuntimeMessage(Object sourceMod, String modId, String key, NBTTagCompound value)
-    {
-        enqueueMessage(sourceMod, modId, new IMCMessage(key, value));
-    }
-
-    public static void sendRuntimeMessage(Object sourceMod, String modId, String key, ItemStack value)
-    {
-        enqueueMessage(sourceMod, modId, new IMCMessage(key, value));
-    }
-
-    public static void sendRuntimeMessage(Object sourceMod, String modId, String key, String value)
+    public static void sendRuntimeMessage(Object sourceMod, String modId, String key, Object value)
     {
         enqueueMessage(sourceMod, modId, new IMCMessage(key, value));
     }
