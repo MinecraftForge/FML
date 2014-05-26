@@ -1,0 +1,18 @@
+--- ../src-base/minecraft/net/minecraft/client/gui/GuiScreen.java
++++ ../src-work/minecraft/net/minecraft/client/gui/GuiScreen.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.client.gui;
+ 
++import cpw.mods.fml.common.FMLCommonHandler;
+ import cpw.mods.fml.relauncher.Side;
+ import cpw.mods.fml.relauncher.SideOnly;
+ import java.awt.Toolkit;
+@@ -61,6 +62,8 @@
+             this.field_146297_k.func_147108_a((GuiScreen)null);
+             this.field_146297_k.func_71381_h();
+         }
++
++        FMLCommonHandler.instance().fireGuiKeyInput(p_73869_1_, p_73869_2_);
+     }
+ 
+     public static String func_146277_j()
