@@ -573,6 +573,11 @@ public class FMLCommonHandler
     {
         bus().post(new PlayerEvent.ItemSmeltedEvent(player, smelted));
     }
+    
+    public void firePlayerEchantEvent(EntityPlayer player, ItemStack enchanted, IInventory tableInventory)
+    {
+        bus().post(new PlayerEvent.ItemEnchantedEvent(player, enchanted, tableInventory));
+    }
 
     public INetHandler getClientPlayHandler()
     {

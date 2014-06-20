@@ -1,0 +1,18 @@
+--- ../src-base/minecraft/net/minecraft/inventory/ContainerEnchantment.java
++++ ../src-work/minecraft/net/minecraft/inventory/ContainerEnchantment.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.inventory;
+ 
++import cpw.mods.fml.common.FMLCommonHandler;
+ import cpw.mods.fml.relauncher.Side;
+ import cpw.mods.fml.relauncher.SideOnly;
+ import java.util.List;
+@@ -219,7 +220,7 @@
+                     this.func_75130_a(this.field_75168_e);
+                 }
+             }
+-
++            FMLCommonHandler.instance().firePlayerEchantEvent(p_75140_1_, itemstack, field_75168_e);
+             return true;
+         }
+         else
