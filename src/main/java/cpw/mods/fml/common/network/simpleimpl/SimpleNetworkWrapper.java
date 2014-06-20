@@ -93,40 +93,40 @@ public class SimpleNetworkWrapper {
      * be registered on the supplied side (this is the side where you want the message to be processed and acted upon).
      *
      * @param messageHandler the message handler type
-     * @param requestMessageType the message type
+     * @param messageType the message type
      * @param discriminator a discriminator byte
      * @param side the side for the handler
      */
-    public <REQ extends IMessage, REPLY extends IMessage> void registerMessage(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> requestMessageType, int discriminator, Side side)
+    public <REQ extends IMessage, REPLY extends IMessage> void registerMessage(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<? extends REQ> messageType, int discriminator, Side side)
     {
-        packetCodec.addDiscriminator(discriminator, requestMessageType);
+        packetCodec.addDiscriminator(discriminator, messageType);
         FMLEmbeddedChannel channel = channels.get(side);
         String type = channel.findChannelHandlerNameForType(SimpleIndexedCodec.class);
         if (side == Side.SERVER)
         {
-            addServerHandlerAfter(channel, type, messageHandler, requestMessageType);
+            addServerHandlerAfter(channel, type, messageHandler, messageType);
         }
         else
         {
-            addClientHandlerAfter(channel, type, messageHandler, requestMessageType);
+            addClientHandlerAfter(channel, type, messageHandler, messageType);
         }
     }
 
-    private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addServerHandlerAfter(FMLEmbeddedChannel channel, String type, Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> requestType)
+    private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addServerHandlerAfter(FMLEmbeddedChannel channel, String type, Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<? extends REQ> messageType)
     {
-        SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.SERVER, requestType);
-        channel.pipeline().addAfter(type, messageHandler.getName(), handler);
+        SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.SERVER, messageType);
+        channel.pipeline().addAfter(type, messageHandler.getName()+messageType.getName()+Side.SERVER.name(), handler);
     }
 
-    private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addClientHandlerAfter(FMLEmbeddedChannel channel, String type, Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> requestType)
+    private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addClientHandlerAfter(FMLEmbeddedChannel channel, String type, Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<? extends REQ> messageType)
     {
-        SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.CLIENT, requestType);
-        channel.pipeline().addAfter(type, messageHandler.getName(), handler);
+        SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.CLIENT, messageType);
+        channel.pipeline().addAfter(type, messageHandler.getName()+messageType.getName()+Side.CLIENT.name(), handler);
     }
 
-    private <REPLY extends IMessage, REQ extends IMessage> SimpleChannelHandlerWrapper<REQ, REPLY> getHandlerWrapper(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Side side, Class<REQ> requestType)
+    private <REPLY extends IMessage, REQ extends IMessage> SimpleChannelHandlerWrapper<REQ, REPLY> getHandlerWrapper(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Side side, Class<? extends REQ> messageType)
     {
-        return new SimpleChannelHandlerWrapper<REQ, REPLY>(messageHandler, side, requestType);
+        return new SimpleChannelHandlerWrapper<REQ, REPLY>(messageHandler, side, messageType);
     }
 
     /**
