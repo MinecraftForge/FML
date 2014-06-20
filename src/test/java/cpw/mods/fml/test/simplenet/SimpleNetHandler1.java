@@ -8,6 +8,7 @@ public class SimpleNetHandler1 implements IMessageHandler<SimpleNetTestMessage1,
     @Override
     public SimpleNetTestMessage2 onMessage(SimpleNetTestMessage1 message, MessageContext context)
     {
+        System.out.println(this.getClass().getSimpleName() + " recieved message: " + message.getClass().getSimpleName() + " on side: " + context.side.name());
         return null;
     }
 
