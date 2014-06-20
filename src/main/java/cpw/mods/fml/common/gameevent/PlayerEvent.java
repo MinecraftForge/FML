@@ -40,6 +40,16 @@ public class PlayerEvent extends Event {
             this.smelting = crafting;
         }
     }
+    public static class ItemEnchantedEvent extends PlayerEvent {
+        public final ItemStack enchanting;
+        public final IInventory tableInventory;
+        public ItemEnchantedEvent(EntityPlayer player, ItemStack enchanting, IInventory tableInventory)
+        {
+            super(player);
+            this.enchanting = enchanting;
+            this.tableInventory = tableInventory;
+        }
+    }
 
     public static class PlayerLoggedInEvent extends PlayerEvent {
         public PlayerLoggedInEvent(EntityPlayer player)
