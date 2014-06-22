@@ -1,6 +1,8 @@
 --- ../src-base/minecraft/net/minecraft/client/gui/GuiButton.java
 +++ ../src-work/minecraft/net/minecraft/client/gui/GuiButton.java
 @@ -23,6 +23,7 @@
+-    protected int width;
++    public int width;
      public boolean field_146125_m;
      protected boolean field_146123_n;
      private static final String __OBFID = "CL_00000668";
