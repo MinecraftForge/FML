@@ -217,7 +217,17 @@ public class CoreModManager {
 
     private static void discoverCoreMods(File mcDir, LaunchClassLoader classLoader)
     {
-        FMLRelaunchLog.fine("Discovering coremods");
+        FMLRelaunchLog.fine("Discovering coremods from classpath");
+        for (URL url : classLoader.getSources())
+        {
+            File coreMod = new File(url.getFile());
+            if (coreMod.isDirectory())
+                continue;
+            
+            checkAndLoadCoremod(coreMod, classLoader, false, false);
+        }
+        
+        FMLRelaunchLog.fine("Discovering coremods from mods folder");
         File coreMods = setupCoreModDir(mcDir);
         FilenameFilter ff = new FilenameFilter() {
             @Override
@@ -238,79 +248,95 @@ public class CoreModManager {
 
         for (File coreMod : coreModList)
         {
-            FMLRelaunchLog.fine("Examining for coremod candidacy %s", coreMod.getName());
-            JarFile jar = null;
-            Attributes mfAttributes;
-            try
-            {
-                jar = new JarFile(coreMod);
-                if (jar.getManifest() == null)
-                {
-                    // Not a coremod
-                    continue;
-                }
-                mfAttributes = jar.getManifest().getMainAttributes();
-            }
-            catch (IOException ioe)
-            {
-                FMLRelaunchLog.log(Level.ERROR, ioe, "Unable to read the jar file %s - ignoring", coreMod.getName());
-                continue;
-            }
-            finally
-            {
-                if (jar != null)
-                {
-                    try
-                    {
-                        jar.close();
-                    }
-                    catch (IOException e)
-                    {
-                        // Noise
-                    }
-                }
-            }
-            String cascadedTweaker = mfAttributes.getValue("TweakClass");
-            if (cascadedTweaker != null)
-            {
-                FMLRelaunchLog.info("Loading tweaker %s from %s", cascadedTweaker, coreMod.getName());
-                Integer sortOrder = Ints.tryParse(Strings.nullToEmpty(mfAttributes.getValue("TweakOrder")));
-                sortOrder = (sortOrder == null ? Integer.valueOf(0) : sortOrder);
-                handleCascadingTweak(coreMod, jar, cascadedTweaker, classLoader, sortOrder);
-                loadedCoremods.add(coreMod.getName());
-                continue;
-            }
-
-            String fmlCorePlugin = mfAttributes.getValue("FMLCorePlugin");
-            if (fmlCorePlugin == null)
+            checkAndLoadCoremod(coreMod, classLoader, true, true);
+        }
+    }
+    
+    /**
+     * 
+     * @param coreMod File to check
+     * @param classLoader ClassLoader to load into
+     * @param loadTweakers TRUE if tweakers should be searched for and loaded
+     * @param load TRUE if anything should be added to the classpath
+     */
+    private static void checkAndLoadCoremod(File coreMod, LaunchClassLoader classLoader, boolean loadTweakers, boolean load)
+    {
+        FMLRelaunchLog.fine("Examining for coremod candidacy %s", coreMod.getName());
+        JarFile jar = null;
+        Attributes mfAttributes;
+        try
+        {
+            jar = new JarFile(coreMod);
+            if (jar.getManifest() == null)
             {
                 // Not a coremod
-                FMLRelaunchLog.fine("Not found coremod data in %s", coreMod.getName());
-                continue;
+                return;
             }
+            mfAttributes = jar.getManifest().getMainAttributes();
+        }
+        catch (IOException ioe)
+        {
+            FMLRelaunchLog.log(Level.ERROR, ioe, "Unable to read the jar file %s - ignoring", coreMod.getName());
+            return;
+        }
+        finally
+        {
+            if (jar != null)
+            {
+                try
+                {
+                    jar.close();
+                }
+                catch (IOException e)
+                {
+                    // Noise
+                }
+            }
+        }
+        String cascadedTweaker = mfAttributes.getValue("TweakClass");
+        if (cascadedTweaker != null && loadTweakers)
+        {
+            FMLRelaunchLog.info("Loading tweaker %s from %s", cascadedTweaker, coreMod.getName());
+            Integer sortOrder = Ints.tryParse(Strings.nullToEmpty(mfAttributes.getValue("TweakOrder")));
+            sortOrder = (sortOrder == null ? Integer.valueOf(0) : sortOrder);
+            handleCascadingTweak(coreMod, jar, cascadedTweaker, classLoader, sortOrder);
+            loadedCoremods.add(coreMod.getName());
+            return;
+        }
 
-            try
+        String fmlCorePlugin = mfAttributes.getValue("FMLCorePlugin");
+        if (fmlCorePlugin == null)
+        {
+            // Not a coremod
+            FMLRelaunchLog.fine("Not found coremod data in %s", coreMod.getName());
+            return;
+        }
+
+        try
+        {
+            if (load)
             {
                 classLoader.addURL(coreMod.toURI().toURL());
-                if (!mfAttributes.containsKey(COREMODCONTAINSFMLMOD))
-                {
-                    FMLRelaunchLog.finer("Adding %s to the list of known coremods, it will not be examined again", coreMod.getName());
-                    loadedCoremods.add(coreMod.getName());
-                }
-                else
-                {
-                    FMLRelaunchLog.finer("Found FMLCorePluginContainsFMLMod marker in %s, it will be examined later for regular @Mod instances",
-                            coreMod.getName());
-                    reparsedCoremods.add(coreMod.getName());
-                }
             }
-            catch (MalformedURLException e)
+            
+            if (!mfAttributes.containsKey(COREMODCONTAINSFMLMOD))
             {
-                FMLRelaunchLog.log(Level.ERROR, e, "Unable to convert file into a URL. weird");
-                continue;
+                FMLRelaunchLog.finer("Adding %s to the list of known coremods, it will not be examined again", coreMod.getName());
+                loadedCoremods.add(coreMod.getName());
             }
-            loadCoreMod(classLoader, fmlCorePlugin, coreMod);
+            else
+            {
+                FMLRelaunchLog.finer("Found FMLCorePluginContainsFMLMod marker in %s, it will be examined later for regular @Mod instances",
+                        coreMod.getName());
+                reparsedCoremods.add(coreMod.getName());
+            }
         }
+        catch (MalformedURLException e)
+        {
+            FMLRelaunchLog.log(Level.ERROR, e, "Unable to convert file into a URL. weird");
+            return;
+        }
+        loadCoreMod(classLoader, fmlCorePlugin, coreMod);
     }
 
     private static Method ADDURL;
@@ -455,7 +481,6 @@ public class CoreModManager {
         return null;
     }
 
-    @SuppressWarnings("unused")
     private static void sortCoreMods()
     {
         TopologicalSort.DirectedGraph<FMLPluginWrapper> sortGraph = new TopologicalSort.DirectedGraph<FMLPluginWrapper>();
