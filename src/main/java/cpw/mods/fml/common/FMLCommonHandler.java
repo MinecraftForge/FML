@@ -539,6 +539,11 @@ public class FMLCommonHandler
         bus().post(new InputEvent.KeyInputEvent());
     }
 
+    public void fireGuiKeyInput(char character, int key)
+    {
+        bus().post(new InputEvent.GuiKeyInputEvent(character, key));
+    }
+
     public void firePlayerChangedDimensionEvent(EntityPlayer player, int fromDim, int toDim)
     {
         bus().post(new PlayerEvent.PlayerChangedDimensionEvent(player, fromDim, toDim));
