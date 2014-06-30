@@ -123,7 +123,7 @@ public class FMLSanityChecker implements IFMLCallHook
             }
             catch (Throwable e)
             {
-                FMLRelaunchLog.log(Level.ERROR, e, "A critical error occurred trying to read the minecraft jar file");
+                FMLRelaunchLog.log(Level.ERROR, e, "An error occurred trying to read the minecraft jar file");
             }
             finally
             {
@@ -146,25 +146,11 @@ public class FMLSanityChecker implements IFMLCallHook
         }
         if (!goodMC)
         {
-            FMLRelaunchLog.severe("The minecraft jar %s appears to be corrupt! There has been CRITICAL TAMPERING WITH MINECRAFT, it is highly unlikely minecraft will work! STOP NOW, get a clean copy and try again!",codeSource.getLocation().getFile());
-            if (!Boolean.parseBoolean(System.getProperty("fml.ignoreInvalidMinecraftCertificates","false")))
-            {
-                FMLRelaunchLog.severe("For your safety, FML will not launch minecraft. You will need to fetch a clean version of the minecraft jar file");
-                FMLRelaunchLog.severe("Technical information: The class net.minecraft.client.ClientBrandRetriever should have been associated with the minecraft jar file, " +
-                		"and should have returned us a valid, intact minecraft jar location. This did not work. Either you have modified the minecraft jar file (if so " +
-                		"run the forge installer again), or you are using a base editing jar that is changing this class (and likely others too). If you REALLY " +
-                		"want to run minecraft in this configuration, add the flag -Dfml.ignoreInvalidMinecraftCertificates=true to the 'JVM settings' in your launcher profile.");
-                System.exit(1);
-            }
-            else
-            {
-                FMLRelaunchLog.severe("FML has been ordered to ignore the invalid or missing minecraft certificate. This is very likely to cause a problem!");
-                FMLRelaunchLog.severe("Technical information: ClientBrandRetriever was at %s, there were %d certificates for it", codeSource.getLocation(), certCount);
-            }
+            FMLRelaunchLog.warning("Minecraft appears to be missing any signature data. This is not a good thing.");
         }
         if (!goodFML)
         {
-            FMLRelaunchLog.severe("FML appears to be missing any signature data. This is not a good thing");
+            FMLRelaunchLog.warning("FML appears to be missing any signature data. This is not a good thing.");
         }
         return null;
     }
