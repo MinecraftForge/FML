@@ -14,6 +14,7 @@ import net.minecraft.util.ObjectIntIdentityMap;
 import net.minecraft.util.RegistryNamespaced;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.functions.GenericIterableFactory;
@@ -28,6 +29,7 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
     // aliases redirecting legacy names to the actual name, may need recursive application to find the final name.
     // these need to be registry specific, it's possible to only have a loosely linked item for a block which may get renamed by itself.
     private final Map<String, String> aliases = new HashMap<String, String>();
+    private final Map<String, String> forcedAliases = Maps.newHashMap();
 
     FMLControlledNamespacedRegistry(String optionalDefault, int maxIdValue, int minIdValue, Class<I> type, char discriminator)
     {
@@ -424,5 +426,10 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
     public I getDefaultValue()
     {
         return optionalDefaultObject;
+    }
+
+    public void forceAlias(String forName, String alias)
+    {
+
     }
 }

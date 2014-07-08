@@ -35,6 +35,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Joiner.MapJoiner;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Lists;
@@ -52,6 +53,7 @@ import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent.MissingMapping;
 import cpw.mods.fml.common.registry.GameRegistry.Type;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
+import cpw.mods.fml.common.util.WeakValuedLinkedListMultimap;
 
 public class GameData {
     static final int MIN_BLOCK_ID = 0;
@@ -74,6 +76,7 @@ public class GameData {
 
     private static Table<String, String, ItemStack> customItemStacks = HashBasedTable.create();
     private static Map<UniqueIdentifier, ModContainer> customOwners = Maps.newHashMap();
+    private static WeakValuedLinkedListMultimap<Item, ItemStack> itemStacks = new WeakValuedLinkedListMultimap<Item, ItemStack>();
     private static GameData frozen;
 
     // public api
@@ -688,6 +691,25 @@ public class GameData {
         ObjectHolderRegistry.INSTANCE.applyObjectHolders();
     }
 
+    public static void newItemStack(ItemStack is)
+    {
+        if (is.getItem() != null)
+        {
+            itemStacks.put(is.getItem(), is);
+        }
+    }
+
+    public static void resetItemStack(ItemStack is, Item old)
+    {
+        if (old != null)
+        {
+            itemStacks.remove(old, is);
+        }
+        if (is.getItem() != null)
+        {
+            itemStacks.put(is.getItem(), is);
+        }
+    }
     protected static boolean isFrozen(FMLControlledNamespacedRegistry<?> registry)
     {
         return frozen != null && (getMain().iBlockRegistry == registry || getMain().iItemRegistry == registry);
@@ -947,5 +969,13 @@ public class GameData {
         }
 
         FMLLog.fine("Registry consistency check successful");
+    }
+
+    static void setAlias(String alias, String forName, Type type)
+    {
+        if (type == GameRegistry.Type.BLOCK)
+        {
+            getMain().iBlockRegistry.forceAlias(forName, alias);
+        }
     }
 }

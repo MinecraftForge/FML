@@ -1,0 +1,36 @@
+--- ../src-base/minecraft/net/minecraft/item/ItemStack.java
++++ ../src-work/minecraft/net/minecraft/item/ItemStack.java
+@@ -2,6 +2,7 @@
+ 
+ import com.google.common.collect.HashMultimap;
+ import com.google.common.collect.Multimap;
++import cpw.mods.fml.common.registry.GameData;
+ import cpw.mods.fml.relauncher.Side;
+ import cpw.mods.fml.relauncher.SideOnly;
+ import java.text.DecimalFormat;
+@@ -72,6 +73,7 @@
+ 
+     public ItemStack(Item p_i1881_1_, int p_i1881_2_, int p_i1881_3_)
+     {
++        GameData.newItemStack(this);
+         this.field_151002_e = p_i1881_1_;
+         this.field_77994_a = p_i1881_2_;
+         this.field_77991_e = p_i1881_3_;
+@@ -165,6 +167,7 @@
+     public void func_77963_c(NBTTagCompound p_77963_1_)
+     {
+         this.field_151002_e = Item.func_150899_d(p_77963_1_.func_74765_d("id"));
++        GameData.newItemStack(this);
+         this.field_77994_a = p_77963_1_.func_74771_c("Count");
+         this.field_77991_e = p_77963_1_.func_74765_d("Damage");
+ 
+@@ -744,7 +747,9 @@
+ 
+     public void func_150996_a(Item p_150996_1_)
+     {
++        Item old = this.field_151002_e;
+         this.field_151002_e = p_150996_1_;
++        GameData.resetItemStack(this, old);
+     }
+ 
+     public IChatComponent func_151000_E()

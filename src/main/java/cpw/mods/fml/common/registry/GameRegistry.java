@@ -145,9 +145,16 @@ public class GameRegistry
     }
 
 
-    public static void addAlias(String alias, String forName, GameRegistry.Type type)
+    /**
+     * Request an aliasing between two things of the same type
+     * @param alias The thing that will provide the alternative
+     * @param forName The thing we want to replace (alias)
+     * @param type The type of alias
+     * @throws DuplicateAliasException If an alias already exists - this exception must be handled in mod code
+     */
+    public static void addAlias(String alias, String forName, GameRegistry.Type type) throws DuplicateAliasException
     {
-
+        GameData.setAlias(alias, forName, type);
     }
 
     /**
