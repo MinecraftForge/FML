@@ -820,6 +820,11 @@ public class FMLClientHandler implements IFMLSidedHandler
         playClientBlock = new CountDownLatch(1);
     }
 
+    public void connectToRealm()
+    {
+        playClientBlock = new CountDownLatch(1);
+    }
+
     private CountDownLatch playClientBlock;
 
     public void setPlayClient(NetHandlerPlayClient netHandlerPlayClient)
