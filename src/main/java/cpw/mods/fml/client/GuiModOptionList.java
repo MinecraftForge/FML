@@ -1,5 +1,7 @@
 package cpw.mods.fml.client;
 
+import cpw.mods.fml.common.ModContainer;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 
 public class GuiModOptionList extends GuiScrollingList {
@@ -15,20 +17,19 @@ public class GuiModOptionList extends GuiScrollingList {
     @Override
     protected int getSize()
     {
-        return 1;
+        return this.parent.modList.size();
     }
 
     @Override
     protected void elementClicked(int index, boolean doubleClick)
     {
-        // TODO Auto-generated method stub
-
+        this.parent.selectModIndex(index);
     }
 
     @Override
     protected boolean isSelected(int index)
     {
-        return false;
+        return this.parent.selected == index;
     }
 
     @Override
@@ -39,9 +40,11 @@ public class GuiModOptionList extends GuiScrollingList {
     @Override
     protected void drawSlot(int var1, int var2, int var3, int var4, Tessellator var5)
     {
-        this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth("Test 1", listWidth - 10), this.left + 3 , var3 + 2, 0xFF2222);
-        this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth("TEST 2", listWidth - 10), this.left + 3 , var3 + 12, 0xFF2222);
-        this.parent.getFontRenderer().drawString(this.parent.getFontRenderer().trimStringToWidth("DISABLED", listWidth - 10), this.left + 3 , var3 + 22, 0xFF2222);
+        ModContainer mod = this.parent.modList.get(var1);
+        FontRenderer fontRenderer = this.parent.getFontRenderer();
+        fontRenderer.drawString(fontRenderer.trimStringToWidth(mod.getName(), this.listWidth - 10), this.left + 3, var3 + 2, 0xFFFFFF);
+        fontRenderer.drawString(fontRenderer.trimStringToWidth("Mod ID: " + mod.getModId(), this.listWidth - 10), this.left + 3, var3 + 12, 0xCCCCCC);
+        fontRenderer.drawString(fontRenderer.trimStringToWidth("Version: " + mod.getDisplayVersion(), this.listWidth - 10), this.left + 3, var3 + 22, 0xCCCCCC);
     }
 
 }
