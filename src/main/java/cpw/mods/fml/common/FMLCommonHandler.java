@@ -82,8 +82,8 @@ public class FMLCommonHandler
 
     private Class<?> forge;
     private boolean noForge;
-    private List<String> brandings;
-    private List<String> brandingsNoMC;
+    public List<String> brandings;
+    public List<String> brandingsNoMC;
     private List<ICrashCallable> crashCallables = Lists.newArrayList(Loader.instance().getCallableCrashInformation());
     private Set<SaveHandler> handlerSet = Sets.newSetFromMap(new MapMaker().weakKeys().<SaveHandler,Boolean>makeMap());
     private WeakReference<SaveHandler> handlerToCheck;
