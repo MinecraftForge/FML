@@ -31,6 +31,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.SaveHandler;
 import net.minecraft.world.storage.WorldInfo;
@@ -223,7 +224,12 @@ public class FMLCommonHandler
             }
             int tModCount = Loader.instance().getModList().size();
             int aModCount = Loader.instance().getActiveModList().size();
+            int oModCount = Loader.instance().getOutdatedModsCount();
             brd.add(String.format("%d mod%s loaded, %d mod%s active", tModCount, tModCount!=1 ? "s" :"", aModCount, aModCount!=1 ? "s" :"" ));
+            if(oModCount > 0)
+            {
+                brd.add(String.format("%s%d mod%s with available updates", EnumChatFormatting.YELLOW, oModCount, oModCount != 1 ? "s" : ""));
+            }
             brandings = brd.build();
             brandingsNoMC = brandings.subList(1, brandings.size());
         }
@@ -593,5 +599,15 @@ public class FMLCommonHandler
     public boolean shouldAllowPlayerLogins()
     {
         return sidedDelegate.shouldAllowPlayerLogins();
+    }
+
+    public void setModOutdated(Object instance)
+    {
+        if(instance.getClass().isAnnotationPresent(Mod.class))
+        {
+            ModContainer mc = Loader.instance().getIndexedModList().get(instance.getClass().getAnnotation(Mod.class).modid());
+            mc.getMetadata().isOutdated = true;
+            Loader.instance().addOutdatedMod(mc);
+        }
     }
 }

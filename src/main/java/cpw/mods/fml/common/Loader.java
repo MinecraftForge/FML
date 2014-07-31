@@ -153,6 +153,8 @@ public class Loader
     private File forcedModFile;
     private ModDiscoverer discoverer;
 
+    private List<ModContainer> outdatedMods;
+
     public static Loader instance()
     {
         if (instance == null)
@@ -463,6 +465,7 @@ public class Loader
         initializeLoader();
         mods = Lists.newArrayList();
         namedMods = Maps.newHashMap();
+        outdatedMods = Lists.newArrayList();
         modController = new LoadController(this);
         modController.transition(LoaderState.LOADING, false);
         discoverer = identifyMods();
@@ -975,5 +978,15 @@ public class Loader
         {
             FMLLog.log(Level.INFO, e, "An error occurred writing the fml mod states file, your disabled change won't persist");
         }
+    }
+
+    void addOutdatedMod(ModContainer mod)
+    {
+        outdatedMods.add(mod);
+    }
+
+    public int getOutdatedModsCount()
+    {
+        return outdatedMods.size();
     }
 }

@@ -133,7 +133,12 @@ public class GuiModList extends GuiScreen
 
     public int drawLine(String line, int offset, int shifty)
     {
-        this.fontRendererObj.drawString(line, offset, shifty, 0xd7edea);
+        return this.drawLine(line, offset, shifty, 0xd7edea);
+    }
+
+    public int drawLine(String line, int offset, int shifty, int color)
+    {
+        this.fontRendererObj.drawString(line, offset, shifty, color);
         return shifty + 10;
     }
 
@@ -224,6 +229,10 @@ public class GuiModList extends GuiScreen
                 if (rightSide > 20)
                 {
                     this.getFontRenderer().drawSplitString(selectedMod.getMetadata().description, offset, shifty + 10, rightSide, 0xDDDDDD);
+                }
+                if(selectedMod.getMetadata().isOutdated)
+                {
+                    shifty = drawLine("Update Available!", offset, shifty, 0xFFFF55);
                 }
                 Disableable disableable = selectedMod.canBeDisabled();
                 if (disableable == Disableable.RESTART)
