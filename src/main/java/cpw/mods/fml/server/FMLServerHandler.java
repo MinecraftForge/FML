@@ -64,6 +64,8 @@ public class FMLServerHandler implements IFMLSidedHandler
      * The singleton
      */
     private static final FMLServerHandler INSTANCE = new FMLServerHandler();
+    
+    private static final Bridge bridgeInstance = new Bridge();
 
     /**
      * A reference to the server itself
@@ -73,6 +75,7 @@ public class FMLServerHandler implements IFMLSidedHandler
     private FMLServerHandler()
     {
         FMLCommonHandler.instance().beginLoading(this);
+        launchBridgeContainerThread();
     }
     /**
      * Called to start the whole game off from
@@ -80,6 +83,10 @@ public class FMLServerHandler implements IFMLSidedHandler
      *
      * @param minecraftServer
      */
+    private void launchBridgeContainerThread() {
+        BridgeContainerThread bridgeContainerThread = new BridgeContainerThread(bridgeInstance);
+        bridgeContainerThread.start();
+    }
     @Override
     public void beginServerLoading(MinecraftServer minecraftServer)
     {
