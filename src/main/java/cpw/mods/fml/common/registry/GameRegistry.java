@@ -329,8 +329,21 @@ public class GameRegistry
 	 */
 	public static void registerCustomItemStack(String name, ItemStack itemStack)
 	{
-	    GameData.registerCustomItemStack(name, itemStack);
+	    registerCustomItemStack(name, itemStack, null);
 	}
+
+    /**
+     * Manually register a custom item stack with FML for later tracking.
+     * 
+     * @param name The name to register it under
+     * @param itemStack The itemstack to register
+     * @param modId The modId that will own the itemstack name. null defaults to the active modId
+     */
+    public static void registerCustomItemStack(String name, ItemStack itemStack, String modId)
+    {
+        GameData.registerCustomItemStack(name, itemStack, modId);
+    }
+
 	/**
 	 * Lookup an itemstack based on mod and name. It will create "default" itemstacks from blocks and items if no
 	 * explicit itemstack is found.

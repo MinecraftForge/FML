@@ -197,7 +197,16 @@ public class GameData {
 
     static void registerCustomItemStack(String name, ItemStack itemStack)
     {
-        customItemStacks.put(Loader.instance().activeModContainer().getModId(), name, itemStack);
+        registerCustomItemStack(name, itemStack, null);
+    }
+
+    static void registerCustomItemStack(String name, ItemStack itemStack, String modId)
+    {
+        if (modId == null)
+        {
+            modId = Loader.instance().activeModContainer().getModId();
+        }
+        customItemStacks.put(modId, name, itemStack);
     }
 
     static UniqueIdentifier getUniqueName(Block block)
