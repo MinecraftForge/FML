@@ -1,5 +1,6 @@
 package cpw.mods.fml.common.gameevent;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
@@ -62,6 +63,15 @@ public class TickEvent extends Event {
         {
             super(Type.RENDER, Side.CLIENT, phase);
             this.renderTickTime = renderTickTime;
+        }
+    }
+    
+    public static class EntityTickEvent extends TickEvent {
+        public final Entity entity;
+        public EntityTickEvent(Phase phase, Entity entity)
+        {
+            super(Type.SERVER, Side.SERVER, phase);
+            this.entity = entity;
         }
     }
 }
