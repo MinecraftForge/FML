@@ -1,0 +1,10 @@
+--- ../src-base/minecraft/net/minecraft/entity/Entity.java
++++ ../src-work/minecraft/net/minecraft/entity/Entity.java
+@@ -292,3 +292,4 @@
+     public void func_70030_z()
+     {
++        cpw.mods.fml.common.FMLCommonHandler.instance().onEntityPreTick(this);
+         this.field_70170_p.field_72984_F.func_76320_a("entityBaseTick");
+@@ -419,1 +419,2 @@
+         this.field_70170_p.field_72984_F.func_76319_b();
++        cpw.mods.fml.common.FMLCommonHandler.instance().onEntityPostTick(this);

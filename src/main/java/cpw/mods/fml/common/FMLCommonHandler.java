@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -338,6 +339,16 @@ public class FMLCommonHandler
     public void onRenderTickEnd(float timer)
     {
         bus().post(new TickEvent.RenderTickEvent(Phase.END, timer));
+    }
+    
+    public void onEntityPreTick(Entity entity)
+    {
+        bus().post(new TickEvent.EntityTickEvent(Phase.START, entity));
+    }
+    
+    public void onEntityPostTick(Entity entity)
+    {
+        bus().post(new TickEvent.EntityTickEvent(Phase.END, entity));
     }
 
     public void onPlayerPreTick(EntityPlayer player)
