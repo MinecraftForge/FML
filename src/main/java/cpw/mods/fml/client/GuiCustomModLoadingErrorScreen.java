@@ -22,12 +22,13 @@ public class GuiCustomModLoadingErrorScreen extends GuiErrorScreen
         super(null,null);
         this.customException = customException;
     }
+
     @Override
     public void initGui()
     {
-        super.initGui();
         this.customException.initGui(this, fontRendererObj);
     }
+
     @Override
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {

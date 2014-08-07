@@ -24,11 +24,10 @@ public class GuiWrongMinecraft extends GuiErrorScreen
         super(null,null);
         this.wrongMC = wrongMC;
     }
+
     @Override
-    public void initGui()
-    {
-        super.initGui();
-    }
+    public void initGui() {}
+
     @Override
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
