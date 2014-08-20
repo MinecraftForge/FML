@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -533,7 +534,10 @@ public class CoreModManager {
     {
         @SuppressWarnings("unchecked")
         List<ITweaker> tweakers = (List<ITweaker>) Launch.blackboard.get("Tweaks");
-        Collections.sort(tweakers, new Comparator<ITweaker>() {
+
+        // We're not using Collections.sort to avoid CME with Java 8u20 (see issue #501)
+        ITweaker[] tweakersArray = tweakers.toArray(new ITweaker[tweakers.size()]);
+        Arrays.sort(tweakersArray, new Comparator<ITweaker>() {
             @Override
             public int compare(ITweaker o1, ITweaker o2)
             {
@@ -576,6 +580,12 @@ public class CoreModManager {
                 return Ints.saturatedCast((long)first - (long)second);
             }
         });
+
+        ListIterator<ITweaker> it = tweakers.listIterator();
+        for (ITweaker tweaker : tweakersArray) {
+            it.next();
+            it.set(tweaker);
+        }
     }
 
     public static List<String> getAccessTransformers()
