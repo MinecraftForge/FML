@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import net.minecraft.command.ServerCommandManager;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.item.EntityItem;
@@ -312,6 +313,8 @@ public class FMLCommonHandler
     {
         FMLServerHandler.instance();
         sidedDelegate.beginServerLoading(dedicatedServer);
+        ServerCommandManager sch = (ServerCommandManager) dedicatedServer.getCommandManager();
+        sch.delayInit();
     }
 
     public void onServerStarted()

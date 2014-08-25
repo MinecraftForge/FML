@@ -1,0 +1,20 @@
+--- ../src-base/minecraft/net/minecraft/command/ServerCommandManager.java
++++ ../src-work/minecraft/net/minecraft/command/ServerCommandManager.java
+@@ -39,7 +39,7 @@
+ {
+     private static final String __OBFID = "CL_00000922";
+ 
+-    public ServerCommandManager()
++    public void delayInit()
+     {
+         this.func_71560_a(new CommandTime());
+         this.func_71560_a(new CommandGameMode());
+@@ -96,6 +96,8 @@
+         {
+             this.func_71560_a(new CommandPublishLocalServer());
+         }
++    }
++    public ServerCommandManager(){
+ 
+         CommandBase.func_71529_a(this);
+     }
