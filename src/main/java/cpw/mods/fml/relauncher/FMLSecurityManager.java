@@ -10,6 +10,14 @@ import java.security.Permission;
  *
  */
 public class FMLSecurityManager extends SecurityManager {
+
+    private SecurityManager delegate;
+
+    public FMLSecurityManager(SecurityManager delegate)
+    {
+        this.delegate=delegate;
+    }
+
     @Override
     public void checkPermission(Permission perm)
     {
@@ -28,6 +36,10 @@ public class FMLSecurityManager extends SecurityManager {
         else if ("setSecurityManager".equals(permName))
         {
             throw new SecurityException("Cannot replace the FML security manager");
+        }
+        else if (delegate != null)
+        {
+            delegate.checkPermission(perm);
         }
         return;
     }
