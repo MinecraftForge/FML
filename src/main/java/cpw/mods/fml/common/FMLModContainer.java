@@ -351,6 +351,51 @@ public class FMLModContainer implements ModContainer
                 return mc.getMetadata();
             }
         });
+        for (ASMData targets : annotations.get(BukkitPluginRef.class.getName()))
+        {
+            Class<?> clz = modInstance.getClass();
+            Field f = null;
+            boolean isStatic = false;
+            try
+            {
+                f = clz.getDeclaredField(targets.getObjectName());
+                f.setAccessible(true);
+                isStatic = Modifier.isStatic(f.getModifiers());
+            }
+            catch (Exception e)
+            {
+                Throwables.propagateIfPossible(e);
+                FMLLog.log(getModId(), Level.ERROR, e, "Failed to access field %s for auto-populating in class %s", targets.getAnnotationName(), targets.getClassName());
+            }
+            if (f != null)
+            {
+                Class<?> fieldType = f.getType();
+                if (!fieldType.isAssignableFrom(BukkitPluginWrapper.class))
+                {
+                    FMLLog.log(getModId(), Level.WARN, "Field %s in class %s was annotated with @%s but was not of type BukkitPluginWrapper", targets.getAnnotationName(), targets.getClassName(), BukkitPluginRef.class.getSimpleName());
+                    continue;
+                }
+                Object target = isStatic ? null : modInstance;
+
+                // A wrapper that always contains nothing
+                BukkitPluginWrapper wrapper = new BukkitPluginWrapper()
+                {
+                    @Override
+                    public boolean initialized()
+                    {
+                        return true;
+                    }
+
+                    @Override
+                    public Object get()
+                    {
+                        return null;
+                    }
+                };
+
+                f.set(target, wrapper);
+            }
+        }
     }
 
     private void parseSimpleFieldAnnotation(SetMultimap<String, ASMData> annotations, String annotationClassName, Function<ModContainer, Object> retreiver) throws IllegalAccessException
