@@ -149,6 +149,7 @@ public class Loader
 
     private static File minecraftDir;
     private static List<String> injectedContainers;
+    private List<String> blacklist;
     private ImmutableMap<String, String> fmlBrandingProperties;
     private File forcedModFile;
     private ModDiscoverer discoverer;
@@ -187,6 +188,12 @@ public class Loader
 
         minecraft = new MinecraftDummyContainer(MC_VERSION);
         mcp = new MCPDummyContainer(MetadataCollection.from(getClass().getResourceAsStream("/mcpmod.info"), "MCP").getMetadataForId("mcp", null));
+        blacklist = new ArrayList();
+        blacklist.add("gregtech");
+        blacklist.add("reika");
+        blacklist.add("redpower");
+        blacklist.add("micdoodle8");
+        blacklist.add("machinemuse");
     }
 
     /**
@@ -346,9 +353,31 @@ public class Loader
 
         mods.addAll(discoverer.identifyMods());
         identifyDuplicates(mods);
+        removeBlockedMods(mods);
         namedMods = Maps.uniqueIndex(mods, new ModIdFunction());
         FMLLog.info("Forge Mod Loader has identified %d mod%s to load", mods.size(), mods.size() != 1 ? "s" : "");
         return discoverer;
+    }
+    
+    private void removeBlockedMods(List<ModContainer> mods)
+    {
+        Iterator<ModContainer> iterator = mods.iterator();
+        while (iterator.hasNext())
+        {
+            ModContainer mc = iterator.next();
+            if (mc instanceof FMLModContainer)
+            {
+                Class clazz = ((FMLModContainer).getMod()).getClass();
+                for (String entry : blacklist)
+                {
+                    if (clazz.getName().toLowerCase().contains(entry)
+                    {
+                        iterator.remove();
+                        FMLLog.info("Removing a blocked mod %s", mc.getModId());
+                    }
+                }
+            }
+        }
     }
 
     private class ModIdComparator implements Comparator<ModContainer>
