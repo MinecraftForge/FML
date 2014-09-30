@@ -15,7 +15,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 public class SimpleChannelHandlerWrapper<REQ extends IMessage, REPLY extends IMessage> extends SimpleChannelInboundHandler<REQ> {
-    private final IMessageHandler<? super REQ, ? extends REPLY> messageHandler;
+    final IMessageHandler<? super REQ, ? extends REPLY> messageHandler;
     private final Side side;
     
     public SimpleChannelHandlerWrapper(Class<? extends IMessageHandler<? super REQ, ? extends REPLY>> handler, Side side, Class<REQ> requestType)
