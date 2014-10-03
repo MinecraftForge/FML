@@ -23,6 +23,7 @@ import cpw.mods.fml.common.event.FMLFingerprintViolationEvent;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCEvent;
+import cpw.mods.fml.common.event.FMLModDisabledEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
@@ -156,7 +157,7 @@ public @interface Mod
 
     /**
      * If your mod doesn't have a runtime persistent effect on the state of the game, and can be disabled without side effects
-     * (minimap mods, graphical tweak mods) then you can set true here and receive the FMLDeactivationEvent to perform deactivation
+     * (minimap mods, graphical tweak mods) then you can set true here and receive the {@link FMLModDisabledEvent} to perform deactivation
      * tasks.
      * This does not affect administrative disabling through the system property fml.modStates or the config file fmlModState.properties.
      * The mod will only be deactivated outside of a running game world - FML will never allow mod deactivation whilst a game server
@@ -232,6 +233,8 @@ public @interface Mod
      * <ul>
      * <li> {@link FMLFingerprintViolationEvent} : Sent just before {@link FMLPreInitializationEvent}
      * if something is wrong with your mod signature</li>
+     * <li> {@link FMLModDisabledEvent} : Sent on mod deactivation if your {@link Mod#canBeDeactivated}, should be used to clean up
+     * resources and unregister event handlers</li>
      * <li> {@link IMCEvent} : Sent just after {@link FMLInitializationEvent} if you have IMC messages waiting
      * from other mods</li>
      * </ul>
