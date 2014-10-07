@@ -8,11 +8,15 @@ public enum EventPriority implements IEventListener
      *   Due to using a ArrayList in the ListenerList,
      *   these need to stay in a contiguous index starting at 0. {Default ordinal}
      */
-    HIGHEST, //First to execute
+    PRE, //First to execute.  Cancellation is not allowed
+    AFTER_PRE, //Cancellation is not allowed
+    HIGHEST, //First standard priority to execute
     HIGH,
     NORMAL,
     LOW,
-    LOWEST //Last to execute
+    LOWEST, //Last standard priority to execute
+    BEFORE_POST, //Cancellation is not allowed
+    POST //Last to execute.  Cancellation is not allowed
 ;
 
     @Override

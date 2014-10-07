@@ -146,6 +146,10 @@ public class EventBus implements IEventExceptionHandler
         return (event.isCancelable() ? event.isCanceled() : false);
     }
 
+    public int getBusID() {
+        return busID;
+    }
+
     @Override
     public void handleException(EventBus bus, Event event, IEventListener[] listeners, int index, Throwable throwable)
     {
