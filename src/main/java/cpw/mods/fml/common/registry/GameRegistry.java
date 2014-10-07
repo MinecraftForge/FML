@@ -45,6 +45,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Primitives;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.IFuelHandler;
@@ -210,14 +211,9 @@ public class GameRegistry
             ItemBlock i = null;
             if (itemclass != null)
             {
-                Class<?>[] ctorArgClasses = new Class<?>[itemCtorArgs.length + 1];
-                ctorArgClasses[0] = Block.class;
-                for (int idx = 1; idx < ctorArgClasses.length; idx++)
-                {
-                    ctorArgClasses[idx] = itemCtorArgs[idx-1].getClass();
-                }
-                Constructor<? extends ItemBlock> itemCtor = itemclass.getConstructor(ctorArgClasses);
-                i = itemCtor.newInstance(ObjectArrays.concat(block, itemCtorArgs));
+                Object[] actualArgs = ObjectArrays.concat(block, itemCtorArgs);
+                Constructor<? extends ItemBlock> itemCtor = findItemBlockCstr(itemclass, actualArgs);
+                i = itemCtor.newInstance(actualArgs);
             }
             // block registration has to happen first
             GameData.getMain().registerBlock(block, name);
@@ -232,6 +228,42 @@ public class GameRegistry
             FMLLog.log(Level.ERROR, e, "Caught an exception during block registration");
             throw new LoaderException(e);
         }
+    }
+    
+    private static Constructor<? extends ItemBlock> findItemBlockCstr(Class<? extends ItemBlock> cls, Object... args)
+    {
+        Constructor<?> found = null;
+        cstrs:
+        for (Constructor<?> cstr : cls.getConstructors())
+        {
+            Class<?>[] cstrParams = cstr.getParameterTypes();
+            if (cstrParams.length != args.length) continue;
+            
+            for (int i = 0, len = cstrParams.length; i < len; i++)
+            {
+                Class<?> reqParam = cstrParams[i];
+                Object actualParam = args[i];
+                // null matches everything
+                if (actualParam != null && !extAssignableFrom(reqParam, actualParam.getClass())) continue cstrs;
+            }
+            if (found != null)
+            {
+                throw new IllegalArgumentException("Found multiple matching constructors in ItemBlock class " + cls.getName());
+            }
+            found = cstr;
+        }
+        if (found == null)
+        {
+            throw new IllegalArgumentException("No matching constructor found in ItemBlock class " + cls.getName());
+        }
+        return (Constructor<? extends ItemBlock>) found;
+    }
+    
+    private static boolean extAssignableFrom(Class<?> req, Class<?> actual)
+    {
+        // support primitive->wrapper conversion and vice versa as reflection does autoboxing/unboxing
+        // actual parameter is always boxed, because it comes from an Object[]
+        return Primitives.wrap(req).isAssignableFrom(actual);
     }
 
     public static void addRecipe(ItemStack output, Object... params)
