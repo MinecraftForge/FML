@@ -791,6 +791,18 @@ public class GameData {
         ((RegistryDelegate.Delegate<Block>) block.delegate).setName(name);
         return blockId;
     }
+    
+    void registerBlockStates(Block block)
+    {
+        Iterator iterator1 = block.getBlockState().getValidStates().iterator();
+
+        while (iterator1.hasNext())
+        {
+            IBlockState iblockstate = (IBlockState)iterator1.next();
+            int i = Block.blockRegistry.getIDForObject(block) << 4 | block.getMetaFromState(iblockstate);
+            Block.BLOCK_STATE_IDS.put(iblockstate, i);
+        }
+    }
 
     /**
      * Block the specified id from being reused.

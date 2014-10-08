@@ -217,7 +217,7 @@ public class GameRegistry
                 GameData.getMain().registerItem(i, name);
                 GameData.getBlockItemMap().put(block, i);
             }
-			registerBlockStates(block);
+            GameData.getMain().registerBlockStates(block);
             return block;
         }
         catch (Exception e)
@@ -226,18 +226,6 @@ public class GameRegistry
             throw new LoaderException(e);
         }
     }
-	
-	private static void registerBlockStates(Block block)
-	{
-		Iterator iterator1 = block.getBlockState().getValidStates().iterator();
-
-        while (iterator1.hasNext())
-        {
-            IBlockState iblockstate = (IBlockState)iterator1.next();
-            int i = Block.blockRegistry.getIDForObject(block) << 4 | block.getMetaFromState(iblockstate);
-            Block.BLOCK_STATE_IDS.put(iblockstate, i);
-        }
-	}
 
     public static void addRecipe(ItemStack output, Object... params)
     {
