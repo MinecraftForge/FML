@@ -794,13 +794,11 @@ public class GameData {
     
     void registerBlockStates(Block block)
     {
-        Iterator iterator1 = block.getBlockState().getValidStates().iterator();
-
-        while (iterator1.hasNext())
+        for (Object stateObject : block.getBlockState().getValidStates())
         {
-            IBlockState iblockstate = (IBlockState)iterator1.next();
-            int i = Block.blockRegistry.getIDForObject(block) << 4 | block.getMetaFromState(iblockstate);
-            Block.BLOCK_STATE_IDS.put(iblockstate, i);
+        	IBlockState state = (IBlockState) stateObject;
+            int id = Block.blockRegistry.getIDForObject(block) << 4 | block.getMetaFromState(state);
+            Block.BLOCK_STATE_IDS.put(state, id);
         }
     }
 
