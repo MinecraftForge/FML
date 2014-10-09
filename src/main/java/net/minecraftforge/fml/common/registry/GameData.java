@@ -26,9 +26,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ObjectIntIdentityMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
@@ -384,6 +386,10 @@ public class GameData {
                 }
             }
         }
+
+        // Clear State map for it's ready for us to register below.
+        GameData.BLOCKSTATE_TO_ID.clear();
+
         // process blocks and items in the world, blocks in the first pass, items in the second
         // blocks need to be added first for proper ItemBlock handling
         for (int pass = 0; pass < 2; pass++)
@@ -789,17 +795,13 @@ public class GameData {
 
         useSlot(blockId);
         ((RegistryDelegate.Delegate<Block>) block.delegate).setName(name);
-        return blockId;
-    }
-    
-    void registerBlockStates(Block block)
-    {
-        for (Object stateObject : block.getBlockState().getValidStates())
+
+        for (IBlockState state : ((List<IBlockState>)block.getBlockState().getValidStates()))
         {
-        	IBlockState state = (IBlockState) stateObject;
-            int id = Block.blockRegistry.getIDForObject(block) << 4 | block.getMetaFromState(state);
-            Block.BLOCK_STATE_IDS.put(state, id);
+            GameData.BLOCKSTATE_TO_ID.put(state, blockId << 4 | block.getMetaFromState(state));
         }
+
+        return blockId;
     }
 
     /**
@@ -942,5 +944,22 @@ public class GameData {
     public static Map getBlockItemMap()
     {
         return BLOCK_TO_ITEM;
+    }
+
+    private static ClearableObjectIntIdentityMap BLOCKSTATE_TO_ID = new ClearableObjectIntIdentityMap();
+    //Internal: DO NOT USE, will change without warning.
+    public static ObjectIntIdentityMap getBlockStateIDMap()
+    {
+        return BLOCKSTATE_TO_ID;
+    }
+
+    //Lets us clear the map so we can rebuild it.
+    private static class ClearableObjectIntIdentityMap extends ObjectIntIdentityMap
+    {
+        private void clear()
+        {
+            this.field_148749_a.clear();
+            this.field_148748_b.clear();
+        }
     }
 }

@@ -217,7 +217,6 @@ public class GameRegistry
                 GameData.getMain().registerItem(i, name);
                 GameData.getBlockItemMap().put(block, i);
             }
-            GameData.getMain().registerBlockStates(block);
             return block;
         }
         catch (Exception e)
