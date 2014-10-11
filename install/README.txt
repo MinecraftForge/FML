@@ -14,12 +14,28 @@ Source pack installation information:
 Standalone source installation
 ==============================
 
-To install this source code for development purposes, extract this zip file.
-It ships with a demonstration mod. Run 'gradlew setupDevWorkspace' to create
-a gradle environment primed with FML. Run 'gradlew eclipse' or 'gradlew idea' to
-create an IDE workspace of your choice.
-Refer to ForgeGradle for more information about the gradle environment
-Note: On macs or linux you run the './gradlew.sh' instead of 'gradlew'
+Step 1: Open your command-line and browse to the folder where you extracted the zip file.
+
+Step 2: Once you have a command window up in the folder that the downloaded material was placed, type:
+
+Windows: "gradlew setupDecompWorkspace --refresh-dependencies"
+
+Linux/Mac OS: "./gradlew setupDecompWorkspace --refresh-dependencies"
+
+Step 3: After all that finished, you're left with a choice.
+For eclipse, run "gradlew eclipse" (./gradlew eclipse if you are on Mac/Linux)
+
+If you preffer to use IntelliJ, steps are a little different.
+1. Open IDEA, and import project.
+2. Select your build.gradle file and have it import.
+3. Once it's finished you must close IntelliJ and run the following command:
+
+"gradlew genIntellijRuns" (./gradlew genIntellijRuns if you are on Mac/Linux)
+
+Step 4: The final step is to open Eclipse and switch your workspace to /eclipse/ (if you use IDEA, it should automatically start on your project)
+
+
+Refer to #ForgeGradle on EsperNet for more information about the gradle environment.
 
 Forge source installation
 =========================
