@@ -102,6 +102,8 @@ public class FMLControlledNamespacedRegistry<I> extends RegistryNamespaced {
         {
             addObjectRaw(registry.getId(thing), registry.getNameForObject(thing), thing);
         }
+        activeSubstitutions.clear();
+        activeSubstitutions.putAll(registry.activeSubstitutions);
     }
 
     // public api
