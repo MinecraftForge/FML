@@ -1,0 +1,11 @@
+--- ../src-base/minecraft/net/minecraft/client/renderer/BlockRendererDispatcher.java
++++ ../src-work/minecraft/net/minecraft/client/renderer/BlockRendererDispatcher.java
+@@ -76,7 +76,7 @@
+                         IBakedModel ibakedmodel = this.func_175022_a(p_175018_1_, p_175018_3_, p_175018_2_);
+                         return this.field_175027_c.func_178259_a(p_175018_3_, ibakedmodel, p_175018_1_, p_175018_2_, p_175018_4_);
+                     default:
+-                        return false;
++                        return net.minecraftforge.fml.client.registry.RenderingRegistry.renderWorldBlock(p_175018_1_, p_175018_2_, p_175018_3_, p_175018_4_, i);
+                 }
+             }
+         }
