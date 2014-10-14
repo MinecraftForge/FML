@@ -16,11 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 import com.google.common.collect.Lists;
@@ -37,6 +40,8 @@ public class RenderingRegistry
 
     private List<EntityRendererInfo> entityRenderers = Lists.newArrayList();
 
+    private Map<Integer, IBlockRenderer> blockRendererMap = Maps.newHashMap();
+    
     /**
      * Register an entity rendering handler. This will, after mod initialization, be inserted into the main
      * render map for entities
@@ -49,6 +54,16 @@ public class RenderingRegistry
         instance().entityRenderers.add(new EntityRendererInfo(entityClass, renderer));
     }
 
+    public static void registerBlockRenderer(IBlockRenderer blockRenderer)
+    {
+        instance().blockRendererMap.put(blockRenderer.getRenderID(), blockRenderer);
+    }
+    
+    public static void registerBlockRenderer(IBlockRenderer blockRenderer, int renderId)
+    {
+        instance().blockRendererMap.put(renderId, blockRenderer);
+    }
+    
     @Deprecated public static RenderingRegistry instance()
     {
         return INSTANCE;
@@ -65,6 +80,12 @@ public class RenderingRegistry
         private Render renderer;
     }
 
+    public static boolean renderWorldBlock(IBlockState blockState, BlockPos blockPos, IBlockAccess blockAccess, WorldRenderer worldRenderer, int modelId)
+    {
+        IBlockRenderer blockRenderer = instance().blockRendererMap.get(modelId);
+        return blockRenderer == null ? false : blockRenderer.renderWorldBlock(blockState, blockPos, blockAccess, worldRenderer, modelId);
+    }
+    
     /*
     public void loadEntityRenderers(Map<Class<? extends Entity>, Render> rendererMap)
     {
