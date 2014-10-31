@@ -1,7 +1,7 @@
 --- ../src-base/minecraft/net/minecraft/server/gui/MinecraftServerGui.java
 +++ ../src-work/minecraft/net/minecraft/server/gui/MinecraftServerGui.java
 @@ -79,6 +79,7 @@
-                 System.exit(0);
+                 FMLCommonHandler.instance().exitJava(0, false);
              }
          });
 +        minecraftservergui.latch.countDown();
