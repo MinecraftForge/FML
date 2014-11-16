@@ -83,8 +83,8 @@ import cpw.mods.fml.relauncher.Side;
  *
  */
 public class SimpleNetworkWrapper {
-    private EnumMap<Side, FMLEmbeddedChannel> channels;
     private SimpleIndexedCodec packetCodec;
+    private EnumMap<Side, FMLEmbeddedChannel> channels;
 
     public SimpleNetworkWrapper(String channelName)
     {
