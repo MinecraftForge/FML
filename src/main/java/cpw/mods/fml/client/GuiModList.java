@@ -50,7 +50,7 @@ import cpw.mods.fml.common.ModContainer.Disableable;
 public class GuiModList extends GuiScreen
 {
     private GuiScreen mainMenu;
-    private GuiSlotModList modList;
+    private cpw.mods.fml.client.GuiSlotModList modList;
     private int selected = -1;
     private ModContainer selectedMod;
     private int listWidth;
@@ -67,7 +67,7 @@ public class GuiModList extends GuiScreen
     {
         this.mainMenu=mainMenu;
         this.mods=new ArrayList<ModContainer>();
-        FMLClientHandler.instance().addSpecialModEntries(mods);
+        cpw.mods.fml.client.FMLClientHandler.instance().addSpecialModEntries(mods);
         for (ModContainer mod : Loader.instance().getModList()) {
             if (mod.getMetadata()!=null && mod.getMetadata().parentMod==null && !Strings.isNullOrEmpty(mod.getMetadata().parent)) {
                 String parentMod = mod.getMetadata().parent;
@@ -101,7 +101,7 @@ public class GuiModList extends GuiScreen
         disableModButton = new GuiButton(21, 10, this.height - 38, this.listWidth, 20, "Disable");
         this.buttonList.add(configModButton);
         this.buttonList.add(disableModButton);
-        this.modList=new GuiSlotModList(this, mods, listWidth);
+        this.modList=new cpw.mods.fml.client.GuiSlotModList(this, mods, listWidth);
         this.modList.registerScrollButtons(this.buttonList, 7, 8);
     }
 
@@ -118,7 +118,16 @@ public class GuiModList extends GuiScreen
                     try
                     {
                         IModGuiFactory guiFactory = FMLClientHandler.instance().getGuiFactoryFor(selectedMod);
-                        GuiScreen newScreen = guiFactory.getMainConfigGui();
+                        Object screenObj = guiFactory.getMainConfigGui();
+						GuiScreen newScreen = null;
+						
+						if (screenObj instanceof GuiScreen) 
+							newScreen = (GuiScreen) screenObj;
+						else if (screenObj instanceof Class && GuiScreen.class.isAssignableFrom((Class<?>) screenObj))
+							newScreen = ((Class<? extends GuiScreen>)screenObj).getConstructor(GuiScreen.class).newInstance(this);
+						else
+							throw new IllegalStateException("Invalid type for getMainConfigGui");
+							
                         this.mc.displayGuiScreen(newScreen);
                     }
                     catch (Exception e)
@@ -156,7 +165,7 @@ public class GuiModList extends GuiScreen
                 {
                     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                     TextureManager tm = mc.getTextureManager();
-                    IResourcePack pack = FMLClientHandler.instance().getResourcePackFor(selectedMod.getModId());
+                    IResourcePack pack = cpw.mods.fml.client.FMLClientHandler.instance().getResourcePackFor(selectedMod.getModId());
                     try
                     {
                         if (cachedLogo == null)
@@ -244,7 +253,7 @@ public class GuiModList extends GuiScreen
                     disableModButton.visible = true;
                     disableModButton.enabled = false;
                 }
-                IModGuiFactory guiFactory = FMLClientHandler.instance().getGuiFactoryFor(selectedMod);
+                cpw.mods.fml.client.IModGuiFactory guiFactory = cpw.mods.fml.client.FMLClientHandler.instance().getGuiFactoryFor(selectedMod);
                 if (guiFactory == null || guiFactory.getMainConfigGui() == null)
                 {
                     configModButton.visible = true;
