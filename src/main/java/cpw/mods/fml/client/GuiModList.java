@@ -118,7 +118,7 @@ public class GuiModList extends GuiScreen
                     try
                     {
                         IModGuiFactory guiFactory = FMLClientHandler.instance().getGuiFactoryFor(selectedMod);
-                        GuiScreen newScreen = guiFactory.mainConfigGuiClass().getConstructor(GuiScreen.class).newInstance(this);
+                        GuiScreen newScreen = guiFactory.getMainConfigGui();
                         this.mc.displayGuiScreen(newScreen);
                     }
                     catch (Exception e)
@@ -245,7 +245,7 @@ public class GuiModList extends GuiScreen
                     disableModButton.enabled = false;
                 }
                 IModGuiFactory guiFactory = FMLClientHandler.instance().getGuiFactoryFor(selectedMod);
-                if (guiFactory == null || guiFactory.mainConfigGuiClass() == null)
+                if (guiFactory == null || guiFactory.getMainConfigGui() == null)
                 {
                     configModButton.visible = true;
                     configModButton.enabled = false;

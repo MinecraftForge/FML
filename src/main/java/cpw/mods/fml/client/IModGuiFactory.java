@@ -14,10 +14,9 @@ public interface IModGuiFactory {
      */
     public void initialize(Minecraft minecraftInstance);
     /**
-     * Return the name of a class extending {@link GuiScreen}. This class will
-     * be instantiated when the "config" button is pressed in the mod list. It will
-     * have a single argument constructor - the "parent" screen, the same as all
-     * Minecraft GUIs. The expected behaviour is that this screen will replace the
+     * Return a new GuiScreen Instance {@link GuiScreen}. This instance is passed
+	 * When the 'config' button is pressed in the GuiModList. 
+	 * The expected behaviour is that this screen will replace the
      * "mod list" screen completely, and will return to the mod list screen through
      * the parent link, once the appropriate action is taken from the config screen.
      *
@@ -31,10 +30,9 @@ public interface IModGuiFactory {
      * desired behaviours that affect server state. Costs, mod game modes, stuff like that
      * can be changed here.
      *
-     * @return A class that will be instantiated on clicks on the config button
-     *  or null if no GUI is desired.
+     * @return A new GuiScreen for when the 'config' button is pressed on the GuiModList
      */
-    public Class<? extends GuiScreen> mainConfigGuiClass();
+    public GuiScreen getMainConfigGui();
 
 
     /**
