@@ -157,7 +157,7 @@ public class FMLClientHandler implements IFMLSidedHandler
 
     private Map<String, IResourcePack> resourcePackMap;
 
-    private BiMap<ModContainer, IModGuiFactory> guiFactories;
+    private BiMap<ModContainer, IModGuiFactory> guiFactories = HashBiMap.create();
 
     private Map<ServerStatusResponse,JsonObject> extraServerListData;
     private Map<ServerData, ExtendedServerListData> serverDataTag;
@@ -302,11 +302,10 @@ public class FMLClientHandler implements IFMLSidedHandler
         // Reload resources
         client.refreshResources();
         RenderingRegistry.instance().loadEntityRenderers((Map<Class<? extends Entity>, Render>)RenderManager.instance.entityRenderMap);
-        guiFactories = HashBiMap.create();
         for (ModContainer mc : Loader.instance().getActiveModList())
         {
             String className = mc.getGuiClassName();
-            if (Strings.isNullOrEmpty(className))
+            if (Strings.isNullOrEmpty(className) || guiFactories.containsKey(mc))
             {
                 continue;
             }
@@ -324,6 +323,14 @@ public class FMLClientHandler implements IFMLSidedHandler
         }
         loading = false;
         client.gameSettings.loadOptions(); //Reload options to load any mod added keybindings.
+    }
+    
+    /**
+     *  This method assumes that all necessary initialization has taken place.
+     */
+    public void registerCustomGuiFactory(ModContainer modContainer, IModGuiFactory guiFactory) {
+        if(!guiFactories.containsKey(modContainer))
+            guiFactories.put(modContainer, guiFactory);
     }
 
     @SuppressWarnings("unused")
