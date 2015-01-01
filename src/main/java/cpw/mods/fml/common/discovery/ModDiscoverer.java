@@ -32,7 +32,7 @@ import cpw.mods.fml.relauncher.ModListHelper;
 
 public class ModDiscoverer
 {
-    private static Pattern zipJar = Pattern.compile("(.+)\\.(zip|jar)$",Pattern.CASE_INSENSITIVE);
+    private static Pattern zipJar = Pattern.compile("(.+)\\.(zip|jar)$");
 
     private List<ModCandidate> candidates = Lists.newArrayList();
 
