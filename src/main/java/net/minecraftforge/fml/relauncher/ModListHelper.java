@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.minecraft.launchwrapper.Launch;
+
 import org.apache.logging.log4j.Level;
+
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -119,10 +122,14 @@ public class ModListHelper {
         {
             FMLRelaunchLog.info("Failed to find mod file %s (%s)", descriptor, modFile.getAbsolutePath());
         }
-        else
+        else if (modFile.getName().endsWith(".jar"))
         {
             FMLRelaunchLog.fine("Adding %s (%s) to the mod list", descriptor, modFile.getAbsolutePath());
             additionalMods.put(descriptor, modFile);
+        }
+        else
+        {
+            FMLRelaunchLog.info("Ignoring non mod jar %s (%s)", descriptor, modFile.getAbsolutePath());
         }
     }
 }
