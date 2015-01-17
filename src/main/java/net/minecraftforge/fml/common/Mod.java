@@ -74,11 +74,11 @@ public @interface Mod
     /**
      * A user friendly name for the mod
      */
-    String name() default "";
+    String name();
     /**
      * A version string for this mod
      */
-    String version() default "";
+    String version() default "unknown";
     /**
      * A simple dependency string for this mod (see modloader's "priorities" string specification)
      */
