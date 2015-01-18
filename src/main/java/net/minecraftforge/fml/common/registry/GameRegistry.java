@@ -47,6 +47,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.Level;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -168,7 +169,7 @@ public class GameRegistry
      */
     public static Block registerBlock(Block block, String name)
     {
-        return registerBlock(block, ItemBlock.class, name);
+        return registerBlock(block, new ItemBlock(block), name);
     }
 
     /**
@@ -183,7 +184,7 @@ public class GameRegistry
     }
 
     /**
-     * Register a block with the world, with the specified item class, block name and owning modId
+     * Register a block with the world, with the specified item class, block name and item-constructor arguments
      * @param block The block to register
      * @param itemclass The item type to register with it : null registers a block without associated item.
      * @param name The mod-unique name to register it as, will get prefixed by your modid.
@@ -191,13 +192,8 @@ public class GameRegistry
      */
     public static Block registerBlock(Block block, Class<? extends ItemBlock> itemclass, String name, Object... itemCtorArgs)
     {
-        if (Loader.instance().isInState(LoaderState.CONSTRUCTING))
-        {
-            FMLLog.warning("The mod %s is attempting to register a block whilst it it being constructed. This is bad modding practice - please use a proper mod lifecycle event.", Loader.instance().activeModContainer());
-        }
         try
         {
-            assert block != null : "registerBlock: block cannot be null";
             ItemBlock i = null;
             if (itemclass != null)
             {
@@ -210,12 +206,39 @@ public class GameRegistry
                 Constructor<? extends ItemBlock> itemCtor = itemclass.getConstructor(ctorArgClasses);
                 i = itemCtor.newInstance(ObjectArrays.concat(block, itemCtorArgs));
             }
+            return registerBlock(block, i, name);
+        }
+        catch (Exception e)
+        {
+            FMLLog.log(Level.ERROR, e, "Caught an exception during block registration");
+            throw new LoaderException(e);
+        }
+    }
+    
+    /**
+     * Register a block with the world, with the specified item and block name. <br />
+     * This method will register both the block and the item
+     * @param block The block to register
+     * @param item The item to register with it : null registers a block without associated item.
+     * @param name The mod-unique name to register it as, will get prefixed by your modid.
+     * 
+     */
+    public static Block registerBlock(Block block, ItemBlock item, String name)
+    {
+        if (Loader.instance().isInState(LoaderState.CONSTRUCTING))
+        {
+            FMLLog.warning("The mod %s is attempting to register a block whilst it it being constructed. This is bad modding practice - please use a proper mod lifecycle event.", Loader.instance().activeModContainer());
+        }
+        try
+        {
+            Preconditions.checkNotNull(block, "block cannot be null");
+            
             // block registration has to happen first
             GameData.getMain().registerBlock(block, name);
-            if (i != null)
+            if (item != null)
             {
-                GameData.getMain().registerItem(i, name);
-                GameData.getBlockItemMap().put(block, i);
+                GameData.getMain().registerItem(item, name);
+                GameData.getBlockItemMap().put(block, item);
             }
             return block;
         }
