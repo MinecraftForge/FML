@@ -13,9 +13,9 @@
 package net.minecraftforge.fml.common.discovery;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.LoaderException;
@@ -34,8 +34,6 @@ import com.google.common.collect.ObjectArrays;
 
 public class ModDiscoverer
 {
-    private static Pattern zipJar = Pattern.compile("(.+).(zip|jar)$");
-
     private List<ModCandidate> candidates = Lists.newArrayList();
 
     private ASMDataTable dataTable = new ASMDataTable();
@@ -86,10 +84,20 @@ public class ModDiscoverer
 
     public void findModDirMods(File modsDir)
     {
-        File[] modList = FileListHelper.sortFileList(modsDir, null);
-        modList = FileListHelper.sortFileList(ObjectArrays.concat(modList, ModListHelper.additionalMods.values().toArray(new File[0]), File.class));
+        // find all files ending in .jar in the mods folder
+        File[] modsDirMods = modsDir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname)
+            {
+                return pathname.getName().endsWith(".jar") || pathname.isDirectory();
+            }
+        });
+        
+        File[] additionalMods = ModListHelper.additionalMods.values().toArray(new File[ModListHelper.additionalMods.size()]);
+        
+        File[] sortedModsList = FileListHelper.sortFileList(ObjectArrays.concat(modsDirMods, additionalMods, File.class));
 
-        for (File modFile : modList)
+        for (File modFile : sortedModsList)
         {
             // skip loaded coremods
             if (CoreModManager.getLoadedCoremods().contains(modFile.getName()))
@@ -103,17 +111,8 @@ public class ModDiscoverer
             }
             else
             {
-                Matcher matcher = zipJar.matcher(modFile.getName());
-
-                if (matcher.matches())
-                {
-                    FMLLog.fine("Found a candidate zip or jar file %s", matcher.group(0));
-                    addCandidate(new ModCandidate(modFile, modFile, ContainerType.JAR));
-                }
-                else
-                {
-                    FMLLog.fine("Ignoring unknown file %s in mods directory", modFile.getName());
-                }
+                FMLLog.fine("Found a candidate jar file %s", modFile.getName());
+                addCandidate(new ModCandidate(modFile, modFile, ContainerType.JAR));
             }
         }
     }
