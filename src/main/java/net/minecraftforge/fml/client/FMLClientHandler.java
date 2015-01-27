@@ -594,7 +594,7 @@ public class FMLClientHandler implements IFMLSidedHandler
     @Override
     public String getCurrentLanguage()
     {
-        return client.getLanguageManager().getCurrentLanguage().getLanguageCode();
+        return (client.getLangaugeManager().getCurrentLanguage() == null) ? "en_US" : client.getLanguageManager().getCurrentLanguage().getLanguageCode();
     }
 
     @Override
