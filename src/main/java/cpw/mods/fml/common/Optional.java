@@ -73,4 +73,19 @@ public final class Optional {
          */
         public String modid();
     }
+    
+    /**
+     * Used to remove optional fields
+     * 
+     * @author cpw
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Field {
+        /**
+         * The modid that is required to be present for stripping NOT to occur
+         * @return the modid
+         */
+        public String modid();
+    }
 }

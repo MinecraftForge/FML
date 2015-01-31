@@ -11,6 +11,7 @@ import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -62,6 +63,9 @@ public class ModAPITransformer implements IClassTransformer {
                 if (stripRefs == null) stripRefs = Boolean.FALSE;
                 stripInterface(classNode,(String)optional.getAnnotationInfo().get("iface"), stripRefs);
             }
+            else if(optional.getAnnotationName().endsWith("$Field")){
+                stripField(classNode, (String)optional.getObjectName());
+            }
             else
             {
                 stripMethod(classNode, (String)optional.getObjectName());
@@ -75,6 +79,29 @@ public class ModAPITransformer implements IClassTransformer {
         return writer.toByteArray();
     }
 
+    private void stripField(ClassNode classNode, String fieldDescriptor)
+    {        
+        if(classNode.name.endsWith("$class"))
+        {
+            
+            String subName = classNode.name.substring(0, classNode.name.length() - 6);
+            int pos = fieldDescriptor.indexOf('(') + 1;
+            fieldDescriptor = fieldDescriptor.substring(0, pos) + 'L' + subName + ';' + fieldDescriptor.substring(pos);
+        }
+        for (ListIterator<FieldNode> iterator = classNode.fields.listIterator(); iterator.hasNext();)
+        {
+            FieldNode field = iterator.next();
+            
+            if (fieldDescriptor.startsWith(field.name))
+            {
+                iterator.remove();
+                if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - field %s removed", fieldDescriptor);
+                return;
+            }
+        }
+        if (logDebugInfo) FMLRelaunchLog.finer("Optional removal - field %s NOT removed - not found", fieldDescriptor);
+    }
+    
     private void stripMethod(ClassNode classNode, String methodDescriptor)
     {
         if(classNode.name.endsWith("$class"))
@@ -132,6 +159,8 @@ public class ModAPITransformer implements IClassTransformer {
         addData(interfaces);
         Set<ASMData> methods = dataTable.getAll("cpw.mods.fml.common.Optional$Method");
         addData(methods);
+        Set<ASMData> fields = dataTable.getAll("cpw.mods.fml.common.Optional$Field");
+        addData(fields);
     }
 
     private Set<ASMData> unpackInterfaces(Set<ASMData> packedInterfaces)
