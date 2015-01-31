@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 
+import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -64,6 +65,45 @@ public class CoreModManager {
     private static File mcDir;
     private static List<String> reparsedCoremods = Lists.newArrayList();
     private static List<String> accessTransformers = Lists.newArrayList();
+
+    private static class TransformerException extends RuntimeException
+    {
+        public TransformerException(String message, Throwable cause)
+        {
+            super(message, cause);
+        }
+    }
+
+    private static class TransformerWrapper implements IClassTransformer
+    {
+        private final IClassTransformer parent;
+        private final String coreMod;
+
+        public TransformerWrapper(IClassTransformer parent, String coreMod)
+        {
+            this.parent = parent;
+            this.coreMod = coreMod;
+        }
+
+        public byte[] transform(String name, String transformedName, byte[] basicClass)
+        {
+            try
+            {
+                parent.transform(name, transformedName, basicClass);
+            }
+            catch(Throwable e)
+            {
+                throw new TransformerException("Exception in class transformer" + parent + "from coremod" + coreMod, e);
+            }
+            return null;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "TransformerWrapper(" + parent + ", " + coreMod + ")";
+        }
+    }
 
     private static class FMLPluginWrapper implements ITweaker {
         public final String name;
@@ -608,5 +648,22 @@ public class CoreModManager {
     public static List<String> getAccessTransformers()
     {
         return accessTransformers;
+    }
+
+    public static void onCrash(StringBuilder builder)
+    {
+        if(!loadedCoremods.isEmpty() || !reparsedCoremods.isEmpty())
+        {
+            builder.append("\nWARNING: coremods are present:\n");
+            for(String coreMod : loadedCoremods)
+            {
+                builder.append("  ").append(coreMod).append('\n');
+            }
+            for(String coreMod : reparsedCoremods)
+            {
+                builder.append("  ").append(coreMod).append('\n');
+            }
+            builder.append("Contact their authors BEFORE contacting forge\n\n");
+        }
     }
 }
