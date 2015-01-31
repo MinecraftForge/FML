@@ -58,8 +58,9 @@ public interface IFMLLoadingPlugin
      * Inject coremod data into this coremod
      * This data includes:
      * "mcLocation" : the location of the minecraft directory,
-     * "coremodList" : the list of coremods
+     * "coremodList" : the list of coremods,
      * "coremodLocation" : the file this coremod loaded from,
+     * "runtimeDeobfuscationEnabled" : if runtime deobfuscation is enabled,
      */
     void injectData(Map<String, Object> data);
 
