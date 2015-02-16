@@ -225,6 +225,33 @@ public class GameRegistry
             throw new LoaderException(e);
         }
     }
+    
+    /**
+     * Register the specified item to use the specified .json rendering file(s).
+     * 
+     * @param item The item to register the texture for
+     * @param meta The metadata for the item
+     * @param resourceLocation The location of the .json render files, in the form "modID:itemName"
+     */
+    public static Item registerTexture(Item item, int meta, String resourceLocation)
+    {
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, meta, new ModelResourceLocation(resourceLocation, "inventory");
+        return item;
+    }
+
+    /**
+     * Register the specified block to use the specified .json rendering files.
+     * This is the same as calling registerTexture(Item.getItemFromBlock(block), meta, resourceLocation)
+     *
+     * @param block The block to register the texture for
+     * @param meta The metadata for the block
+     * @param resourceLocation The location of the .json render files, in the form "modID:itemName"
+     */
+    public static Block registerTexture(Block block, int meta, String resourceLocation)
+    {
+        registerTexture(Item.getItemFromBlock(block), meta, resourceLocation);
+        return Block;
+    }
 
     public static void addRecipe(ItemStack output, Object... params)
     {
