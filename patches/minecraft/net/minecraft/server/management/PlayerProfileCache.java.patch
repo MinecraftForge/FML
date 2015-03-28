@@ -1,0 +1,18 @@
+--- ../src-base/minecraft/net/minecraft/server/management/PlayerProfileCache.java
++++ ../src-work/minecraft/net/minecraft/server/management/PlayerProfileCache.java
+@@ -236,6 +236,7 @@
+             {
+                 ;
+             }
++            catch (Exception exception) { this.field_152665_g.delete(); }
+             finally
+             {
+                 IOUtils.closeQuietly(bufferedreader);
+@@ -289,6 +290,7 @@
+         {
+             return;
+         }
++        catch (Exception exception) {}
+         finally
+         {
+             IOUtils.closeQuietly(bufferedwriter);
