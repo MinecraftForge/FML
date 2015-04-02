@@ -5,7 +5,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 
-@Mod(modid = ExampleMod.MODID, version = ExampleMod.VERSION)
+@Mod(modid = ExampleMod.MODID, version = ExampleMod.VERSION, acceptableRemoteVersions = "*")
 public class ExampleMod
 {
     public static final String MODID = "examplemod";
