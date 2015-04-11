@@ -95,7 +95,24 @@ public class FMLModContainer implements ModContainer
         this.candidate = container;
         this.descriptor = modDescriptor;
         this.modLanguage = (String) modDescriptor.get("modLanguage");
-        this.languageAdapter = "scala".equals(modLanguage) ? new ILanguageAdapter.ScalaAdapter() : new ILanguageAdapter.JavaAdapter();
+        if (!modDescriptor.get("modLanguageAdapter").equals(""))
+        {
+            try
+            {
+                this.languageAdapter = (ILanguageAdapter)Class.forName((String)modDescriptor.get("modLanguageAdapter")).newInstance();
+                FMLLog.finer("Using custom adapter %s (for %s)", this.languageAdapter, this.className);
+            }
+            catch (Exception ex)
+            {
+                FMLLog.severe("Error constructing mod container %s: %s", this.className, ex);
+                FMLCommonHandler.instance().exitJava(1, true);
+            }
+        }
+        else
+        {
+            this.languageAdapter = "scala".equals(modLanguage) ? new ILanguageAdapter.ScalaAdapter() : new ILanguageAdapter.JavaAdapter();
+        }
+
         this.eventMethods = ArrayListMultimap.create();
     }
 
