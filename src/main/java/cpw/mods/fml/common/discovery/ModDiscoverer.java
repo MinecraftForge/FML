@@ -82,10 +82,17 @@ public class ModDiscoverer
 
     }
 
-    public void findModDirMods(File modsDir)
+    public void findModDirMods(File... dirs)
     {
-        File[] modList = FileListHelper.sortFileList(modsDir, null);
-        modList = FileListHelper.sortFileList(ObjectArrays.concat(modList, ModListHelper.additionalMods.values().toArray(new File[0]), File.class));
+        List<File> mods = Lists.newArrayList(ModListHelper.additionalMods.values());
+        for (File dir : dirs)
+        {
+            if (dir != null && dir.exists())
+            {
+                mods.addAll(Lists.newArrayList(dir.listFiles()));
+            }
+        }
+        File[] modList = FileListHelper.sortFileList(mods.toArray(new File[0]));
 
         for (File modFile : modList)
         {

@@ -46,6 +46,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Multiset.Entry;
 import com.google.common.collect.Multisets;
+import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
@@ -338,13 +339,14 @@ public class Loader
         FMLLog.fine("Minecraft jar mods loaded successfully");
 
         FMLLog.info("Searching %s for mods", canonicalModsDir.getAbsolutePath());
-        discoverer.findModDirMods(canonicalModsDir);
+        File[] modsDirs = { canonicalModsDir };
         File versionSpecificModsDir = new File(canonicalModsDir,mccversion);
         if (versionSpecificModsDir.isDirectory())
         {
             FMLLog.info("Also searching %s for mods", versionSpecificModsDir);
-            discoverer.findModDirMods(versionSpecificModsDir);
+            modsDirs = ObjectArrays.concat(modsDirs, versionSpecificModsDir);
         }
+        discoverer.findModDirMods(modsDirs);
 
         mods.addAll(discoverer.identifyMods());
         identifyDuplicates(mods);
