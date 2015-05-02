@@ -54,6 +54,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -180,7 +181,7 @@ public class Loader
     private Loader()
     {
         modClassLoader = new ModClassLoader(getClass().getClassLoader());
-        if (!mccversion.equals(MC_VERSION))
+        if (!mccversion.equals(MC_VERSION) && Strings.isNullOrEmpty(System.getProperty("net.minecraftforge.gradle.GradleStart.srg.srg-mcp")))
         {
             FMLLog.severe("This version of FML is built for Minecraft %s, we have detected Minecraft %s in your minecraft jar file", mccversion, MC_VERSION);
             throw new LoaderException(String.format("This version of FML is built for Minecraft %s, we have detected Minecraft %s in your minecraft jar file", mccversion, MC_VERSION));
