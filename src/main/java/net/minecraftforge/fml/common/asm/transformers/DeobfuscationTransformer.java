@@ -31,7 +31,7 @@ public class DeobfuscationTransformer implements IClassTransformer, IClassNameTr
             return null;
         }
         ClassReader classReader = new ClassReader(bytes);
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         RemappingClassAdapter remapAdapter = new FMLRemappingAdapter(classWriter);
         classReader.accept(remapAdapter, ClassReader.EXPAND_FRAMES);
         return classWriter.toByteArray();
