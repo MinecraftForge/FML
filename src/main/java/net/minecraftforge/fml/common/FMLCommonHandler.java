@@ -759,4 +759,9 @@ public class FMLCommonHandler
         props.clear();
         return null;
     }
+
+    public void processWindowMessages()
+    {
+        sidedDelegate.processWindowMessages();
+    }
 }

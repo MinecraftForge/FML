@@ -89,7 +89,9 @@ import net.minecraftforge.fml.common.toposort.ModSortingException;
 import net.minecraftforge.fml.relauncher.Side;
 
 import org.apache.logging.log4j.Level;
+import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -178,6 +180,7 @@ public class FMLClientHandler implements IFMLSidedHandler
     @SuppressWarnings("unchecked")
     public void beginMinecraftLoading(Minecraft minecraft, @SuppressWarnings("rawtypes") List resourcePackList, IReloadableResourceManager resourceManager)
     {
+        SplashProgress.start();
         client = minecraft;
         this.resourcePackList = resourcePackList;
         this.resourceManager = resourceManager;
@@ -327,6 +330,7 @@ public class FMLClientHandler implements IFMLSidedHandler
         }
         loading = false;
         client.gameSettings.loadOptions(); //Reload options to load any mod added keybindings.
+        SplashProgress.finish();
     }
 
     public void extendModList()
@@ -862,5 +866,15 @@ public class FMLClientHandler implements IFMLSidedHandler
             net instanceof INetHandlerPlayServer ||
             net instanceof INetHandlerStatusServer) return getServer();
         throw new RuntimeException("Unknown INetHandler: " + net);
+    }
+
+    @Override
+    public void processWindowMessages()
+    {
+        // workaround for windows requiring messages being processed on the main thread
+        if(LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_WINDOWS)
+        {
+            Display.processMessages();
+        }
     }
 }
