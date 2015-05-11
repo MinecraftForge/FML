@@ -28,6 +28,7 @@ public class BlamingTransformer implements IClassTransformer
     private static final Set<String> naughtyMods = new HashSet<String>();
     private static final Set<String> naughtyClasses = new TreeSet<String>();
     private static final Set<String> orphanNaughtyClasses = new HashSet();
+    private static final float classVersion = Float.parseFloat(System.getProperty("java.class.version"));
 
     @Override
     public byte[] transform(String name, String transformedName, byte[] bytes)
@@ -57,8 +58,8 @@ public class BlamingTransformer implements IClassTransformer
         @Override
         public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
         {
-            if( (version == Opcodes.V1_8 && !SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_1_8)) ||
-                (version == Opcodes.V1_7 && !SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_1_7)) )
+            if( (version == Opcodes.V1_8 && classVersion > 51.0) ||
+                (version == Opcodes.V1_7 && classVersion > 50.0) )
             {
                 if(classMap.containsKey(name)) blame(classMap.get(name), name);
                 else orphanNaughtyClasses.add(name);
