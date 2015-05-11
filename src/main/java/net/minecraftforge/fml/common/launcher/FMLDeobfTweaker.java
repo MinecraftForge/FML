@@ -4,6 +4,8 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import com.google.common.base.Strings;
+
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -21,7 +23,7 @@ public class FMLDeobfTweaker implements ITweaker {
     public void injectIntoClassLoader(LaunchClassLoader classLoader)
     {
         // Deobfuscation transformer, always last, and the access transformer tweaker as well
-        if (!(Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment"))
+        if (!(Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment") || !Strings.isNullOrEmpty(System.getProperty("net.minecraftforge.gradle.GradleStart.srg.srg-mcp")))
         {
             classLoader.registerTransformer("net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer");
         }
