@@ -35,3 +35,17 @@ https://www.youtube.com/watch?v=8VEdtQLuLO0&feature=youtu.be
 
 For more details update more often refer to the Forge Forums:
 http://www.minecraftforge.net/forum/index.php/topic,14048.0.html
+
+
+
+-------------------------------------------
+            Building a new mod
+-------------------------------------------
+To build a mod, place your source files in src/main/java. Any related resources such as
+textures or mcmod.info files should be placed in src/main/resources. Run 'gradlew build'
+to create a new jar. 
+
+An example mod has been provided. You can find any built jars in build/libs. Examine your 
+build.gradle to change mod name, mod ID, etc.
+
+Additional information can be found at https://forgegradle.readthedocs.org/en/latest/
