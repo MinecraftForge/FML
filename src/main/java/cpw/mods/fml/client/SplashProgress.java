@@ -9,6 +9,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.nio.IntBuffer;
 import java.util.Iterator;
@@ -174,7 +177,12 @@ public class SplashProgress
                 return "GL info";
             }
         });
-        CrashReport report = CrashReport.makeCrashReport(new Throwable(), "Loading screen debug info");
+        CrashReport report = CrashReport.makeCrashReport(new Throwable()
+        {
+            @Override public String getMessage(){ return "This is just a prompt for computer specs to be printed."; }
+            @Override public void printStackTrace(final PrintWriter s){ s.println(getMessage()); }
+            @Override public void printStackTrace(final PrintStream s) { s.println(getMessage()); }
+        }, "Loading screen debug info");
         System.out.println(report.getCompleteReport());
 
         try
@@ -270,8 +278,8 @@ public class SplashProgress
 
                     // forge logo
                     setColor(backgroundColor);
-                    float fw = (float)forgeTexture.getWidth() / 2;
-                    float fh = (float)forgeTexture.getHeight() / 2;
+                    float fw = (float)forgeTexture.getWidth() / 2 / 2;
+                    float fh = (float)forgeTexture.getHeight() / 2 / 2;
                     if(rotate)
                     {
                         float sh = Math.max(fw, fh);
@@ -303,7 +311,15 @@ public class SplashProgress
                         clearGL();
                         setGL();
                     }
-                    Display.sync(100);
+                    try
+                    {
+                        Thread.sleep(10);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
                 }
                 clearGL();
             }
