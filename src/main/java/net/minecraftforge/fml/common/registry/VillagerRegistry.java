@@ -116,7 +116,6 @@ public class VillagerRegistry
      * Register your villager id
      * @param id
      */
-    @Deprecated // Doesn't work at all.
     public void registerVillagerId(int id)
     {
         if (newVillagerIds.contains(id))
@@ -133,7 +132,6 @@ public class VillagerRegistry
      * @param villagerSkin
      */
     @SideOnly(Side.CLIENT)
-    @Deprecated // Doesn't work at all.
     public void registerVillagerSkin(int villagerId, ResourceLocation villagerSkin)
     {
         if (newVillagers == null)
@@ -160,7 +158,6 @@ public class VillagerRegistry
      * @param defaultSkin
      */
     @SideOnly(Side.CLIENT)
-    @Deprecated // Doesn't work at all.
     public static ResourceLocation getVillagerSkin(int villagerType, ResourceLocation defaultSkin)
     {
         if (instance().newVillagers != null && instance().newVillagers.containsKey(villagerType))
@@ -175,7 +172,6 @@ public class VillagerRegistry
      *
      * @return newVillagerIds
      */
-    @Deprecated // Doesn't work at all.
     public static Collection<Integer> getRegisteredVillagers()
     {
         return Collections.unmodifiableCollection(instance().newVillagerIds);
@@ -209,6 +205,17 @@ public class VillagerRegistry
     private boolean hasInit = false;
     private FMLControlledNamespacedRegistry<VillagerProfession> professions = GameData.createRegistry("villagerprofessions", VillagerProfession.class, 0, 1024);
 
+    public void addTradingOption(String prof, String career, ITradeList[][] tradeArray)
+    {
+        // TODO if profession does not exist, throw exception
+        
+        (new VillagerCareer(prof, career)).init(tradeArray);
+    }
+    
+    public void addNewProfession(String prof, String texture)
+    {
+        register(new VillagerProfession(prof, texture));
+    }
 
     private void init()
     {
@@ -218,8 +225,12 @@ public class VillagerRegistry
         VillagerProfession prof = new VillagerProfession("minecraft:farmer", "minecraft:textures/entity/villager/farmer.png");
         {
             register(prof, 0);
-            (new VillagerCareer(prof, "farmer"    )).init(VanillaTrades.trades[0][0]);
-            (new VillagerCareer(prof, "fisherman" )).init(VanillaTrades.trades[0][1]);
+            // Examples of using addTradingOption in init() if it works - dvatreknerd314
+            addTradingOption("minecraft:farmer", "farmer", VanillaTrades.trades[0][0]);
+            addTradingOption("minecraft:farmer", "fisherman", VanillaTrades.trades[0][1]);
+            
+            //(new VillagerCareer(prof, "farmer"    )).init(VanillaTrades.trades[0][0]);
+            //(new VillagerCareer(prof, "fisherman" )).init(VanillaTrades.trades[0][1]);
             (new VillagerCareer(prof, "shepherd"  )).init(VanillaTrades.trades[0][2]);
             (new VillagerCareer(prof, "fletcher"  )).init(VanillaTrades.trades[0][3]);
         }
@@ -261,6 +272,20 @@ public class VillagerRegistry
             this.texture = new ResourceLocation(texture);
             ((RegistryDelegate.Delegate<VillagerProfession>)delegate).setName(name);
         }
+        
+        // ===== Changes by dvatreknerd314 =====
+        
+        // The idea behind this is to be able to pass in a triple (or array of triples) to VillagerRegistry
+        // to set the trades for combinations of profession and career.  Could potentially be used to
+        // override vanilla trades
+        //
+        // This returns a static copy of the careers list to get the number of careers and get a career's
+        // trading array
+        public static List<VillagerCareer> getCareers()
+        {
+            return careers;
+        }
+        // ===== End changes by dvatreknerd314 =====
 
         private void register(VillagerCareer career)
         {
@@ -276,15 +301,23 @@ public class VillagerRegistry
         private VillagerProfession profession;
         private String name;
         private int id;
+        private EntityVillager.ITradeList[][] trades; // (dvatreknerd314) stores trades with career objects
         public VillagerCareer(VillagerProfession parent, String name)
         {
             this.profession = parent;
             this.name = name;
             parent.register(this);
         }
+        
+        // Returns static copy of trades available to this career - dvatreknerd314
+        public EntityVillager.ITradeList[][] getTrades()
+        {
+            return static trades;
+        }
 
         private VillagerCareer init(EntityVillager.ITradeList[][] traids)
         {
+            this.trades = traids;
             return this;
         }
 
@@ -307,12 +340,30 @@ public class VillagerRegistry
     public static void setRandomProfession(EntityVillager entity, Random rand)
     {
         Set<String> entries = INSTANCE.professions.getKeys();
-        int prof = rand.nextInt(entries.size());
-        //TODO: Grab id range from internal registry
-        entity.setProfession(rand.nextInt(5));
+        
+        // ===== Changes by dvatreknerd314 =====
+        // The goal here is to set the villager profession to a number between 0 and 5, but
+        // leaving non-vanilla options equally likely.
+        //
+        // If the profession is non-vanilla, the specific number selected is the (n-5)th key
+        // in the professions registry.
+        //
+        // at least, that's the goal
+        int prof = rand.nextInt(entries.size() + 5);
+        if (prof < 5)
+        {
+            entity.setProfession(prof);
+        }
+        else
+        {
+            entity.setProfession(entries[prof-5]);
+        }
+        // ===== End changes by dvatreknerd314 =====
     }
 
     //TODO: Figure out a good generic system for this. Put on hold for Patches.
+    
+    
 
     private static class VanillaTrades
     {
