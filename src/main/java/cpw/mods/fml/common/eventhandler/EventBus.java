@@ -121,9 +121,12 @@ public class EventBus implements IEventExceptionHandler
     public void unregister(Object object)
     {
         ArrayList<IEventListener> list = listeners.remove(object);
-        for (IEventListener listener : list)
+        if (list != null)
         {
-            ListenerList.unregisterAll(busID, listener);
+            for (IEventListener listener : list)
+            {
+                ListenerList.unregisterAll(busID, listener);
+            }
         }
     }
 
