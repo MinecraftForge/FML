@@ -586,13 +586,13 @@ public class NetworkDispatcher extends SimpleChannelInboundHandler<Packet> imple
         }
 
         @Override
-        public String getChannelName() // getChannel
+        public String getChannelName()
         {
             return this.channel;
         }
 
         @Override
-        public PacketBuffer getBufferData() // getData
+        public PacketBuffer getBufferData()
         {
             return this.data_buf;
         }
