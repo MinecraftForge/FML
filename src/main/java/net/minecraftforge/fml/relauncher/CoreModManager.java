@@ -185,7 +185,7 @@ public class CoreModManager {
         try
         {
             // Are we in a 'decompiled' environment?
-            byte[] bs = classLoader.getClassBytes("net.minecraft.world.World");
+            byte[] bs = classLoader.getClassBytes("net.minecraft.util.IRegistry");
             if (bs != null)
             {
                 FMLRelaunchLog.info("Managed to load a deobfuscated Minecraft name- we are in a deobfuscated environment. Skipping runtime deobfuscation");
