@@ -807,6 +807,16 @@ public class GameData {
 
         return blockId;
     }
+    
+    void registerBlockStates(Block block)
+    {
+        for (Object stateObject : block.getBlockState().getValidStates())
+        {
+        	IBlockState state = (IBlockState) stateObject;
+            int id = Block.blockRegistry.getIDForObject(block) << 4 | block.getMetaFromState(state);
+            Block.BLOCK_STATE_IDS.put(state, id);
+        }
+    }
 
     /**
      * Block the specified id from being reused.

@@ -18,8 +18,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.item.Item;
+import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
 
 public class ClientRegistry
 {
@@ -47,5 +51,55 @@ public class ClientRegistry
     public static void registerKeyBinding(KeyBinding key)
     {
         Minecraft.getMinecraft().gameSettings.keyBindings = ArrayUtils.add(Minecraft.getMinecraft().gameSettings.keyBindings, key);
+    }
+    
+    public void setItemModel(Item item, int meta, String model)
+    {
+        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, meta, new ModelResourceLocation(this.addPrefix(model), "inventory"));
+    }
+    
+    public void setItemModel(Item item, String model)
+    {
+        this.setItemModel(item, 0, model);
+    }
+
+    public void setBlockItemModel(Block block, int itemMeta, String model)
+    {
+        this.setItemModel(Item.getItemFromBlock(block), itemMeta, model);
+    }
+
+    public void setBlockItemModel(Block block, String model)
+    {
+        this.setBlockItemModel(block, 0, model);
+    }
+    
+    private String addPrefix(String name)
+    {
+        int index = name.lastIndexOf(':');
+        String oldPrefix = "";
+        String newPrefix = "";
+        
+        ModContainer mc = Loader.instance().activeModContainer();
+        if (mc != null)
+        {
+            newPrefix = mc.getModId();
+        }
+        else
+        {
+            newPrefix = "minecraft";
+        }
+
+        if (index != -1)
+        {
+            oldPrefix = name.substring(0, index);
+            name = name.substring(index + 1);
+        }
+
+        if (!oldPrefix.isEmpty())
+        {
+            newPrefix = oldPrefix;
+        }
+        
+        return newPrefix + ":" + name;
     }
 }
