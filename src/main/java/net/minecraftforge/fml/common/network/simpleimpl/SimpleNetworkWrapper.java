@@ -1,8 +1,10 @@
 package net.minecraftforge.fml.common.network.simpleimpl;
 
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 
 import java.util.EnumMap;
+import java.util.Map.Entry;
 
 import com.google.common.base.Throwables;
 
@@ -144,13 +146,31 @@ public class SimpleNetworkWrapper {
     private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addServerHandlerAfter(FMLEmbeddedChannel channel, String type, IMessageHandler<? super REQ, ? extends REPLY> messageHandler, Class<REQ> requestType)
     {
         SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.SERVER, requestType);
-        channel.pipeline().addAfter(type, messageHandler.getClass().getName(), handler);
+        channel.pipeline().addAfter(type, findNameFor(channel, messageHandler), handler);
     }
 
     private <REQ extends IMessage, REPLY extends IMessage, NH extends INetHandler> void addClientHandlerAfter(FMLEmbeddedChannel channel, String type, IMessageHandler<? super REQ, ? extends REPLY> messageHandler, Class<REQ> requestType)
     {
         SimpleChannelHandlerWrapper<REQ, REPLY> handler = getHandlerWrapper(messageHandler, Side.CLIENT, requestType);
-        channel.pipeline().addAfter(type, messageHandler.getClass().getName(), handler);
+        channel.pipeline().addAfter(type, findNameFor(channel, messageHandler), handler);
+    }
+    
+    private String findNameFor(FMLEmbeddedChannel channel, IMessageHandler<?, ?> handler)
+    {
+        int idx = 0;
+        for (Entry<String, ChannelHandler> entry : channel.pipeline())
+        {
+            if (!(entry.getValue() instanceof SimpleChannelHandlerWrapper))
+            {
+                continue;
+            }
+            SimpleChannelHandlerWrapper<?, ?> wrapper = (SimpleChannelHandlerWrapper<?, ?>) entry.getValue();
+            if (wrapper.messageHandler.getClass() == handler.getClass())
+            {
+                idx++;
+            }
+        }
+        return handler.getClass().getName() + (idx == 0 ? "" : idx);
     }
 
     private <REPLY extends IMessage, REQ extends IMessage> SimpleChannelHandlerWrapper<REQ, REPLY> getHandlerWrapper(IMessageHandler<? super REQ, ? extends REPLY> messageHandler, Side side, Class<REQ> requestType)
