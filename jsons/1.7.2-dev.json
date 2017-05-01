@@ -93,89 +93,16 @@
       "name": "org.apache.logging.log4j:log4j-core:2.0-beta9"
     },
     {
-      "name": "org.lwjgl.lwjgl:lwjgl:2.9.0",
-      "rules": [
-        {
-          "action": "allow"
-        },
-        {
-          "action": "disallow",
-          "os": {
-            "name": "osx"
-          }
-        }
-      ]
+      "name": "org.lwjgl.lwjgl:lwjgl:2.9.0"
     },
     {
-      "name": "org.lwjgl.lwjgl:lwjgl_util:2.9.0",
-      "rules": [
-        {
-          "action": "allow"
-        },
-        {
-          "action": "disallow",
-          "os": {
-            "name": "osx"
-          }
-        }
-      ]
+      "name": "org.lwjgl.lwjgl:lwjgl_util:2.9.0"
     },
     {
       "name": "org.lwjgl.lwjgl:lwjgl-platform:2.9.0",
-      "rules": [
-        {
-          "action": "allow"
-        },
-        {
-          "action": "disallow",
-          "os": {
-            "name": "osx"
-          }
-        }
-      ],
       "natives": {
         "linux": "natives-linux",
-        "windows": "natives-windows"
-      },
-      "extract": {
-        "exclude": [
-          "META-INF/"
-        ]
-      }
-    },
-    {
-      "name": "org.lwjgl.lwjgl:lwjgl:2.9.1-nightly-20131017",
-      "rules": [
-        {
-          "action": "allow",
-          "os": {
-            "name": "osx"
-          }
-        }
-      ]
-    },
-    {
-      "name": "org.lwjgl.lwjgl:lwjgl_util:2.9.1-nightly-20131017",
-      "rules": [
-        {
-          "action": "allow",
-          "os": {
-            "name": "osx"
-          }
-        }
-      ]
-    },
-    {
-      "name": "org.lwjgl.lwjgl:lwjgl-platform:2.9.1-nightly-20131017",
-      "rules": [
-        {
-          "action": "allow",
-          "os": {
-            "name": "osx"
-          }
-        }
-      ],
-      "natives": {
+        "windows": "natives-windows",
         "osx": "natives-osx"
       },
       "extract": {
